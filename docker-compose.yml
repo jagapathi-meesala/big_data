@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: aid_dras_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: aid_dras
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: aid_dras_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    restart: always
+
+  ai-service:
+    build: ./ai-service
+    container_name: aid_dras_ai_service
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/aid_dras
+      - REDIS_URL=redis://redis:6379/0
+      - BACKEND_API_URL=http://backend:5000/api/v1
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: aid_dras_namenode
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    environment:
+      - CLUSTER_NAME=aid_dras_hadoop
+    env_file:
+      - ./bigdata/configs/hadoop.env
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    restart: always
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: aid_dras_datanode
+    ports:
+      - "9864:9864"
+    environment:
+      - SERVICE_PRECONDITION=namenode:9000
+    env_file:
+      - ./bigdata/configs/hadoop.env
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    depends_on:
+      - namenode
+    restart: always
+
+  spark-master:
+    image: bde2020/spark-master:3.1.1-hadoop3.2
+    container_name: aid_dras_spark_master
+    ports:
+      - "8082:8080"
+      - "7077:7077"
+    environment:
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
+    restart: always
+
+  spark-worker:
+    image: bde2020/spark-worker:3.1.1-hadoop3.2
+    container_name: aid_dras_spark_worker
+    ports:
+      - "8083:8081"
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    restart: always
+
+volumes:
+  pgdata:
+  redisdata:
+  hadoop_namenode:
+  hadoop_datanode:
