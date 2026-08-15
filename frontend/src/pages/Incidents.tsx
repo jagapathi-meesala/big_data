@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Plus, Search, Trash2, Edit2 } from 'lucide-react';
 import api from '../services/api';
 
@@ -133,6 +134,19 @@ export const Incidents: React.FC = () => {
           <Plus size={16} />
           <span>Report Incident</span>
         </button>
+      </div>
+
+      {/* Sub-navigation tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
+        <Link to="/sos-requests" className="pb-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+          SOS Requests
+        </Link>
+        <Link to="/incidents" className="border-b-2 border-brand-500 pb-3 text-brand-500">
+          Incidents Log
+        </Link>
+        <Link to="/weather" className="pb-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+          Weather Alerts
+        </Link>
       </div>
 
       {/* Filters bar */}

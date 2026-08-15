@@ -7,6 +7,7 @@ import Resource, { ResourceStatus } from '../models/Resource';
 import { AuthenticatedRequest } from '../middlewares/auth';
 import logger from '../config/logger';
 import axios from 'axios';
+import { createSystemNotification } from '../services/notificationService';
 
 async function getRoadRoute(startCoords: [number, number], endCoords: [number, number]): Promise<any> {
   try {
@@ -79,15 +80,11 @@ export const optimizeAllocation = async (
 
       const resourceName = closestResource.name || closestResource.getDataValue('name') || closestResource.type || closestResource.getDataValue('type');
       const incidentTitle = incident.title || incident.getDataValue('title');
-      await sequelize.query(`
-        INSERT INTO system_notifications (title, message, type, "createdAt", "updatedAt")
-        VALUES (:title, :message, 'SUCCESS', NOW(), NOW());
-      `, {
-        replacements: {
-          title: 'Resource Dispatched',
-          message: `Resource '${resourceName}' allocated & routed to incident '${incidentTitle}'.`
-        }
-      });
+      await createSystemNotification(
+        'Resource Dispatched',
+        `Resource '${resourceName}' allocated & routed to incident '${incidentTitle}'.`,
+        'SUCCESS'
+      );
 
       return {
         allocation,

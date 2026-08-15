@@ -1,10 +1,14 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import { DisasterTrendsChart, ResourceAvailabilityChart, SeverityDistributionChart, VehicleAvailabilityChart } from '../components/DisasterCharts';
 import api from '../services/api';
 import { Cpu, Brain, Sparkles, AlertTriangle, CheckCircle2, Info, ChevronRight, Activity, TrendingUp, Layers } from 'lucide-react';
 
 export const Analytics: React.FC = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
   const [simDays, setSimDays] = React.useState(30);
 
   const { data: stats, isLoading } = useQuery(['analytics-stats'], async () => {
@@ -95,6 +99,24 @@ export const Analytics: React.FC = () => {
           <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Analytics & Predictions Panel</h1>
           <p className="text-sm opacity-60">System efficiency, demand forecasts, and historical logs.</p>
         </div>
+      </div>
+
+      {/* Sub-navigation tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
+        <Link to="/analytics" className="border-b-2 border-brand-500 pb-3 text-brand-500">
+          AI Forecasts
+        </Link>
+        <Link to="/volunteers" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          Volunteers List
+        </Link>
+        <Link to="/reports" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          System Reports
+        </Link>
+        {user?.role === 'ADMIN' && (
+          <Link to="/admin" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+            Admin Panel
+          </Link>
+        )}
       </div>
 
       {isLoading ? (

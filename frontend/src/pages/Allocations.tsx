@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Play, Check, XCircle, Clock } from 'lucide-react';
 import api from '../services/api';
 
@@ -83,6 +84,22 @@ export const Allocations: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">AI & Geospatial Resource Allocation</h1>
         <p className="text-sm opacity-60">Execute dispatch solvers, monitor active supply routes, and track audit logs.</p>
+      </div>
+
+      {/* Sub-navigation tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
+        <Link to="/resources" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          Supply Stocks
+        </Link>
+        <Link to="/hospitals" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          Hospitals
+        </Link>
+        <Link to="/shelters" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          Refuge Shelters
+        </Link>
+        <Link to="/allocations" className="border-b-2 border-brand-500 pb-3 text-brand-500">
+          Resource Allocations
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

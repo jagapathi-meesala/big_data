@@ -24,6 +24,7 @@ import weatherRoutes from './routes/weatherRoutes';
 import reportRoutes from './routes/reportRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import helmet from 'helmet';
+import { syncGDACSDisasters } from './services/gdacsService';
 import rateLimit from 'express-rate-limit';
 import { auditLogger } from './middlewares/auditLogger';
 
@@ -95,6 +96,14 @@ const startServer = async () => {
     await sequelize.sync({ alter: true });
     logger.info('Database tables synchronized successfully.');
     await seedDatabase();
+    
+    // Ingest live real-world disasters on startup
+    await syncGDACSDisasters();
+    
+    // Set up recurring sync every 30 minutes
+    setInterval(async () => {
+      await syncGDACSDisasters();
+    }, 30 * 60 * 1000);
   } catch (error) {
     logger.error(`Database synchronization failed: ${error}`);
   }

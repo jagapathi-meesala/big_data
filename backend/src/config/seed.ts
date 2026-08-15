@@ -410,12 +410,8 @@ export const seedDatabase = async () => {
       );
     `);
     
-    await sequelize.query(`
-      INSERT INTO system_notifications (title, message, type, "createdAt", "updatedAt") VALUES
-      ('New Hospital Beds Registered', 'Gandhi Medical College has registered 150 new ICU bed capacities in Secunderabad.', 'INFO', NOW() - INTERVAL '1 hour', NOW() - INTERVAL '1 hour'),
-      ('AI Optimization Triggered', 'Disaster responder solver mapped closest beds to Health Alert incident in Guntur.', 'SUCCESS', NOW() - INTERVAL '30 minutes', NOW() - INTERVAL '30 minutes'),
-      ('Weather Warning Issued', 'Heavy rainfall forecast (120mm) issued for coastal districts of Visakhapatnam.', 'WARNING', NOW() - INTERVAL '10 minutes', NOW() - INTERVAL '10 minutes');
-    `);
+    // Clear notifications log to allow real-time events to build up naturally
+    await sequelize.query(`TRUNCATE TABLE system_notifications;`);
     console.log('System notifications seeded.');
     console.log('All dataset-driven database records seeded successfully.');
   } catch (error) {

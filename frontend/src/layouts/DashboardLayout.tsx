@@ -7,7 +7,7 @@ import { toggleTheme, initializeTheme } from '../store/slices/themeSlice';
 import {
   Menu, Sun, Moon, LogOut, LayoutDashboard, MapPin, AlertTriangle, Shield,
   Workflow, Activity, CloudRain, Bell, User as UserIcon, Settings, FileText,
-Users, Home, Building2, AlertOctagon, ShieldCheck
+  Users, Home, Building2, AlertOctagon, ShieldCheck, ChevronDown, ChevronRight
 } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
@@ -30,26 +30,11 @@ export const DashboardLayout: React.FC = () => {
 
   const navigationItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Live Map', path: '/live-map', icon: MapPin },
-    { name: 'Incidents', path: '/incidents', icon: AlertTriangle },
-    { name: 'Resources', path: '/resources', icon: Shield },
-    { name: 'Allocations', path: '/allocations', icon: Workflow },
-
-    { name: 'Hospitals', path: '/hospitals', icon: Building2 },
-    { name: 'Shelters', path: '/shelters', icon: Home },
-    { name: 'Volunteers', path: '/volunteers', icon: Users },
+    { name: 'Disaster Map', path: '/live-map', icon: MapPin },
     { name: 'SOS Requests', path: '/sos-requests', icon: AlertOctagon },
-    { name: 'Weather Alerts', path: '/weather', icon: CloudRain },
+    { name: 'Resources', path: '/resources', icon: Shield },
     { name: 'Analytics', path: '/analytics', icon: Activity },
-    { name: 'Reports', path: '/reports', icon: FileText },
-    { name: 'Notifications', path: '/notifications', icon: Bell },
-    { name: 'Profile', path: '/profile', icon: UserIcon },
-    { name: 'Settings', path: '/settings', icon: Settings },
   ];
-
-  if (user?.role === 'ADMIN') {
-    navigationItems.push({ name: 'Admin Panel', path: '/admin', icon: ShieldCheck });
-  }
 
   return (
     <div className={`min-h-screen flex ${darkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-55 text-slate-800'}`}>
@@ -66,7 +51,14 @@ export const DashboardLayout: React.FC = () => {
         <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
           {navigationItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = location.pathname === item.path || (
+              item.name === 'Resources' && ['/hospitals', '/shelters', '/allocations'].includes(location.pathname)
+            ) || (
+              item.name === 'SOS Requests' && ['/incidents', '/weather'].includes(location.pathname)
+            ) || (
+              item.name === 'Analytics' && ['/volunteers', '/reports', '/admin'].includes(location.pathname)
+            );
+            
             return (
               <Link
                 key={item.name}

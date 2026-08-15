@@ -53,6 +53,15 @@ export const initSockets = async (server: HttpServer) => {
         console.error('Failed parsing subscription incident event:', err);
       }
     });
+
+    await subClient.subscribe('notification:events', (message: string) => {
+      try {
+        const data = JSON.parse(message);
+        io.emit('new_notification', data);
+      } catch (err) {
+        console.error('Failed parsing subscription notification event:', err);
+      }
+    });
   } catch (err) {
     console.error('Redis subscription setup failed:', err);
   }

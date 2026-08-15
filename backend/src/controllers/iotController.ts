@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { sequelize } from '../config/db';
 import logger from '../config/logger';
+import { createSystemNotification } from '../services/notificationService';
 
 const checkTable = async () => {
   await sequelize.query(`
@@ -49,6 +50,11 @@ export const receiveTelemetry = async (req: Request, res: Response) => {
 
     if (value > 15.0) {
       logger.warn(`[WARNING] IoT Sensor ${deviceId} reported critical alert value: ${value}`);
+      await createSystemNotification(
+        'IoT Alert Triggered',
+        `Sensor '${deviceId}' reported critical warning telemetry value: ${value}.`,
+        'WARNING'
+      );
     }
 
     return res.status(200).json({ message: 'Telemetry processed successfully.' });

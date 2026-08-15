@@ -1,9 +1,13 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import { Shield, Phone, MapPin, Award, CheckCircle } from 'lucide-react';
 import api from '../services/api';
 
 export const Volunteers: React.FC = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
   const { data, isLoading } = useQuery(['volunteers-list'], async () => {
     const res = await api.get('/users', { params: { role: 'VOLUNTEER', limit: 1000 } });
     return res.data;
@@ -14,6 +18,24 @@ export const Volunteers: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Active Volunteer Directory</h1>
         <p className="text-sm opacity-60">Registered volunteers, contact numbers, and assignment statuses.</p>
+      </div>
+
+      {/* Sub-navigation tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
+        <Link to="/analytics" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          AI Forecasts
+        </Link>
+        <Link to="/volunteers" className="border-b-2 border-brand-500 pb-3 text-brand-500">
+          Volunteers List
+        </Link>
+        <Link to="/reports" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          System Reports
+        </Link>
+        {user?.role === 'ADMIN' && (
+          <Link to="/admin" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+            Admin Panel
+          </Link>
+        )}
       </div>
 
       {isLoading ? (

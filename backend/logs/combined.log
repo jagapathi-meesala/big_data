@@ -4892,3 +4892,540 @@ Stack: Error:
 [2026-07-25 14:57:38:5738] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
 [2026-07-25 14:57:38:5738] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
 [2026-07-25 14:58:07:587] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:58:08:588] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:58:08:588] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:58:08:588] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:58:17:5817] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:58:17:5817] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:58:27:5827] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:58:38:5838] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:59:09:599] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:59:10:5910] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:59:10:5910] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 14:59:10:5910] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:00:11:011] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:00:11:011] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:00:11:011] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:02:09:29] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:02:10:210] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:12:312] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:12:312] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:12:312] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:20:320] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:22:322] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:22:322] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:22:322] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:41:341] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:42:342] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:42:342] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:03:42:342] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:04:11:411] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:04:13:413] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:04:13:413] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:04:13:413] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:04:21:421] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:04:22:422] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:06:03:63] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:06:03:63] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:06:03:63] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:06:21:621] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:06:22:622] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:06:31:631] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:06:41:641] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:07:05:75] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:07:05:75] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:07:05:75] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:07:14:714] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:07:15:715] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:07:15:715] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:07:15:715] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:08:52:852] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:08:54:854] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:08:55:855] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:08:55:855] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:08:55:855] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:09:02:92] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:10:35:1035] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-25 15:11:45:1145] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:54:35:5435] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-07-27 19:54:35:5435] [[32minfo[39m]: [32mBackend server is running on port 5000 in development mode.[39m
+[2026-07-27 19:55:10:5510] [[32minfo[39m]: [32mHTTP POST /api/v1/auth/login - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:10:5510] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:10:5510] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:10:5510] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:10:5510] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:11:5511] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:21:5521] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:21:5521] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:21:5521] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:21:5521] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:55:21:5521] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:57:21:5721] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:58:33:5833] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?search=&severity=&page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:58:34:5834] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:58:35:5835] [[32minfo[39m]: [32mHTTP GET /api/v1/weather/live - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 16.5062, 80.648[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 16.9891, 81.7835[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 17.9689, 79.5941[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 16.3067, 80.4365[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 15.5057, 80.0499[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 18.1124, 83.3956[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 17.385, 78.4867[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 15.8281, 78.0373[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 14.4673, 78.8242[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 17.6868, 83.2185[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 14.6819, 77.6006[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 17.2473, 80.1514[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 16.7104, 81.1035[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 18.6725, 78.0941[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 14.4426, 79.9865[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 17.15, 79.62[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 18.4386, 79.1288[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 18.2949, 83.8938[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 17.67, 80.89[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 17.6167, 78.0833[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 16.7333, 77.9833[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 17.0575, 79.2684[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 13.6284, 79.4192[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 19.6641, 78.532[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[32minfo[39m]: [32mWeather history persisted successfully for location: 16.989, 82.2475[39m
+[2026-07-27 19:58:37:5837] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:37:5837] [[32minfo[39m]: [32mWeather history persisted successfully for location: 18.1018, 78.852[39m
+[2026-07-27 19:58:38:5838] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=&page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:58:40:5840] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:58:42:5842] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:58:44:5844] [[32minfo[39m]: [32mHTTP GET /api/v1/users?page=1&limit=10 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:35:5935] [[32minfo[39m]: [32mHTTP GET /api/v1/users?page=1&limit=10 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/active - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=AMBULANCE&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:50:5950] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:52:5952] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:54:5954] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=&page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 19:59:55:5955] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:04:16:416] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:04:27:427] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:04:35:435] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:34:534] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:34:534] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:34:534] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:35:535] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:35:535] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:35:535] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:35:535] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/active - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:35:535] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:35:535] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:35:535] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=AMBULANCE&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:35:535] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:37:537] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:38:538] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=&page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:40:540] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:44:544] [[32minfo[39m]: [32mHTTP GET /api/v1/notifications - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:52:552] [[32minfo[39m]: [32mHTTP PUT /api/v1/users/profile - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:55:555] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=&page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:57:557] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:58:558] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:59:559] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/active - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:59:559] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:05:59:559] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/history?page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:08:68] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:08:68] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/active - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:08:68] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:08:68] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:08:68] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=AMBULANCE&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:08:68] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:21:621] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:25:625] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=&page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:30:630] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:06:32:632] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:26:726] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=&page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:32:732] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/active - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:32:732] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/history?page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:32:732] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:33:733] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:34:734] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:38:738] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:40:740] [[32minfo[39m]: [32mHTTP PATCH /api/v1/incidents/342b0a0f-b3f2-4bcc-b501-c2af3dcdbe38/status - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:40:740] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:40:740] [[32minfo[39m]: [32mHTTP PATCH /api/v1/incidents/342b0a0f-b3f2-4bcc-b501-c2af3dcdbe38/status - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:40:740] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:40:740] [[32minfo[39m]: [32mHTTP PATCH /api/v1/incidents/342b0a0f-b3f2-4bcc-b501-c2af3dcdbe38/status - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:40:740] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:42:742] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/active - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:42:742] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:42:742] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:42:742] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:42:742] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=AMBULANCE&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:42:742] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:43:743] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:43:743] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:43:743] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:43:743] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:43:743] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:53:753] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:53:753] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:54:754] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:54:754] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:07:54:754] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:03:83] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:04:84] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:04:84] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:04:84] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:04:84] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:14:814] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:14:814] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:14:814] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:14:814] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:14:814] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:18:818] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:19:819] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=&page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:08:21:821] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:09:11:911] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:09:12:912] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:09:19:919] [[32minfo[39m]: [32mHTTP GET /api/v1/users?page=1&limit=10 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:09:21:921] [[32minfo[39m]: [32mHTTP GET /api/v1/users?page=1&limit=10 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:09:54:954] [[32minfo[39m]: [32mHTTP GET /api/v1/reports/pdf?timeframe=daily - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:07:107] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=&page=1&limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:10:1010] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:11:1011] [[32minfo[39m]: [32mHTTP GET /api/v1/notifications - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:17:1017] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:17:1017] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:17:1017] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/active - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:17:1017] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:17:1017] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:17:1017] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=AMBULANCE&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:17:1017] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:19:1019] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:19:1019] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:19:1019] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:19:1019] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:19:1019] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:29:1029] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:29:1029] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:29:1029] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:29:1029] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:10:29:1029] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:22:22:2222] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:22:23:2223] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:22:23:2223] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:22:24:2224] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:23:00:230] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:25:39:2539] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:25:41:2541] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:25:52:2552] [[32minfo[39m]: [32mHTTP POST /api/v1/auth/login - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:25:52:2552] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=16 - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:28:13:2813] [[32minfo[39m]: [32mHTTP POST /api/v1/auth/login - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 20:28:13:2813] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 21:49:02:492] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 21:59:23:5923] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-07-27 22:12:59:1259] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:01:12:112] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:01:14:114] [[32minfo[39m]: [32mBackend server is running on port 5000 in development mode.[39m
+[2026-08-15 14:01:54:154] [[32minfo[39m]: [32mHTTP POST /api/v1/auth/login - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:01:54:154] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:01:54:154] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:01:54:154] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:01:54:154] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:01:54:154] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:00:20] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/active - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:00:20] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:00:20] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:00:20] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:00:20] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=AMBULANCE&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:00:20] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:01:21] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?severity=CRITICAL&limit=100 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:03:23] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:03:23] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:03:23] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:03:23] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:03:23] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:13:213] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:13:213] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:13:213] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:13:213] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:13:213] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:23:223] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:23:223] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:23:223] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:23:223] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:23:223] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:33:233] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:33:233] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:33:233] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:33:233] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:33:233] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:43:243] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:43:243] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:43:243] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:43:243] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:44:244] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:53:253] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:53:253] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:54:254] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:54:254] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:54:254] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:02:55:255] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:05:05:55] [[32minfo[39m]: [32mHTTP POST /api/v1/auth/login - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:05:06:56] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=16 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:32:34:3234] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:32:36:3236] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:33:27:3327] [[32minfo[39m]: [32m[GDACS Sync] Completed. Ingested 22 new real-world active disasters.[39m
+[2026-08-15 14:33:27:3327] [[32minfo[39m]: [32mBackend server is running on port 5000 in development mode.[39m
+[2026-08-15 14:33:54:3354] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:33:56:3356] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:34:20:3420] [[32minfo[39m]: [32m[GDACS Sync] Completed. Ingested 22 new real-world active disasters.[39m
+[2026-08-15 14:34:20:3420] [[32minfo[39m]: [32mBackend server is running on port 5000 in development mode.[39m
+[2026-08-15 14:34:29:3429] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:36:02:362] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:36:08:368] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:36:11:3611] [[32minfo[39m]: [32mHTTP GET /api/v1/users?page=1&limit=10 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:36:14:3614] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:37:33:3733] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:37:33:3733] [[32minfo[39m]: [32mHTTP GET /api/v1/allocations/active - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:37:34:3734] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:37:34:3734] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:37:34:3734] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=AMBULANCE&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:37:34:3734] [[32minfo[39m]: [32mHTTP GET /api/v1/users?role=VOLUNTEER&limit=1000 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:39:26:3926] [[32minfo[39m]: [32mHTTP GET /api/v1/notifications - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:39:31:3931] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:39:33:3933] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:40:15:4015] [[32minfo[39m]: [32m[GDACS Sync] Completed. Ingested 0 new real-world active disasters.[39m
+[2026-08-15 14:40:15:4015] [[32minfo[39m]: [32mBackend server is running on port 5000 in development mode.[39m
+[2026-08-15 14:41:02:412] [[32minfo[39m]: [32mHTTP GET /api/v1/analytics/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:43:29:4329] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:43:29:4329] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:43:29:4329] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:43:29:4329] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:43:29:4329] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:43:37:4337] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:43:41:4341] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:43:43:4343] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:44:02:442] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:44:04:444] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:44:12:4412] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:44:14:4414] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:44:21:4421] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:44:22:4422] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:44:41:4441] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:44:42:4442] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:44:49:4449] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:44:53:4453] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:44:55:4455] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:45:29:4529] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:45:31:4531] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:45:50:4550] [[32minfo[39m]: [32m[GDACS Sync] Completed. Ingested 0 new real-world active disasters.[39m
+[2026-08-15 14:45:50:4550] [[32minfo[39m]: [32mBackend server is running on port 5000 in development mode.[39m
+[2026-08-15 14:45:54:4554] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:45:54:4554] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:45:54:4554] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:45:54:4554] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:45:54:4554] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:04:464] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:04:464] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:04:464] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:04:464] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:04:464] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:14:4614] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:14:4614] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:14:4614] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:14:4614] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:14:4614] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:24:4624] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:24:4624] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:24:4624] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:25:4625] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:25:4625] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:35:4635] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:35:4635] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:35:4635] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:35:4635] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:35:4635] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:45:4645] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:45:4645] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:45:4645] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:45:4645] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:45:4645] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:55:4655] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:55:4655] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:56:4656] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:56:4656] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:46:56:4656] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:47:04:474] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:47:05:475] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m
+[2026-08-15 14:47:33:4733] [[32minfo[39m]: [32m[GDACS Sync] Completed. Ingested 0 new real-world active disasters.[39m
+[2026-08-15 14:47:33:4733] [[32minfo[39m]: [32m[Weather Sync] Querying live Open-Meteo weather parameters for AP & Telangana...[39m
+[2026-08-15 14:47:54:4754] [[33mwarn[39m]: [33m[Weather Sync] Failed fetching live weather for Kakinada: timeout of 4000ms exceeded[39m
+[2026-08-15 14:48:00:480] [[33mwarn[39m]: [33m[Weather Sync] Failed fetching live weather for Eluru: timeout of 4000ms exceeded[39m
+[2026-08-15 14:48:08:488] [[33mwarn[39m]: [33m[Weather Sync] Failed fetching live weather for Suryapet: timeout of 4000ms exceeded[39m
+[2026-08-15 14:48:16:4816] [[32minfo[39m]: [32m[Weather Sync] Completed. Ingested 20 new real-time weather incidents.[39m
+[2026-08-15 14:48:16:4816] [[32minfo[39m]: [32mBackend server is running on port 5000 in development mode.[39m
+[2026-08-15 14:48:23:4823] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:23:4823] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:23:4823] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:23:4823] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:23:4823] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:33:4833] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:33:4833] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:33:4833] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:33:4833] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:33:4833] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:43:4843] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:43:4843] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:43:4843] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:44:4844] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:44:4844] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:53:4853] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:53:4853] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:54:4854] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:54:4854] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:48:54:4854] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:03:493] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:03:493] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:04:494] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:04:494] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:04:494] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:13:4913] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:13:4913] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:14:4914] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:14:4914] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:14:4914] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:23:4923] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:23:4923] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:24:4924] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:24:4924] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:24:4924] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:33:4933] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:33:4933] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:34:4934] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:34:4934] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:34:4934] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:43:4943] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:43:4943] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:44:4944] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:44:4944] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:45:4945] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:53:4953] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:54:4954] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:55:4955] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:55:4955] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:49:55:4955] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:03:503] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:04:504] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:05:505] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:05:505] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:05:505] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:13:5013] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:14:5014] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:15:5015] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:15:5015] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:15:5015] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:23:5023] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:24:5024] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:25:5025] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:25:5025] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:25:5025] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:33:5033] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:34:5034] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:35:5035] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:35:5035] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:35:5035] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:43:5043] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:44:5044] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:45:5045] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:45:5045] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:45:5045] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:53:5053] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:54:5054] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:56:5056] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:56:5056] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:50:56:5056] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:04:514] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:04:514] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:06:516] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:06:516] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:06:516] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:14:5114] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:14:5114] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:16:5116] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:16:5116] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:16:5116] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:24:5124] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:24:5124] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:26:5126] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:26:5126] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:26:5126] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:34:5134] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:34:5134] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:36:5136] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:36:5136] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:36:5136] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:44:5144] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:44:5144] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:46:5146] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:46:5146] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:46:5146] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:54:5154] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:54:5154] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:56:5156] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:57:5157] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:51:57:5157] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:04:524] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:04:524] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:07:527] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:07:527] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:07:527] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:14:5214] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:14:5214] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:17:5217] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:17:5217] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:17:5217] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:24:5224] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:25:5225] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:27:5227] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:27:5227] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:27:5227] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:34:5234] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:35:5235] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:37:5237] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:37:5237] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:37:5237] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:44:5244] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:45:5245] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:47:5247] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:47:5247] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:47:5247] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:54:5254] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:55:5255] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:57:5257] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:57:5257] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:52:57:5257] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:04:534] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:05:535] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:07:537] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:07:537] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:08:538] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:14:5314] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:15:5315] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:18:5318] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:18:5318] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:18:5318] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:24:5324] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:25:5325] [[32minfo[39m]: [32mHTTP GET /api/v1/dashboard/stats - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:28:5328] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:28:5328] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=HOSPITAL_BED&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:28:5328] [[32minfo[39m]: [32mHTTP GET /api/v1/resources?type=SHELTER_CAPACITY&limit=50 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:34:5334] [[32minfo[39m]: [32mHTTP GET /api/v1/incidents?limit=5 - IP: ::ffff:127.0.0.1[39m
+[2026-08-15 14:53:41:5341] [[32minfo[39m]: [32mDatabase tables synchronized successfully.[39m
+[2026-08-15 14:53:43:5343] [[32minfo[39m]: [32m[GDACS Sync] Querying live GeoJSON disaster feed...[39m

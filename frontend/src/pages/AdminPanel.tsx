@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Trash2, ShieldAlert, UserPlus, X } from 'lucide-react';
 import api from '../services/api';
 
@@ -107,6 +108,22 @@ export const AdminPanel: React.FC = () => {
           <UserPlus size={14} />
           <span>Add User</span>
         </button>
+      </div>
+
+      {/* Sub-navigation tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
+        <Link to="/analytics" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          AI Forecasts
+        </Link>
+        <Link to="/volunteers" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          Volunteers List
+        </Link>
+        <Link to="/reports" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          System Reports
+        </Link>
+        <Link to="/admin" className="border-b-2 border-brand-500 pb-3 text-brand-500">
+          Admin Panel
+        </Link>
       </div>
 
       {isLoading ? (

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Building2, Bed, MapPin } from 'lucide-react';
 import api from '../services/api';
 
@@ -14,6 +15,22 @@ export const Hospitals: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Hospitals & Trauma Centers</h1>
         <p className="text-sm opacity-60">Emergency bed capacities and regional coordinates.</p>
+      </div>
+
+      {/* Sub-navigation tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
+        <Link to="/resources" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          Supply Stocks
+        </Link>
+        <Link to="/hospitals" className="border-b-2 border-brand-500 pb-3 text-brand-500">
+          Hospitals
+        </Link>
+        <Link to="/shelters" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          Refuge Shelters
+        </Link>
+        <Link to="/allocations" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
+          Resource Allocations
+        </Link>
       </div>
 
       {isLoading ? (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AlertOctagon, ShieldCheck, MapPin, Radio, Activity } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { useSocket } from '../hooks/useSocket';
 
@@ -97,6 +98,19 @@ export const EmergencyRequests: React.FC = () => {
             <div className="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
           </label>
         </div>
+      </div>
+
+      {/* Sub-navigation tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
+        <Link to="/sos-requests" className="border-b-2 border-brand-500 pb-3 text-brand-500">
+          SOS Requests
+        </Link>
+        <Link to="/incidents" className="pb-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+          Incidents Log
+        </Link>
+        <Link to="/weather" className="pb-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+          Weather Alerts
+        </Link>
       </div>
 
       {/* Summary KPI Strip */}

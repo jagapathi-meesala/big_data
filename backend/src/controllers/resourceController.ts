@@ -4,6 +4,7 @@ import { sequelize } from '../config/db';
 import { redisClient } from '../config/redis';
 import Resource, { ResourceStatus } from '../models/Resource';
 import { AuthenticatedRequest } from '../middlewares/auth';
+import { createSystemNotification } from '../services/notificationService';
 
 export const createResource = async (
   req: AuthenticatedRequest,
@@ -50,6 +51,13 @@ export const createResource = async (
     } catch (redisErr) {
       console.error('Redis GEOADD failed:', redisErr);
     }
+
+    // Trigger live system notification
+    await createSystemNotification(
+      'New Hospital Beds Registered',
+      `${resource.name || resource.type} has registered ${resource.quantity} new capacities.`,
+      'INFO'
+    );
 
     res.status(201).json({
       message: 'Resource registered successfully.',
@@ -143,6 +151,13 @@ export const updateResource = async (
     }
 
     await resource.save();
+
+    // Trigger live system notification
+    await createSystemNotification(
+      'Hospital Capacity Updated',
+      `${resource.name || resource.type} updated capacity to ${resource.quantity} units.`,
+      'INFO'
+    );
 
     res.status(200).json({
       message: 'Resource updated successfully.',
