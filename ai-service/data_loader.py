@@ -2,15 +2,17 @@ import os
 import glob
 import pandas as pd
 import psycopg2
+from pathlib import Path
 from app.config import DATABASE_URL
 
-DATASETS_DIR = "/home/jagapathi/Downloads/big/datasets"
+# Dynamic path resolution
+DATASETS_DIR = Path(__file__).resolve().parents[2] / "datasets"
 
 def scan_csv_datasets():
     """
     Scans the datasets directory recursively and loads CSV files.
     """
-    csv_files = glob.glob(os.path.join(DATASETS_DIR, "**/*.csv"), recursive=True)
+    csv_files = glob.glob(os.path.join(str(DATASETS_DIR), "**/*.csv"), recursive=True)
     datasets = {}
     
     for file_path in csv_files:
@@ -40,7 +42,6 @@ def load_incidents_from_db():
         query = "SELECT id, title, description, severity, status, disaster_type, geom, created_at FROM incidents;"
         df = pd.read_sql_query(query, conn)
         conn.close()
-        # Extract coordinates from GeoJSON/Geometry column if possible
         return df
     except Exception as e:
         print(f"PostgreSQL connection failed, using fallback mock: {e}")

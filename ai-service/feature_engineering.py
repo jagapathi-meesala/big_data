@@ -1,18 +1,19 @@
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from data_loader import scan_csv_datasets
 
-TRAINING_DIR = "/home/jagapathi/Downloads/big/datasets/training"
+TRAINING_DIR = Path(__file__).resolve().parents[1] / "datasets" / "training"
+os.makedirs(TRAINING_DIR, exist_ok=True)
 
 def build_master_dataset():
-    os.makedirs(TRAINING_DIR, exist_ok=True)
     datasets = scan_csv_datasets()
     
     disaster_df = datasets.get("disasterIND.csv")
     records = []
     
-    # Process historical EM-DAT rows
+    # Process historical EM-DAT rows if available
     if disaster_df is not None:
         for _, row in disaster_df.iterrows():
             d_type = str(row.get("Disaster Type", "FLOOD")).upper()
@@ -25,41 +26,13 @@ def build_master_dataset():
             
             # Map features to logical severity labels
             if d_type == "FLOOD":
-                if rainfall > 200:
-                    severity = "CRITICAL"
-                elif rainfall > 120:
-                    severity = "HIGH"
-                elif rainfall > 70:
-                    severity = "MEDIUM"
-                else:
-                    severity = "LOW"
+                severity = "CRITICAL" if rainfall > 200 else ("HIGH" if rainfall > 120 else ("MEDIUM" if rainfall > 70 else "LOW"))
             elif d_type == "STORM":
-                if wind_speed > 100:
-                    severity = "CRITICAL"
-                elif wind_speed > 75:
-                    severity = "HIGH"
-                elif wind_speed > 45:
-                    severity = "MEDIUM"
-                else:
-                    severity = "LOW"
+                severity = "CRITICAL" if wind_speed > 100 else ("HIGH" if wind_speed > 75 else ("MEDIUM" if wind_speed > 45 else "LOW"))
             elif d_type == "FIRE":
-                if temp > 90:
-                    severity = "CRITICAL"
-                elif temp > 78:
-                    severity = "HIGH"
-                elif temp > 65:
-                    severity = "MEDIUM"
-                else:
-                    severity = "LOW"
+                severity = "CRITICAL" if temp > 90 else ("HIGH" if temp > 78 else ("MEDIUM" if temp > 65 else "LOW"))
             else:
-                if pop_density > 1100:
-                    severity = "CRITICAL"
-                elif pop_density > 750:
-                    severity = "HIGH"
-                elif pop_density > 350:
-                    severity = "MEDIUM"
-                else:
-                    severity = "LOW"
+                severity = "CRITICAL" if pop_density > 1100 else ("HIGH" if pop_density > 750 else ("MEDIUM" if pop_density > 350 else "LOW"))
                 
             records.append({
                 "disaster_type": d_type,
@@ -79,7 +52,7 @@ def build_master_dataset():
                 "rescue_time_mins": np.random.uniform(15, 180)
             })
             
-    # Fallback to create synthetic records if datasets are empty or corrupt
+    # Synthetic records fallback
     if not records:
         print("Historical dataset empty or corrupt, generating synthetic master data.")
         for _ in range(500):
@@ -90,43 +63,14 @@ def build_master_dataset():
             temp = np.random.uniform(50, 110)
             humidity = np.random.uniform(80, 100) if d_type == "FLOOD" else np.random.uniform(20, 80)
             
-            # Map features to logical severity labels
             if d_type == "FLOOD":
-                if rainfall > 200:
-                    severity = "CRITICAL"
-                elif rainfall > 120:
-                    severity = "HIGH"
-                elif rainfall > 70:
-                    severity = "MEDIUM"
-                else:
-                    severity = "LOW"
+                severity = "CRITICAL" if rainfall > 200 else ("HIGH" if rainfall > 120 else ("MEDIUM" if rainfall > 70 else "LOW"))
             elif d_type == "STORM":
-                if wind_speed > 100:
-                    severity = "CRITICAL"
-                elif wind_speed > 75:
-                    severity = "HIGH"
-                elif wind_speed > 45:
-                    severity = "MEDIUM"
-                else:
-                    severity = "LOW"
+                severity = "CRITICAL" if wind_speed > 100 else ("HIGH" if wind_speed > 75 else ("MEDIUM" if wind_speed > 45 else "LOW"))
             elif d_type == "FIRE":
-                if temp > 90:
-                    severity = "CRITICAL"
-                elif temp > 78:
-                    severity = "HIGH"
-                elif temp > 65:
-                    severity = "MEDIUM"
-                else:
-                    severity = "LOW"
+                severity = "CRITICAL" if temp > 90 else ("HIGH" if temp > 78 else ("MEDIUM" if temp > 65 else "LOW"))
             else:
-                if pop_density > 1100:
-                    severity = "CRITICAL"
-                elif pop_density > 750:
-                    severity = "HIGH"
-                elif pop_density > 350:
-                    severity = "MEDIUM"
-                else:
-                    severity = "LOW"
+                severity = "CRITICAL" if pop_density > 1100 else ("HIGH" if pop_density > 750 else ("MEDIUM" if pop_density > 350 else "LOW"))
             
             records.append({
                 "disaster_type": d_type,
@@ -147,7 +91,7 @@ def build_master_dataset():
             })
             
     master_df = pd.DataFrame(records)
-    master_path = os.path.join(TRAINING_DIR, "master_dataset.csv")
+    master_path = TRAINING_DIR / "master_dataset.csv"
     master_df.to_csv(master_path, index=False)
     print(f"Generated master training dataset at: {master_path} with {len(master_df)} rows.")
     return master_df

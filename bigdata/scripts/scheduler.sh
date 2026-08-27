@@ -1,23 +1,18 @@
 #!/bin/bash
 
-echo "=== Running Big Data Scheduled Jobs ==="
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIGDATA_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$BIGDATA_DIR/.." && pwd)"
+
+echo "=== Running AID-DRAS IEEE Research Pipeline ==="
 
 echo "Step 1: Uploading datasets to HDFS..."
-bash /home/jagapathi/Downloads/big/bigdata/scripts/upload_to_hdfs.sh
+bash "$SCRIPT_DIR/upload_to_hdfs.sh"
 
-echo "Step 2: Starting Spark Batch Analytics..."
-if command -v spark-submit &> /dev/null; then
-    spark-submit /home/jagapathi/Downloads/big/bigdata/spark/data_cleaning.py
-    spark-submit /home/jagapathi/Downloads/big/bigdata/spark/resource_analytics.py
-    spark-submit /home/jagapathi/Downloads/big/bigdata/spark/prediction_preparation.py
-else
-    echo "Spark-submit tool not found. Simulating Spark job runs..."
-    python3 /home/jagapathi/Downloads/big/bigdata/spark/data_cleaning.py
-    python3 /home/jagapathi/Downloads/big/bigdata/spark/resource_analytics.py
-    python3 /home/jagapathi/Downloads/big/bigdata/spark/prediction_preparation.py
-fi
+echo "Step 2: Executing Python/Spark Research Pipeline..."
+python3 "$BIGDATA_DIR/spark/run_full_pipeline.py"
 
-echo "Step 3: Triggering AI model retraining..."
-curl -s -X POST "http://localhost:8000/train?version=auto_$(date +%s)"
+echo "Step 3: Triggering AI Microservice Model Sync..."
+curl -s -X POST "http://localhost:8000/train?version=auto_$(date +%s)" || true
 
-echo "=== Big Data Schedule Run Complete ==="
+echo "=== AID-DRAS Pipeline Run Complete ==="

@@ -1,0 +1,24 @@
+{
+  "forecast_period": "2015-09",
+  "num_districts_evaluated": 23,
+  "spearman_correlation_rho": -0.6447,
+  "spearman_p_value": 0.0008981064410387321,
+  "mean_absolute_rank_change_MARC": 12.74,
+  "max_district_rank_change": 21,
+  "top_5_hazard_risk_districts": [
+    "Krishna",
+    "Prakasam",
+    "Guntur",
+    "Chittoor",
+    "Srikakulam"
+  ],
+  "top_5_response_priority_districts": [
+    "Adilabad",
+    "Medak",
+    "Mahbubnagar",
+    "Karimnagar",
+    "Nalgonda"
+  ],
+  "top_5_overlap_districts": [],
+  "top_5_overlap_percentage": 0.0
+}

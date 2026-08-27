@@ -1,0 +1,54 @@
+[
+  {
+    "model_name": "RandomForestClassifier",
+    "accuracy": 0.7475,
+    "macro_precision": 0.4991,
+    "macro_recall": 0.4986,
+    "macro_f1": 0.4942,
+    "positive_class_f1": 0.1363,
+    "positive_class_precision": 0.1104,
+    "positive_class_recall": 0.178,
+    "roc_auc": 0.5163,
+    "pr_auc": 0.128,
+    "confusion_matrix": [
+      [
+        2008,
+        443
+      ],
+      [
+        254,
+        55
+      ]
+    ],
+    "class_support": [
+      2451,
+      309
+    ]
+  },
+  {
+    "model_name": "PersistenceBaseline",
+    "accuracy": 0.7993,
+    "macro_precision": 0.4953,
+    "macro_recall": 0.4953,
+    "macro_f1": 0.4953,
+    "positive_class_f1": 0.1036,
+    "positive_class_precision": 0.1036,
+    "positive_class_recall": 0.1036,
+    "roc_auc": 0.4953,
+    "pr_auc": 0.1111,
+    "confusion_matrix": [
+      [
+        2174,
+        277
+      ],
+      [
+        277,
+        32
+      ]
+    ],
+    "class_support": [
+      2451,
+      309
+    ]
+  }
+]
