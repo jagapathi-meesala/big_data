@@ -1,17 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DisasterMap } from '../components/DisasterMap';
 import api from '../services/api';
 import { useSocket } from '../hooks/useSocket';
+import { Route, Navigation } from 'lucide-react';
+
+// ─── Key rescue corridors (incident zone → nearest hospital/shelter) ──────────
+const RESCUE_CORRIDORS = [
+  { id: 'r1', label: 'Hyderabad → Warangal Corridor', from: [17.3850, 78.4867] as [number,number], to: [17.9689, 79.5941] as [number,number] },
+  { id: 'r2', label: 'Vijayawada → Guntur Flood Corridor', from: [16.5062, 80.6480] as [number,number], to: [16.3067, 80.4365] as [number,number] },
+  { id: 'r3', label: 'Karimnagar → Nalgonda Emergency Line', from: [18.4386, 79.1288] as [number,number], to: [17.0575, 79.2684] as [number,number] },
+  { id: 'r4', label: 'Visakhapatnam → Kakinada Cyclone Route', from: [17.6868, 83.2185] as [number,number], to: [16.9891, 82.2475] as [number,number] },
+  { id: 'r5', label: 'Kurnool → Tirupati Medical Expressway', from: [15.8281, 78.0373] as [number,number], to: [13.6284, 79.4192] as [number,number] },
+];
+
+async function fetchOSRMRoute(from: [number,number], to: [number,number]): Promise<[number,number][]> {
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.code !== 'Ok' || !data.routes?.[0]) return [from, to];
+    return data.routes[0].geometry.coordinates.map(([lng, lat]: [number,number]) => [lat, lng]);
+  } catch {
+    return [from, to];
+  }
+}
 
 export const LiveDisaster: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'incident' | 'hospital' | 'shelter' | 'resource' | 'volunteer'>('all');
+  const [showRescueRoutes, setShowRescueRoutes] = useState(true);
+  const [rescuePaths, setRescuePaths] = useState<[number,number][][]>([]);
+  const [loadingRoutes, setLoadingRoutes] = useState(true);
   const queryClient = useQueryClient();
 
+  // Load live OSRM rescue route geometries
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      const paths: [number,number][][] = [];
+      for (const corridor of RESCUE_CORRIDORS) {
+        const routeCoords = await fetchOSRMRoute(corridor.from, corridor.to);
+        if (isMounted) paths.push(routeCoords);
+      }
+      if (isMounted) {
+        setRescuePaths(paths);
+        setLoadingRoutes(false);
+      }
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
   const { data: mapItems, isLoading } = useQuery(['live-disaster-map-items'], async () => {
-    const resInc = await api.get('/incidents', { params: { limit: 1000 } });
+    const resInc  = await api.get('/incidents', { params: { limit: 1000 } });
     const resHosp = await api.get('/resources', { params: { type: 'HOSPITAL_BED', limit: 1000 } });
-    const resShelt = await api.get('/resources', { params: { type: 'SHELTER_CAPACITY', limit: 1000 } });
+    const resShelt= await api.get('/resources', { params: { type: 'SHELTER_CAPACITY', limit: 1000 } });
     const resAmbs = await api.get('/resources', { params: { type: 'AMBULANCE', limit: 1000 } });
     const resVols = await api.get('/users', { params: { role: 'VOLUNTEER', limit: 1000 } });
 
@@ -159,11 +201,14 @@ export const LiveDisaster: React.FC = () => {
 
   const filteredItems = !mapItems ? [] : filter === 'all' ? mapItems : mapItems.filter(item => item.type === filter || forceShowIds.has(item.id));
 
+  // Combine allocation routes with live OSRM rescue corridor routes
+  const combinedRoutePaths = [...activeRoutes, ...(showRescueRoutes ? rescuePaths : [])];
+
   return (
     <div className="space-y-6 h-full flex flex-col">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Live Disaster Map Console</h1>
-        <p className="text-sm opacity-60">High-precision geolocated spatial coordination.</p>
+        <p className="text-sm opacity-60">High-precision geolocated spatial coordination with real-time OSRM rescue corridors.</p>
       </div>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 min-h-[500px]">
@@ -194,7 +239,7 @@ export const LiveDisaster: React.FC = () => {
                   filter === 'hospital' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
-                🏥 Hospitals & ERs
+                🏥 Hospitals &amp; ERs
               </button>
               <button
                 onClick={() => setFilter('shelter')}
@@ -202,7 +247,7 @@ export const LiveDisaster: React.FC = () => {
                   filter === 'shelter' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
-                🏠 Shelters & Camps
+                🏠 Shelters &amp; Camps
               </button>
               <button
                 onClick={() => setFilter('resource')}
@@ -221,10 +266,30 @@ export const LiveDisaster: React.FC = () => {
                 👤 Volunteers On-Duty
               </button>
             </div>
+
+            {/* Rescue Corridor Toggle Button */}
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+              <button
+                onClick={() => setShowRescueRoutes(!showRescueRoutes)}
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-between ${
+                  showRescueRoutes
+                    ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <Navigation size={14} className={loadingRoutes ? 'animate-spin' : ''} />
+                  <span>OSRM Rescue Corridors</span>
+                </div>
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-indigo-500/20">
+                  {showRescueRoutes ? 'ON' : 'OFF'}
+                </span>
+              </button>
+            </div>
           </div>
 
           <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs opacity-75">
-            <strong>Geo Sync Active:</strong> Listening for WebSocket events on channels <code>incident:created</code> and <code>resource_location_update</code>.
+            <strong>Geo Sync Active:</strong> OSRM routing engine loaded. Listening for WebSocket events on channels <code>incident:created</code> and <code>resource_location_update</code>.
           </div>
         </div>
 
@@ -232,7 +297,7 @@ export const LiveDisaster: React.FC = () => {
           {isLoading ? (
             <div className="h-full w-full bg-slate-100 dark:bg-slate-950 animate-pulse flex items-center justify-center text-xs opacity-50">Loading live markers...</div>
           ) : (
-            <DisasterMap items={filteredItems} center={[17.3850, 78.4867]} zoom={8} routePaths={activeRoutes} />
+            <DisasterMap items={filteredItems} center={[17.3850, 78.4867]} zoom={8} routePaths={combinedRoutePaths} />
           )}
         </div>
       </div>
