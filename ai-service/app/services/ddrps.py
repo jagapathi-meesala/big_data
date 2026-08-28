@@ -1,12 +1,44 @@
+import json
 import numpy as np
+from pathlib import Path
 
-DDRPS_WEIGHTS = {
+# Default hardcoded weights (fallback)
+_DEFAULT_WEIGHTS = {
     "Qd": 0.30,  # Predicted Risk Probability
     "Dd": 0.25,  # Population Exposure
     "Hd": 0.20,  # Healthcare Availability Deficit
     "Rd": 0.15,  # Road Infrastructure Deficit
     "Sd": 0.10,  # Shelter Availability Deficit
 }
+
+# Path to learned weights produced by weight_learning.py
+_LEARNED_WEIGHTS_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "bigdata" / "results" / "learned_ddrps_weights.json"
+)
+
+
+def _load_weights() -> dict:
+    """Load XGBoost+SHAP learned weights if available, else use defaults."""
+    try:
+        if _LEARNED_WEIGHTS_PATH.exists():
+            with open(_LEARNED_WEIGHTS_PATH) as f:
+                data = json.load(f)
+            lw = data.get("learned_weights", {})
+            # ai-service uses Rd/Sd aliases (backward compat)
+            return {
+                "Qd": lw.get("Qd", _DEFAULT_WEIGHTS["Qd"]),
+                "Dd": lw.get("Dd", _DEFAULT_WEIGHTS["Dd"]),
+                "Hd": lw.get("Hd", _DEFAULT_WEIGHTS["Hd"]),
+                "Rd": lw.get("Md", _DEFAULT_WEIGHTS["Rd"]),  # Md == Rd
+                "Sd": lw.get("Vd", _DEFAULT_WEIGHTS["Sd"]),  # Vd == Sd
+            }
+    except Exception:
+        pass
+    return _DEFAULT_WEIGHTS
+
+
+DDRPS_WEIGHTS = _load_weights()
 
 def calculate_ddrps_priority(params: dict) -> dict:
     """

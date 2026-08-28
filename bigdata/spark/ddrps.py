@@ -8,7 +8,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from bigdata.config import (
     RESULTS_DIR,
-    DDRPS_WEIGHTS
+    DDRPS_WEIGHTS,
+    load_learned_weights,
 )
 
 def min_max_normalize(series: pd.Series) -> pd.Series:
@@ -19,22 +20,26 @@ def min_max_normalize(series: pd.Series) -> pd.Series:
 
 def calculate_ddrps_priorities(df_predictions: pd.DataFrame, weights: dict = None, forecast_period: str = None) -> pd.DataFrame:
     """
-    Computes Distributed Disaster Resource Provisioning System (DDRPS) Priority Score:
-    DDRPS_d = 0.30 * Qd + 0.25 * Dd + 0.20 * Hd + 0.15 * Md + 0.10 * Vd
-    
-    RESEARCH PIPELINE SPECIFICATION:
+    Computes Distributed Disaster Resource Provisioning System (DDRPS) Priority Score.
+
+    Weight source (in priority order):
+      1. Caller-supplied `weights` argument (explicit override)
+      2. Learned weights from XGBoost + SHAP (results/learned_ddrps_weights.json)
+      3. Hardcoded fallback from config.DDRPS_WEIGHTS
+
+    Sub-score definitions:
     - Qd: Predicted Extreme Precipitation Risk Probability in [0, 1]
     - Dd: Population Exposure Deficit
     - Hd: Healthcare Capacity Deficit
     - Md: Mobility Access Deficit (Household transport access proxy)
     - Vd: Housing Vulnerability (Dilapidated dwellings structural vulnerability proxy)
-    
+
     Decision Snapshot (Requirement #9):
     Extracts a specific forecast_period snapshot (e.g. 2015-09) to compute 1..N priority ranks
     for operational decision making, keeping it distinct from historical analytical time series.
     """
     if weights is None:
-        weights = DDRPS_WEIGHTS
+        weights = load_learned_weights()   # auto-use XGBoost+SHAP weights if available
         
     df = df_predictions.copy()
     

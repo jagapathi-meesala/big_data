@@ -37,9 +37,21 @@ bash deploy.sh
 
 ## 4. API Documentation
 
+### Public API Integrations (GitHub public-apis Repository)
+- **Open-Meteo Weather & Rainfall API**: Real-time precipitation (mm), temperature, wind speed, relative humidity, and atmospheric pressure.
+- **OSRM (Open Source Routing Machine) Road API**: Real-time road routing, travel duration, distance, and road accessibility scoring ($R_d$).
+- **World Bank Open Data API**: National and regional population metrics for exposure estimation ($D_d$).
+- **GDACS GeoJSON API**: Real-time satellite-tracked global disaster alerts.
+- **OpenStreetMap Overpass API**: Live hospital & shelter infrastructure spatial mapping.
+
 ### Backend endpoints
 - **Authentication**: `POST /api/v1/auth/register`, `POST /api/v1/auth/login`
 - **Incidents**: `GET /api/v1/incidents`, `POST /api/v1/incidents`
+- **Public Multi-Source APIs**:
+  - `GET /api/v1/public-apis/weather` (Open-Meteo Rainfall & Weather)
+  - `GET /api/v1/public-apis/roads` (OSRM Transport Routing & Accessibility)
+  - `GET /api/v1/public-apis/population` (World Bank Population Indicators)
+  - `GET /api/v1/public-apis/summary` (Multi-Source District DDRPS Summary)
 - **IoT Registries**: `POST /api/v1/iot/register`, `POST /api/v1/iot/telemetry`
 
 ### AI Solver endpoints

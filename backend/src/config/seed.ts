@@ -150,7 +150,7 @@ export const seedDatabase = async () => {
     const citizenId = citizen.id || citizen.dataValues?.id;
 
     // 2. Seed Hospitals from hospitals.csv
-    const hospitalsCSVPath = '/home/jagapathi/Downloads/big/datasets/hospitals.csv';
+    const hospitalsCSVPath = path.resolve(__dirname, '../../../datasets/hospitals.csv');
     let hospitalCount = 0;
     if (fs.existsSync(hospitalsCSVPath)) {
       const rows = parseCSV(hospitalsCSVPath);
@@ -246,7 +246,7 @@ export const seedDatabase = async () => {
     console.log(`Seeded ${hospitalCount} hospitals from dataset.`);
 
     // 3. Seed Incidents from patients_data.csv
-    const patientsCSVPath = '/home/jagapathi/Downloads/big/datasets/patients_data.csv';
+    const patientsCSVPath = path.resolve(__dirname, '../../../datasets/patients_data.csv');
     let incidentCount = 0;
     if (fs.existsSync(patientsCSVPath)) {
       const rows = parseCSV(patientsCSVPath);
@@ -318,7 +318,7 @@ export const seedDatabase = async () => {
     console.log(`Seeded ${incidentCount} incidents from dataset.`);
 
     // 4. Seed Shelters & Resources from india_places.csv
-    const placesCSVPath = '/home/jagapathi/Downloads/big/datasets/india_places.csv';
+    const placesCSVPath = path.resolve(__dirname, '../../../datasets/india_places.csv');
     let shelterCount = 0;
     let resourceCount = 0;
     if (fs.existsSync(placesCSVPath)) {

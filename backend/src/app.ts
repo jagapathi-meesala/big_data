@@ -23,6 +23,7 @@ import analyticsRoutes from './routes/analyticsRoutes';
 import weatherRoutes from './routes/weatherRoutes';
 import reportRoutes from './routes/reportRoutes';
 import notificationRoutes from './routes/notificationRoutes';
+import publicApisRoutes from './routes/publicApisRoutes';
 import helmet from 'helmet';
 import { syncGDACSDisasters } from './services/gdacsService';
 import rateLimit from 'express-rate-limit';
@@ -81,6 +82,7 @@ app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/public-apis', publicApisRoutes);
 
 // Global Error Handler Middleware (MUST be registered last)
 app.use(errorHandler);
@@ -96,14 +98,6 @@ const startServer = async () => {
     await sequelize.sync({ alter: true });
     logger.info('Database tables synchronized successfully.');
     await seedDatabase();
-    
-    // Ingest live real-world disasters on startup
-    await syncGDACSDisasters();
-    
-    // Set up recurring sync every 30 minutes
-    setInterval(async () => {
-      await syncGDACSDisasters();
-    }, 30 * 60 * 1000);
   } catch (error) {
     logger.error(`Database synchronization failed: ${error}`);
   }
@@ -114,9 +108,21 @@ const startServer = async () => {
   // 4. Initialize Sockets
   await initSockets(httpServer);
 
-  // 5. Run HttpServer
+  // 5. Run HttpServer — bind to port FIRST so the dashboard loads immediately
   httpServer.listen(PORT, () => {
     logger.info(`Backend server is running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode.`);
+
+    // 6. Fire live disaster sync AFTER server is online (non-blocking)
+    syncGDACSDisasters().catch((err) =>
+      logger.error(`[GDACS Sync] Startup sync failed: ${err.message}`)
+    );
+
+    // Set up recurring sync every 30 minutes
+    setInterval(() => {
+      syncGDACSDisasters().catch((err) =>
+        logger.error(`[GDACS Sync] Recurring sync failed: ${err.message}`)
+      );
+    }, 30 * 60 * 1000);
   });
 };
 

@@ -1,4 +1,5 @@
 import os
+import json
 from pathlib import Path
 
 # Base Paths
@@ -25,6 +26,9 @@ PATIENTS_CSV = DATASETS_DIR / "patients_data.csv"
 DISTRICT_TIME_PARQUET = RESULTS_DIR / "district_time_features.parquet"
 DISTRICT_TIME_CSV = RESULTS_DIR / "district_time_features.csv"
 
+# Learned weights output (produced by weight_learning.py)
+LEARNED_WEIGHTS_PATH = RESULTS_DIR / "learned_ddrps_weights.json"
+
 # DDRPS Default Weight Matrix (Revised Terminology)
 DDRPS_WEIGHTS = {
     "Qd": 0.30,  # Predicted Extreme Precipitation Risk Probability
@@ -40,6 +44,22 @@ DDRPS_WEIGHTS = {
 # Z-score anomaly threshold for extreme precipitation event definition
 Z_SCORE_THRESHOLD = 1.5
 
+
+def load_learned_weights() -> dict:
+    """
+    Load data-driven DDRPS weights produced by weight_learning.py.
+    Falls back to the hardcoded DDRPS_WEIGHTS if the file doesn't exist yet.
+    """
+    if LEARNED_WEIGHTS_PATH.exists():
+        with open(LEARNED_WEIGHTS_PATH, "r") as f:
+            data = json.load(f)
+        weights = data.get("learned_weights", {})
+        # Ensure backward-compat aliases
+        weights.setdefault('Rd', weights.get('Md', 0.15))
+        weights.setdefault('Sd', weights.get('Vd', 0.10))
+        return weights
+    return DDRPS_WEIGHTS
+
+
 if __name__ == "__main__":
     print(f"[config] Loaded AID-DRAS paths. Workspace root: {PROJECT_ROOT}")
-

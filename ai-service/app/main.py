@@ -228,6 +228,20 @@ def run_simulation(payload: SimulationInput):
     )
     return sim_data
 
+from app.services.public_apis import fetch_live_rainfall, fetch_road_distance_osrm, fetch_worldbank_population
+
+@app.get("/public-apis/weather")
+def get_public_weather(lat: float = 17.3850, lon: float = 78.4867):
+    return fetch_live_rainfall(lat, lon)
+
+@app.get("/public-apis/roads")
+def get_public_roads(origin_lat: float = 17.3850, origin_lon: float = 78.4867, dest_lat: float = 17.9689, dest_lon: float = 79.5941):
+    return fetch_road_distance_osrm(origin_lat, origin_lon, dest_lat, dest_lon)
+
+@app.get("/public-apis/population")
+def get_public_population():
+    return fetch_worldbank_population()
+
 @app.post("/train")
 def train_models(version: Optional[str] = "v1.0.0"):
     try:
@@ -235,3 +249,4 @@ def train_models(version: Optional[str] = "v1.0.0"):
         return metrics
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Training pipeline failed: {str(e)}")
+
