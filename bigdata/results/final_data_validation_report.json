@@ -1,0 +1,37 @@
+{
+  "num_districts": 23,
+  "num_subdivisions": 2,
+  "subdivisions_list": [
+    "COASTAL ANDHRA PRADESH",
+    "TELANGANA"
+  ],
+  "date_range": [
+    "1901-01",
+    "2015-12"
+  ],
+  "total_records": 2760,
+  "positive_target_prevalence_pct": 7.97,
+  "missing_values_rainfall": 0,
+  "missing_values_census": 0,
+  "duplicate_records_rainfall": 0,
+  "unmatched_subdivision_joins": 0,
+  "leakage_checks_passed": true,
+  "DDRPS_component_ranges": {
+    "Dd": [
+      0.0,
+      1.0
+    ],
+    "Hd": [
+      0.0,
+      1.0
+    ],
+    "Md": [
+      0.0,
+      1.0
+    ],
+    "Vd": [
+      0.0,
+      1.0
+    ]
+  }
+}

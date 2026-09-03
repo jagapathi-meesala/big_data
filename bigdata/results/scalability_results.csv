@@ -1,0 +1,6 @@
+scale_factor,input_records,spark_partitions,aggregated_output_groups,runtime_sec,throughput_records_per_sec
+1x,31740,2,276,1.7379,18263.81
+5x,158700,8,276,1.9172,82776.14
+10x,317400,8,276,2.2041,144001.53
+20x,634800,8,276,3.8115,166548.43
+50x,1587000,8,276,7.8842,201289.0

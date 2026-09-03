@@ -1,0 +1,73 @@
+Unique id,Diagnosed date,Age,Gender,Detected city,Detected state,Current status,Status change date,Notes,Lat,Long
+5,02-Mar,Not Known,Not Known,Hyderabad,Telangana,Recovered,02-Mar,"Travelled from Dubai, Singapore contact. Travel history to Dubai, Singapore contact",25.3801017,68.3750376
+71,12-Mar,27,Male,Sri Potti Sriramulu Nellore,Andhra Pradesh,Recovered,23-Mar,Travelled from Italy on March 6th. Arrived from Italy on March 6th,14.2939818,79.7794384
+107,14-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,14-Mar,Travelled from Italy. Returned from Italy,25.3801017,68.3750376
+112,15-Mar,46,Not Known,Hyderabad,Telangana,Hospitalized,15-Mar,Travelled from Netherlands March 9. Netherlands travel history March 9,25.3801017,68.3750376
+127,16-Mar,Not Known,Male,Hyderabad,Telangana,Hospitalized,16-Mar,Travelled from Scotland. Returned from Scotland,25.3801017,68.3750376
+141,17-Mar,52,Male,Hyderabad,Telangana,Hospitalized,17-Mar,"Indonesian national; The patient had flown into Delhi on March 9 and after a few days took a train to Karimnagar, about 170 km from Hyderabad, for a religious meeting with a group from Indonesia and Malaysia.",25.3801017,68.3750376
+149,18-Mar,22,Male,Hyderabad,Telangana,Hospitalized,18-Mar,"Studying BBA at Scotland, Travelled from UK. Travelled from Scotland, UK",25.3801017,68.3750376
+163,18-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,18-Mar,Indonesian,25.3801017,68.3750376
+164,18-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,18-Mar,Indonesian,25.3801017,68.3750376
+165,18-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,18-Mar,Indonesian,25.3801017,68.3750376
+166,18-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,18-Mar,Indonesian,25.3801017,68.3750376
+167,18-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,18-Mar,Indonesian,25.3801017,68.3750376
+168,18-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,18-Mar,Indonesian,25.3801017,68.3750376
+169,18-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,18-Mar,Indonesian,25.3801017,68.3750376
+176,19-Mar,24,Male,Prakasam,Andhra Pradesh,Hospitalized,19-Mar,Travelled from UK. Travel History to UK,15.5,79.5
+190,19-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,19-Mar,Travelled from UK on 10th Mar. Returned from London on 10th Mar,25.3801017,68.3750376
+191,19-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,19-Mar,Travelled from Dubai on 14 Mar. Returned from Dubai on 14 Mar,25.3801017,68.3750376
+192,19-Mar,Not Known,Not Known,Hyderabad,Telangana,Hospitalized,19-Mar,Travelled from UK. Returned from London,25.3801017,68.3750376
+196,19-Mar,65,Male,Visakapatnam,Andhra Pradesh,Hospitalized,19-Mar,Travelled from Saudi Arabia on 12 Mar. Returned from Saudi Arabia on 12 Mar,17.6102986,83.1946352
+220,20-Mar,18,Female,Hyderabad,Telangana,Hospitalized,20-Mar,Travelled from London. Travel history to UK,25.3801017,68.3750376
+252,20-Mar,27,Male,Karimnagar,Telangana,Hospitalized,20-Mar,Indonesian citizen,18.4346438,79.1322648
+253,20-Mar,60,Male,Karimnagar,Telangana,Hospitalized,20-Mar,Indonesian citizen,18.4346438,79.1322648
+299,21-Mar,35,Male,Hyderabad,Telangana,Hospitalized,21-Mar,Contact of P191. Details awaited,25.3801017,68.3750376
+300,21-Mar,33,Male,Hyderabad,Telangana,Hospitalized,21-Mar,"Travelled from Dubai, Beliseema MSE Cruise Emp; . Bellisima (?) Cruise employee; Travelled from Dubai",25.3801017,68.3750376
+330,21-Mar,22,Male,East Godavari,Andhra Pradesh,Hospitalized,21-Mar,Travelled from UK. London to Hyderabad to Rajahmundry,17.233496,81.7225986
+331,21-Mar,24,Not Known,Krishna,Andhra Pradesh,Hospitalized,21-Mar,Travelled from Paris. Paris to Delhi to Hyderabad to Vijayawada,16.6691525,80.7190024
+350,22-Mar,24,Male,Guntur,Telangana,Hospitalized,22-Mar,Travelled from London via Dubai. From London via Dubai,16.2915189,80.4541588
+368,22-Mar,26,Male,East Godavari,Telangana,Hospitalized,22-Mar,Travelled from Sweden,17.233496,81.7225986
+369,22-Mar,34,Male,Rangareddy,Telangana,Hospitalized,22-Mar,Travelled from Sweden,17.1333954,78.3970979
+370,22-Mar,23,Male,Bhadradri Kothagudem,Telangana,Hospitalized,22-Mar,Travelled from London,17.7153452,80.5714976
+371,22-Mar,23,Male,Hyderabad,Telangana,Hospitalized,22-Mar,Travelled from London via Doha,25.3801017,68.3750376
+372,22-Mar,50,Female,Hyderabad,Telangana,Hospitalized,22-Mar,Travelled from Dubai,25.3801017,68.3750376
+397,22-Mar,49,Female,Visakhapatnam,Andhra Pradesh,Hospitalized,22-Mar,Patient's husband tested positive,17.7231276,83.3012842
+434,23-Mar,21,Male,Balkampet,Telangana,Hospitalized,23-Feb,Returned from France,17.4469233,78.4504513
+435,23-Mar,30,Male,Hyderabad,Telangana,Hospitalized,23-Feb,Returned from London,25.3801017,68.3750376
+436,23-Mar,23,Male,Karimnagar,Telangana,Hospitalized,23-Feb,"No Travel History, Contact with Indonesian Group",18.4346438,79.1322648
+438,23-Mar,20,Male,Hyderabad,Telangana,Hospitalized,23-Feb,Returned from New York,25.3801017,68.3750376
+439,23-Mar,25,Male,Hyderabad,Telangana,Hospitalized,23-Feb,Returned from London,25.3801017,68.3750376
+440,23-Mar,56,Male,Hyderabad,Telangana,Hospitalized,23-Feb,Returned from Sri Lanka,25.3801017,68.3750376
+493,23-Mar,25,Male,Vishakhapatnam,Andhra Pradesh,Hospitalized,23-Feb,"Travelled from Birmingham,UK. Birmingham to Delhi (Recommended Home Quarantine) -> Vizag airport to Thagarapuvalasa in a car with father -> develops symptoms, visits hospital (Gayatri Vidya Parishad Hospital) -> hospitalised",17.68009,83.20161
+527,24-Mar,49,Male,Rangareddy,Telangana,Hospitalized,24-Mar,Travelled from London,17.1333954,78.3970979
+528,24-Mar,39,Female,Hyderabad,Telangana,Hospitalized,24-Mar,Travelled from Germany,25.3801017,68.3750376
+529,24-Mar,61,Female,Hyderabad,Telangana,Hospitalized,24-Mar,Travelled from Saudi Arabia,25.3801017,68.3750376
+561,24-Mar,25,Male,Chitoor,Andhra Pradesh,Hospitalized,24-Mar,Travelled from London,13.0929032,80.266619
+565,24-Mar,64,Female,Hyderabad,Telangana,Hospitalized,24-Mar,Contact with TS-P25,25.3801017,68.3750376
+571,24-Mar,57,Male,Bhadradri Kothagudem,Telangana,Hospitalized,24-Mar,Contact with TS-P26,17.7153452,80.5714976
+572,24-Mar,Not Known,Female,Bhadradri Kothagudem,Telangana,Hospitalized,24-Mar,Contact with TS-P26,17.7153452,80.5714976
+647,25-Mar,43,Female,Hyderabad,Telangana,Hospitalized,25-Mar,Contact with TS-P34,25.3801017,68.3750376
+648,25-Mar,3,Male,Not Known,Telangana,Hospitalized,25-Mar,"Travelled from Saudi Arabia, along with his parents",17.6339929,78.4843146
+651,25-Mar,22,Male,Krishna,Andhra Pradesh,Hospitalized,25-Mar,"Travelled from Washington, USA to Delhi on 20.03.2020, Delhi to Vijayawada on 22.03.2020. Hospitalised on 23.03.2020",16.6691525,80.7190024
+655,25-Mar,52,Male,Guntur,Andhra Pradesh,Hospitalized,25-Mar,No foreign travel. Attended meeting at Delhi Nizamuddin mosque from 14.03.2020 and returned to Vijayawada by train on 19.03.2020.,16.2915189,80.4541588
+683,26-Mar,49,Male,Medchal,Telangana,Hospitalized,26-Mar,Travelled from Delhi,17.6339929,78.4843146
+684,26-Mar,36,Female,Hyderabad,Telangana,Hospitalized,26-Mar,"Doctor, Wife of TS-P44",25.3801017,68.3750376
+685,26-Mar,41,Male,Hyderabad,Telangana,Hospitalized,26-Mar,"Doctor, Husband of TS-P43",25.3801017,68.3750376
+721,26-Mar,29,Male,Krishna,Andhra Pradesh,Hospitalized,26-Mar,"Travelled from Stockholm to Delhi on , Delhi to Vijayawada on ",18.03.2020,19.03.2020
+724,26-Mar,45,Male,Hyderabad,Telangana,Hospitalized,26-Mar,Travelled from Delhi,25.3801017,68.3750376
+747,27-Mar,Not Known,Male,Visakhapatnam,Andhra Pradesh,Hospitalized,27-Mar,Contact of AP-P7,17.7231276,83.3012842
+785,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+786,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+787,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+788,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+789,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+790,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+791,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+792,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+793,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+794,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+795,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+796,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+797,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+798,27-Mar,Not Known,Not Known,Rangareddy,Telangana,Hospitalized,27-Mar,Details awaited,17.1333954,78.3970979
+876,27-Mar,,Female,Guntur,Andhra Pradesh,Hospitalized,27-Mar,Contact of AP-P10,17.7231276,83.3012842

@@ -1,0 +1,5 @@
+model_name,accuracy,macro_precision,macro_recall,macro_f1,positive_class_f1,positive_class_precision,positive_class_recall,roc_auc,pr_auc,confusion_matrix,class_support,num_features,features_used
+Subset_A_Rainfall_Only,0.8319,0.5271,0.5207,0.5222,0.1375,0.1616,0.1197,0.5115,0.1353,"[[2259, 192], [272, 37]]","[2451, 309]",3,"rainfall_mm, rainfall_lag_1, rainfall_lag_2"
+Subset_B_Rainfall_Temporal,0.8268,0.4973,0.498,0.4961,0.0878,0.107,0.0744,0.5245,0.1561,"[[2259, 192], [286, 23]]","[2451, 309]",6,"rainfall_mm, rainfall_lag_1, rainfall_lag_2, rolling_3_month_rainfall, month_sin, month_cos"
+Subset_C_Rainfall_Extremes,0.796,0.528,0.533,0.5297,0.1757,0.1604,0.1942,0.5144,0.1467,"[[2137, 314], [249, 60]]","[2451, 309]",6,"rainfall_mm, rainfall_lag_1, rainfall_lag_2, rainfall_zscore, historical_extreme_count, monsoon_cumulative_rainfall"
+Subset_D_Full_Risk_Set,0.7475,0.4991,0.4986,0.4942,0.1363,0.1104,0.178,0.5163,0.128,"[[2008, 443], [254, 55]]","[2451, 309]",10,"rainfall_mm, rainfall_lag_1, rainfall_lag_2, rolling_3_month_rainfall, monsoon_cumulative_rainfall, rainfall_zscore, historical_extreme_count, month_sin, month_cos, is_monsoon"

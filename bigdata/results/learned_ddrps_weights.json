@@ -1,0 +1,19 @@
+{
+  "method": "elasticnet_cv",
+  "description": "Cross-sectional ElasticNet (positive-constrained) on 23 districts. Target = normalized long-run annual extreme event rate (1901-1990). Coefficients normalized to sum=1.0 as DDRPS weights.",
+  "r2_score": 0.6283,
+  "old_weights": {
+    "Qd": 0.3,
+    "Dd": 0.25,
+    "Hd": 0.2,
+    "Md": 0.15,
+    "Vd": 0.1
+  },
+  "learned_weights": {
+    "Qd": 0.009709,
+    "Dd": 0.57574,
+    "Hd": 0.009709,
+    "Md": 0.009709,
+    "Vd": 0.395134
+  }
+}

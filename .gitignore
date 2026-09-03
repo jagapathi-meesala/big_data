@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+scratch/
+node_modules/
+dist/
+*.log
+backend/logs/
+frontend/dist/
+frontend/node_modules/
+backend/node_modules/
