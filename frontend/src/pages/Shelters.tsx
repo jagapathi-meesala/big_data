@@ -49,7 +49,7 @@ export const Shelters: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-sm">{shelt.name || `Refuge Center ${shelt.id.slice(0, 5).toUpperCase()}`}</h3>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">{shelt.district || 'Hyderabad'}, {shelt.state || 'Telangana'}</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">{shelt.district || 'N/A'}, {shelt.state || 'N/A'}</span>
                 </div>
               </div>
 
@@ -70,14 +70,14 @@ export const Shelters: React.FC = () => {
                     <Flashlight size={14} />
                     <span>Power</span>
                   </span>
-                  <span className="font-bold uppercase text-[9px] text-emerald-500">{shelt.electricityStatus || 'YES'}</span>
+                  <span className="font-bold uppercase text-[9px] text-emerald-500">{shelt.electricityStatus || 'Unknown'}</span>
                 </div>
                 <div className="flex justify-between items-center pl-2 pt-1.5 mt-1.5 border-t">
                   <span className="opacity-70 flex items-center space-x-1">
                     <PlusCircle size={14} />
                     <span>Medical</span>
                   </span>
-                  <span className="font-bold uppercase text-[9px] text-emerald-500">{shelt.medicalFacilityStatus || 'YES'}</span>
+                  <span className="font-bold uppercase text-[9px] text-emerald-500">{shelt.medicalFacilityStatus || 'Unknown'}</span>
                 </div>
               </div>
 

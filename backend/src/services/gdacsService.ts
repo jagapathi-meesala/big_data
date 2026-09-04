@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Op } from 'sequelize';
 import Incident, { DisasterType, SeverityLevel, IncidentStatus } from '../models/Incident';
 import { logger } from '../config/logger';
 import { createSystemNotification } from './notificationService';

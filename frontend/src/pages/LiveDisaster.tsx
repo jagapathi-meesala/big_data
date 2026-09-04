@@ -92,11 +92,12 @@ export const LiveDisaster: React.FC = () => {
           ambulancesCount: hosp.ambulancesCount
         });
 
-        // Scatter hospital-affiliated ambulances around the hospital location
+        // Scatter hospital-affiliated ambulances deterministically around hospital location
         const ambCount = hosp.ambulancesCount || 0;
         for (let i = 0; i < ambCount; i++) {
-          const offsetLat = (Math.random() - 0.5) * 0.025;
-          const offsetLng = (Math.random() - 0.5) * 0.025;
+          const angle = (i * 2 * Math.PI) / (ambCount || 1);
+          const offsetLat = Math.sin(angle) * 0.008;
+          const offsetLng = Math.cos(angle) * 0.008;
           items.push({
             id: `amb-hosp-${hosp.id}-${i}`,
             title: `${cleanTitle} Ambulance Unit #${i + 1}`,

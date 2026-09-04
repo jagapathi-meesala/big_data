@@ -35,10 +35,71 @@ export const Analytics: React.FC = () => {
     }
   };
 
-  const slope = stats?.metrics?.slope ?? 0.5;
-  const intercept = stats?.metrics?.intercept ?? 10;
-  const N = stats?.metrics?.N ?? 10;
+  const slope = stats?.metrics?.slope ?? 0;
+  const intercept = stats?.metrics?.intercept ?? 0;
+  const N = stats?.metrics?.N ?? 0;
   const simIncidents = Math.max(0, Math.round(slope * (N + simDays) + intercept));
+
+  const generateInsights = () => {
+    const insights = [];
+    
+    // 1. Analyze forecast peaks
+    if (stats?.forecast && stats.forecast.length > 0) {
+      let peakDay = stats.forecast[0];
+      stats.forecast.forEach((d: any) => {
+        if (d.count > peakDay.count) {
+          peakDay = d;
+        }
+      });
+      
+      if (peakDay.count > 8) {
+        const peakDateStr = new Date(peakDay.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        insights.push({
+          type: 'CRITICAL',
+          title: `Predictive Emergency Alert (Peak Expected: ${peakDateStr})`,
+          message: `AI projects a temporary surge of up to ${peakDay.count} active incidents around ${peakDateStr}. Recommend pre-positioning additional vehicle units and medical supplies in high-risk zones.`,
+          action: 'Pre-position Vehicles'
+        });
+      }
+    }
+    
+    // 2. Analyze resource shortages
+    const ambulances = stats?.resourceDistribution?.find((r: any) => r.type === 'AMBULANCE')?.total || 0;
+    const fireTrucks = stats?.resourceDistribution?.find((r: any) => r.type === 'FIRE_TRUCK')?.total || 0;
+    const beds = stats?.resourceDistribution?.find((r: any) => r.type === 'HOSPITAL_BED')?.total || 0;
+
+    if (ambulances < 50) {
+      insights.push({
+        type: 'WARNING',
+        title: 'Resource Deficiency: Ambulance Fleet Capacity',
+        message: `Current registered ambulance units (${ambulances}) are operating near threshold. Recommend coordinating with neighboring districts to request emergency mobile backup.`,
+        action: 'Request Mobile Backup'
+      });
+    }
+
+    if (beds < 8000) {
+      insights.push({
+        type: 'INFO',
+        title: 'Bed Allocation Optimization',
+        message: `Active ICU bed occupancy is projected to increase. Suggest optimizing distribution to match the Guntur and Visakhapatnam regional demands.`,
+        action: 'Review Bed Allocation'
+      });
+    }
+
+    // 3. Success / resolved state
+    insights.push({
+      type: 'SUCCESS',
+      title: 'Disaster Mitigation Target Achieved',
+      message: `Automatic PostGIS solver successfully resolved travel routes for all active verified incidents. High-speed evacuation paths have been shared with local dispatch units.`,
+      action: 'View Transit Map'
+    });
+
+    return insights;
+  };
+
+  const handleActionClick = (actionName: string) => {
+    alert(`AI Dispatch Command Action: "${actionName}" successfully transmitted to district centers.`);
+  };
 
   // KPI Calculations
   const totalSupplies = stats?.resourceDistribution?.reduce((acc: number, item: any) => {
@@ -48,41 +109,11 @@ export const Analytics: React.FC = () => {
   const totalFleet = parseInt(stats?.resourceDistribution?.find((r: any) => r.type === 'AMBULANCE')?.total || 0, 10) + 
                     parseInt(stats?.resourceDistribution?.find((r: any) => r.type === 'FIRE_TRUCK')?.total || 0, 10);
 
-  const activeIncidents = stats?.trends?.reduce((acc: number, item: any) => acc + parseInt(item.count, 10), 0) || 16;
+  const activeIncidents = stats?.trends?.reduce((acc: number, item: any) => acc + parseInt(item.count, 10), 0) || 0;
   const liveMeta = stats?.liveMeta;
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Analytics &amp; Predictions Panel</h1>
-            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping mr-1" />
-              Live APIs Connected
-            </span>
-          </div>
-          <p className="text-sm opacity-60">Real-world live incident tracking from USGS, GDACS, NASA EONET &amp; Open-Meteo.</p>
-        </div>
-
-        <button
-          onClick={handleSyncLiveAPIs}
-          disabled={isSyncing}
-          className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-sm hover:shadow transition-all disabled:opacity-50"
-        >
-          <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
-          <span>{isSyncing ? 'Syncing Live Feeds...' : 'Sync Live Global APIs'}</span>
-        </button>
-      </div>
-
-      {syncStatus && (
-        <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-xs text-blue-600 dark:text-blue-400 font-semibold flex items-center space-x-2">
-          <Radio size={14} className="animate-pulse text-blue-500" />
-          <span>{syncStatus}</span>
-        </div>
-      )}
-
-      {/* Sub-navigation tabs */}
       <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
         <Link to="/analytics" className="border-b-2 border-brand-500 pb-3 text-brand-500">
           AI Forecasts

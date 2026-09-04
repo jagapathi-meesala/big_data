@@ -1,0 +1,3 @@
+import type { FetchInfiniteQueryOptions, QueryKey, WithRequired } from '@tanstack/query-core';
+export declare function usePrefetchInfiniteQuery<TQueryFnData = unknown, TError = unknown, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: WithRequired<FetchInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey>, 'queryKey'>): void;
+//# sourceMappingURL=usePrefetchInfiniteQuery.d.ts.map

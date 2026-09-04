@@ -1,0 +1,92 @@
+[2026-07-24 02:54:17:5417] [[31merror[39m]: [31mError saving weather history: SequelizeUniqueConstraintError: Validation error[39m
+[2026-07-24 02:54:17:5417] [[31merror[39m]: [31mError saving weather history: SequelizeUniqueConstraintError: Validation error[39m
+[2026-07-24 02:54:17:5417] [[31merror[39m]: [31mError saving weather history: SequelizeUniqueConstraintError: Validation error[39m
+[2026-07-24 02:54:17:5417] [[31merror[39m]: [31mError saving weather history: SequelizeUniqueConstraintError: Validation error[39m
+[2026-07-24 03:03:48:348] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 03:03:48:348] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 03:03:56:356] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 03:03:56:356] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 03:03:56:356] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 03:40:11:4011] [[31merror[39m]: [31mDatabase synchronization failed: SequelizeValidationError: notNull Violation: Resource.ownerId cannot be null[39m
+[2026-07-24 03:40:25:4025] [[31merror[39m]: [31mDatabase synchronization failed: SequelizeValidationError: notNull Violation: Resource.ownerId cannot be null[39m
+[2026-07-24 03:46:41:4641] [[31merror[39m]: [31mDatabase synchronization failed: SequelizeValidationError: notNull Violation: Resource.ownerId cannot be null[39m
+[2026-07-24 03:46:57:4657] [[31merror[39m]: [31mDatabase synchronization failed: Error: DEBUG hospitalAdmin: {"id":"6f2cb31c-5fdf-4d8e-9c37-f0155bd1871d","availability":"AVAILABLE","profilePicture":"https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80","firstName":"Dr. Srinivas","lastName":"Rao","email":"srinivas.hosp@aid-dras.gov","passwordHash":"$2a$10$lYL0s1Uz1p437jrmgMqgpOdPiVNXp6upbc/Nrh7rCNQZKC7n2I3qi","phoneNumber":"+918887776660","role":"HOSPITAL","status":"ACTIVE","district":"Visakhapatnam","state":"Andhra Pradesh","updatedAt":"2026-07-23T22:16:57.278Z","createdAt":"2026-07-23T22:16:57.278Z","refreshToken":null,"passwordResetToken":null,"passwordResetExpires":null}[39m
+[2026-07-24 03:47:15:4715] [[31merror[39m]: [31mDatabase synchronization failed: SequelizeValidationError: notNull Violation: Resource.ownerId cannot be null[39m
+[2026-07-24 03:47:26:4726] [[31merror[39m]: [31mDatabase synchronization failed: SequelizeValidationError: notNull Violation: Resource.ownerId cannot be null[39m
+[2026-07-24 03:47:56:4756] [[31merror[39m]: [31mDatabase synchronization failed: Error: Failed to create Hospital Resource at row 1 (Gandhi Medical College): notNull Violation: Resource.ownerId cannot be null. hospitalAdmin.id = undefined[39m
+[2026-07-24 03:48:39:4839] [[31merror[39m]: [31mLogin error: Error: Illegal arguments: string, undefined[39m
+[31m    at _async (/home/jagapathi/Downloads/big/backend/node_modules/bcryptjs/dist/bcrypt.js:286:46)[39m
+[31m    at /home/jagapathi/Downloads/big/backend/node_modules/bcryptjs/dist/bcrypt.js:307:17[39m
+[31m    at new Promise (<anonymous>)[39m
+[31m    at Object.bcrypt.compare (/home/jagapathi/Downloads/big/backend/node_modules/bcryptjs/dist/bcrypt.js:306:20)[39m
+[31m    at login (/home/jagapathi/Downloads/big/backend/src/controllers/authController.ts:99:34)[39m
+[31m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+[2026-07-24 03:58:14:5814] [[31merror[39m]: [31mOptimize allocation error: TypeError: Cannot read properties of undefined (reading 'coordinates')[39m
+[31m    at optimizeAllocation (/home/jagapathi/Downloads/big/backend/src/controllers/allocationController.ts:28:42)[39m
+[31m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+[2026-07-24 03:58:34:5834] [[31merror[39m]: [31mOptimize allocation error: TypeError: Cannot read properties of null (reading '0')[39m
+[31m    at optimizeAllocation (/home/jagapathi/Downloads/big/backend/src/controllers/allocationController.ts:39:59)[39m
+[31m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+[2026-07-24 03:59:05:595] [[31merror[39m]: [31mOptimize allocation error: TypeError: Cannot read properties of undefined (reading 'coordinates')[39m
+[31m    at optimizeAllocation (/home/jagapathi/Downloads/big/backend/src/controllers/allocationController.ts:52:49)[39m
+[31m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+[2026-07-24 03:59:26:5926] [[31merror[39m]: [31mOptimize allocation error: SequelizeValidationError: notNull Violation: Allocation.incidentId cannot be null,[39m
+[31mnotNull Violation: Allocation.resourceId cannot be null[39m
+[31m    at InstanceValidator._validate (/home/jagapathi/Downloads/big/backend/node_modules/sequelize/src/instance-validator.js:78:13)[39m
+[31m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+[31m    at InstanceValidator._validateAndRunHooks (/home/jagapathi/Downloads/big/backend/node_modules/sequelize/src/instance-validator.js:111:7)[39m
+[31m    at InstanceValidator.validate (/home/jagapathi/Downloads/big/backend/node_modules/sequelize/src/instance-validator.js:93:12)[39m
+[31m    at Allocation.save (/home/jagapathi/Downloads/big/backend/node_modules/sequelize/src/model.js:4077:7)[39m
+[31m    at Function.create (/home/jagapathi/Downloads/big/backend/node_modules/sequelize/src/model.js:2305:12)[39m
+[31m    at optimizeAllocation (/home/jagapathi/Downloads/big/backend/src/controllers/allocationController.ts:69:24)[39m
+[2026-07-24 10:23:55:2355] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:23:55:2355] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:23:55:2355] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:23:55:2355] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:32:25:3225] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:32:25:3225] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:32:25:3225] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:32:25:3225] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:32:25:3225] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:32:25:3225] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:32:25:3225] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:32:25:3225] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 10:32:25:3225] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:18:30:1830] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:18:30:1830] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:18:30:1830] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:18:30:1830] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:18:30:1830] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:18:30:1830] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:32:06:326] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:32:06:326] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:32:06:326] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:32:06:326] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 14:32:06:326] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 15:19:17:1917] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 15:19:17:1917] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:28:26:2826] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:30:46:3046] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:32:21:3221] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:32:21:3221] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-24 16:32:21:3221] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:36:5836] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-07-27 19:58:37:5837] [[31merror[39m]: [31mOpen-Meteo API failed: AxiosError: Request failed with status code 429. Using static mock profiles.[39m
+[2026-09-04 18:14:48:1448] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: value too long for type character varying(100)[39m
+[2026-09-04 18:17:03:173] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: value too long for type character varying(100)[39m

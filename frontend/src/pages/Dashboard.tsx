@@ -33,6 +33,7 @@ async function fetchOSRMRoute(from: [number,number], to: [number,number]): Promi
     const durMins = Math.round(data.routes[0].duration / 60);
     return { path: coords, distKm, durMins };
   } catch {
+    // Fallback straight line if OSRM is unavailable
     return { path: [from, to], distKm: 0, durMins: 0 };
   }
 }
@@ -120,7 +121,7 @@ export const Dashboard: React.FC = () => {
       <div className="p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-brand-950 border border-slate-800 rounded-3xl shadow-lg relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between">
         <div className="space-y-1 relative z-10">
           <h1 className="text-3xl font-extrabold tracking-tight text-white">
-            Welcome, {user?.firstName || 'Jagapathi'}
+            Welcome, {user?.firstName || 'User'}
           </h1>
           <p className="text-sm text-slate-300">Emergency status monitoring room for Andhra Pradesh &amp; Telangana.</p>
         </div>

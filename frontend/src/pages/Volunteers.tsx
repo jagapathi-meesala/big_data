@@ -46,9 +46,7 @@ export const Volunteers: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {data?.users?.map((vol: any, idx: number) => {
-            const skills = idx % 2 === 0 ? 'First Aid, Search & Rescue' : 'Logistics, Water Rescue';
-            const completedMissions = (idx * 3 + 2) % 7;
+          {data?.users?.map((vol: any) => {
             
             return (
               <div key={vol.id} className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm space-y-4">
@@ -75,21 +73,21 @@ export const Volunteers: React.FC = () => {
                       <MapPin size={14} />
                       <span>Location</span>
                     </span>
-                    <span className="font-semibold">{vol.district || 'Warangal'}, {vol.state || 'Telangana'}</span>
+                    <span className="font-semibold">{vol.district || 'N/A'}, {vol.state || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="opacity-60 flex items-center space-x-1">
                       <Award size={14} />
                       <span>Skills</span>
                     </span>
-                    <span className="font-semibold text-[10px]">{skills}</span>
+                    <span className="font-semibold text-[10px]">{vol.skills || 'Not specified'}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="opacity-60 flex items-center space-x-1">
                       <CheckCircle size={14} />
                       <span>Missions</span>
                     </span>
-                    <span className="font-bold text-brand-500">{completedMissions} Completed</span>
+                    <span className="font-bold text-brand-500">{vol.completedMissions ?? 0} Completed</span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
                     <span className="opacity-60 flex items-center space-x-1">

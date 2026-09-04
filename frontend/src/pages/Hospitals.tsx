@@ -214,7 +214,7 @@ export const Hospitals: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-sm">{hosp.name || `ER Facility ${hosp.id.slice(0, 5).toUpperCase()}`}</h3>
-                    <span className="text-[10px] uppercase font-bold text-slate-400">{hosp.district || 'Hyderabad'}, {hosp.state || 'Telangana'}</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-400">{hosp.district || 'N/A'}, {hosp.state || 'N/A'}</span>
                   </div>
                 </div>
 

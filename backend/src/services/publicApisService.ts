@@ -1,94 +1,77 @@
 import axios from 'axios';
 import logger from '../config/logger';
 
-// 1. Weather & Rainfall API (Open-Meteo - Public API)
-const OPENMETEO_API_URL = 'https://api.open-meteo.com/v1/forecast';
-// 2. Road & Routing API (OSRM - Public API)
-const OSRM_ROUTING_URL = 'http://router.project-osrm.org/route/v1/driving';
-// 3. Population & Demographics API (World Bank Open Data - Public API)
-const WORLDBANK_POP_URL = 'https://api.worldbank.org/v2/country/IND/indicator/SP.POP.TOTL';
-// 4. OpenStreetMap Nominatim Search API
-const OSM_NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
-// 5. NPPES Healthcare Provider Directory API
-const NPPES_REGISTRY_URL = 'https://npiregistry.cms.hhs.gov/api/';
-
+// Types & Interfaces
 export interface LiveWeatherData {
   temperature: number;
   humidity: number;
-  precipitation: number; // mm
-  rain: number; // mm
-  windSpeed: number;
-  surfacePressure: number;
+  rainfallMm: number;
+  precipitation?: number;
+  windSpeedKmH: number;
+  pressureHpa: number;
   weatherCode: number;
   description: string;
+  isHighRisk: boolean;
 }
 
 export interface LiveRoadRouteData {
   distanceKm: number;
-  durationMins: number;
-  averageSpeedKmh: number;
-  roadAccessibilityScore: number; // 0 to 1
-  routabilityStatus: string;
-}
-
-export interface LivePopulationData {
-  country: string;
-  totalPopulation: number;
-  dataYear: string;
-  source: string;
-}
-
-export interface DistrictPublicApiSummary {
-  district: string;
-  coordinates: { lat: number; lon: number };
-  weather: LiveWeatherData;
-  roadRoute: LiveRoadRouteData;
-  population: LivePopulationData;
-  ddrpsSubScores: {
-    Qd: number; // Risk (Rainfall/Weather)
-    Dd: number; // Population Density
-    Hd: number; // Healthcare Deficit
-    Md: number; // Mobility/Road Deficit
-    Vd: number; // Housing/Shelter Vulnerability
-  };
-}
-
-export interface BDAResourceItem {
-  id: string;
-  name: string;
-  category: 'HOSPITAL' | 'SHELTER' | 'FUEL' | 'RELIEF';
-  sourceApi: 'OpenStreetMap Nominatim' | 'NPPES Healthcare Registry';
-  lat: number;
-  lon: number;
-  address: string;
-  distanceKm: number;
-  durationMins: number;
-  capacityBunks: number;
-  availableBunks: number;
-  occupancyPercent: number;
-  phone: string;
+  durationMinutes: number;
+  durationMins?: number;
+  roadAccessibilityScore?: number;
+  routeGeometry?: any;
 }
 
 export interface BDAEscapeRouteCandidate {
   id: string;
   name: string;
   distanceKm: number;
-  durationMins: number;
+  durationMinutes: number;
+  durationMins?: number;
   roadRiskScore: number;
-  compositeScore: number;
-  riskCategory: 'LOW' | 'MEDIUM' | 'HIGH';
-  recommendation: 'BEST_RECOMMENDED' | 'CAUTION' | 'HIGH_HAZARD';
+  compositeBdaScore: number;
+  compositeScore?: number;
+  recommendation: string;
   badge: string;
   color: string;
-  polyline: [number, number][];
-  steps: string[];
 }
 
-/**
- * Calculate Haversine Distance between two geographic points
- */
+export interface LivePopulationData {
+  country: string;
+  year: number;
+  population: number;
+  totalPopulation?: number;
+}
+
+export interface BDAResourceItem {
+  id: string;
+  name: string;
+  type: string;
+  category?: string;
+  district: string;
+  lat: number;
+  lon: number;
+  distanceKm: number;
+  bunksAvailable?: number;
+  availableBunks?: number;
+  fuelAvailable?: boolean;
+}
+
+export interface DistrictPublicApiSummary {
+  district: string;
+  coordinates?: { lat: number; lon: number };
+  resources: BDAResourceItem[];
+  summaryMetrics: {
+    totalHospitals: number;
+    totalShelters: number;
+    totalFuelPoints: number;
+    availableBunksSum: number;
+    avgDistanceKm: number;
+  };
+}
+
 export function calculateHaversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371; // km
+  const R = 6371; // Earth radius in km
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
   const a =
@@ -99,6 +82,16 @@ export function calculateHaversineKm(lat1: number, lon1: number, lat2: number, l
   return parseFloat((R * c).toFixed(2));
 }
 
+// 1. Weather & Rainfall API (Open-Meteo - Public API)
+const OPENMETEO_API_URL = 'https://api.open-meteo.com/v1/forecast';
+// 2. Road & Routing API (OSRM - Public API)
+const OSRM_ROUTING_URL = 'http://router.project-osrm.org/route/v1/driving';
+// 3. Population & Demographics API (World Bank Open Data - Public API)
+const WORLDBANK_POP_URL = 'https://api.worldbank.org/v2/country/IND/indicator/SP.POP.TOTL';
+// 4. OpenStreetMap Nominatim Search API
+const OSM_NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+// 5. NPPES Healthcare Provider Directory API
+const NPPES_REGISTRY_URL = 'https://npiregistry.cms.hhs.gov/api/';
 /**
  * 1. Fetch Real Live Weather & Rainfall from Open-Meteo Public API
  */
@@ -173,6 +166,7 @@ export const fetchLiveRoadRouting = async (
       const durationMins = parseFloat((route.duration / 60).toFixed(2));
       const avgSpeed = durationMins > 0 ? parseFloat((distanceKm / (durationMins / 60)).toFixed(1)) : 40.0;
 
+      // Higher speed and clear routability -> higher accessibility score
       const roadAccessibilityScore = Math.min(1.0, Math.max(0.1, avgSpeed / 80.0));
 
       return {
