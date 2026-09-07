@@ -64,7 +64,7 @@ export const receiveTelemetry = async (req: Request, res: Response) => {
   }
 };
 
-export const getHealthSummary = async (req: Request, res: Response) => {
+export const getHealthSummary = async (_req: Request, res: Response) => {
   try {
     await checkTable();
     const [devices] = await sequelize.query(`SELECT * FROM iot_devices;`);

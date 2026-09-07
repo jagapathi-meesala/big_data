@@ -5,7 +5,7 @@ import { seedDatabase } from '../config/seed';
 
 const router = Router();
 
-router.get('/seed', async (req, res) => {
+router.get('/seed', async (_req, res) => {
   try {
     await seedDatabase();
     res.status(200).json({ message: 'Seeder completed successfully!' });

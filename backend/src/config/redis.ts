@@ -17,7 +17,6 @@ export const connectRedis = async (): Promise<void> => {
     await redisClient.connect();
     console.log('Connected to Redis server successfully.');
   } catch (error) {
-    console.error('Failed to connect to Redis:', error);
-    process.exit(1);
+    console.warn('Failed to connect to Redis. Proceeding in fallback mode:', error);
   }
 };

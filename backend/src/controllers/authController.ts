@@ -12,8 +12,8 @@ const generateToken = (id: string, email: string, role: string): string => {
     { id, email, role },
     process.env.JWT_SECRET || 'supersecretjwtkeyforaid-dras2026!',
     {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-    }
+      expiresIn: '7d',
+    } as any
   );
 };
 
@@ -23,7 +23,7 @@ const generateRefreshToken = (id: string, email: string, role: string): string =
     process.env.JWT_SECRET || 'supersecretjwtkeyforaid-dras2026!',
     {
       expiresIn: '30d',
-    }
+    } as any
   );
 };
 

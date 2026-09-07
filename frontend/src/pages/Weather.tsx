@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
   CloudRain, Wind, Droplets, Thermometer, AlertCircle, MapPin,
-  Eye, TrendingUp, TrendingDown, BarChart3, Calendar, Activity,
-  Zap, CloudLightning, CloudSnow, Sun, Waves
+  Eye, BarChart3, Activity,
+  Zap, Award, ChevronUp, ChevronDown
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -21,11 +21,6 @@ interface CityWeather {
 }
 
 // ─── Real Rainfall Data (1901–2015, IMD Dataset) ─────────────────────────────
-const MONTHLY_AVG_MM = {
-  CAP: { JAN:7.5, FEB:12.9, MAR:13.2, APR:26.7, MAY:62.5, JUN:123.7, JUL:173.8, AUG:175.9, SEP:181.7, OCT:185.5, NOV:77.9, DEC:11.4 },
-  TEL: { JAN:7.7, FEB:9.7,  MAR:12.6, APR:18.2, MAY:25.4, JUN:142.1, JUL:247.5, AUG:215.1, SEP:175.5, OCT:74.2,  NOV:20.3, DEC:5.1  },
-};
-
 const ANNUAL_RECENT = [
   { year:2000, cap:992.3,  tel:1078.0 },
   { year:2001, cap:1009.3, tel:922.3  },
@@ -45,21 +40,6 @@ const ANNUAL_RECENT = [
   { year:2015, cap:1010.9, tel:857.3  },
 ];
 
-const DECADE_MONSOON = [
-  { decade:'1900s', cap:622.0, tel:715.5 },
-  { decade:'1910s', cap:677.6, tel:710.3 },
-  { decade:'1920s', cap:597.8, tel:685.5 },
-  { decade:'1930s', cap:609.1, tel:816.0 },
-  { decade:'1940s', cap:624.0, tel:760.9 },
-  { decade:'1950s', cap:745.2, tel:874.8 },
-  { decade:'1960s', cap:654.9, tel:797.8 },
-  { decade:'1970s', cap:627.6, tel:752.5 },
-  { decade:'1980s', cap:682.4, tel:918.1 },
-  { decade:'1990s', cap:662.7, tel:768.7 },
-  { decade:'2000s', cap:670.7, tel:750.5 },
-  { decade:'2010s', cap:704.3, tel:822.1 },
-];
-
 const EXTREME_YEARS = [
   { sub:'Coastal AP',  year:2010, mm:1712.4 },
   { sub:'Coastal AP',  year:1990, mm:1611.1 },
@@ -73,10 +53,32 @@ const EXTREME_YEARS = [
   { sub:'Coastal AP',  year:1995, mm:1352.0 },
 ];
 
-const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-const MONSOON_MONTHS = ['JUN','JUL','AUG','SEP'];
+const DISTRICT_PRIORITIES = [
+  { rank: 1,  district: 'Karimnagar',                    state: 'Telangana',      score: 0.8146, zone: 'ZONE 1 — CRITICAL', shift: 1,   Dd: '0.85', Vd: '0.78', Qd: '0.45' },
+  { rank: 2,  district: 'Nalgonda',                      state: 'Telangana',      score: 0.8037, zone: 'ZONE 1 — CRITICAL', shift: -1,  Dd: '0.82', Vd: '0.76', Qd: '0.48' },
+  { rank: 3,  district: 'Mahbubnagar',                   state: 'Telangana',      score: 0.6713, zone: 'ZONE 2 — HIGH',     shift: 0,   Dd: '0.68', Vd: '0.65', Qd: '0.52' },
+  { rank: 4,  district: 'Medak',                         state: 'Telangana',      score: 0.5694, zone: 'ZONE 2 — HIGH',     shift: 0,   Dd: '0.58', Vd: '0.54', Qd: '0.41' },
+  { rank: 5,  district: 'Warangal',                      state: 'Telangana',      score: 0.5169, zone: 'ZONE 2 — HIGH',     shift: 1,   Dd: '0.52', Vd: '0.50', Qd: '0.49' },
+  { rank: 6,  district: 'Adilabad',                      state: 'Telangana',      score: 0.4848, zone: 'ZONE 3 — MEDIUM',   shift: -1,  Dd: '0.47', Vd: '0.49', Qd: '0.55' },
+  { rank: 7,  district: 'Khammam',                       state: 'Telangana',      score: 0.4311, zone: 'ZONE 3 — MEDIUM',   shift: 0,   Dd: '0.44', Vd: '0.41', Qd: '0.50' },
+  { rank: 8,  district: 'West Godavari',                 state: 'Andhra Pradesh', score: 0.3714, zone: 'ZONE 3 — MEDIUM',   shift: 11,  Dd: '0.38', Vd: '0.35', Qd: '0.42' },
+  { rank: 9,  district: 'Nizamabad',                     state: 'Telangana',      score: 0.3706, zone: 'ZONE 3 — MEDIUM',   shift: 0,   Dd: '0.36', Vd: '0.37', Qd: '0.39' },
+  { rank: 10, district: 'Krishna',                       state: 'Andhra Pradesh', score: 0.3108, zone: 'ZONE 3 — MEDIUM',   shift: 6,   Dd: '0.31', Vd: '0.30', Qd: '0.35' },
+  { rank: 11, district: 'East Godavari',                state: 'Andhra Pradesh', score: 0.3031, zone: 'ZONE 3 — MEDIUM',   shift: 11,  Dd: '0.30', Vd: '0.29', Qd: '0.38' },
+  { rank: 12, district: 'Hyderabad',                    state: 'Telangana',      score: 0.3029, zone: 'ZONE 3 — MEDIUM',   shift: 11,  Dd: '0.29', Vd: '0.31', Qd: '0.28' },
+  { rank: 13, district: 'Guntur',                       state: 'Andhra Pradesh', score: 0.2798, zone: 'ZONE 4 — LOW',      shift: 2,   Dd: '0.27', Vd: '0.28', Qd: '0.32' },
+  { rank: 14, district: 'Srikakulam',                   state: 'Andhra Pradesh', score: 0.2591, zone: 'ZONE 4 — LOW',      shift: -6,  Dd: '0.25', Vd: '0.26', Qd: '0.34' },
+  { rank: 15, district: 'Rangareddy',                    state: 'Telangana',      score: 0.2283, zone: 'ZONE 4 — LOW',      shift: 5,   Dd: '0.22', Vd: '0.23', Qd: '0.25' },
+  { rank: 16, district: 'Vizianagaram',                 state: 'Andhra Pradesh', score: 0.2113, zone: 'ZONE 4 — LOW',      shift: -5,  Dd: '0.20', Vd: '0.21', Qd: '0.31' },
+  { rank: 17, district: 'Sri Potti Sriramulu Nellore',  state: 'Andhra Pradesh', score: 0.2042, zone: 'ZONE 4 — LOW',      shift: -5,  Dd: '0.19', Vd: '0.21', Qd: '0.29' },
+  { rank: 18, district: 'Prakasam',                     state: 'Andhra Pradesh', score: 0.1901, zone: 'ZONE 4 — LOW',      shift: -5,  Dd: '0.18', Vd: '0.19', Qd: '0.27' },
+  { rank: 19, district: 'Chittoor',                     state: 'Andhra Pradesh', score: 0.1805, zone: 'ZONE 4 — LOW',      shift: -5,  Dd: '0.17', Vd: '0.18', Qd: '0.26' },
+  { rank: 20, district: 'Visakhapatnam',                state: 'Andhra Pradesh', score: 0.1774, zone: 'ZONE 4 — LOW',      shift: 1,   Dd: '0.17', Vd: '0.17', Qd: '0.25' },
+  { rank: 21, district: 'Anantapur',                    state: 'Andhra Pradesh', score: 0.1654, zone: 'ZONE 4 — LOW',      shift: -11, Dd: '0.15', Vd: '0.16', Qd: '0.22' },
+  { rank: 22, district: 'Cuddapah',                     state: 'Andhra Pradesh', score: 0.1585, zone: 'ZONE 4 — LOW',      shift: -5,  Dd: '0.15', Vd: '0.15', Qd: '0.21' },
+  { rank: 23, district: 'Kurnool',                      state: 'Andhra Pradesh', score: 0.1529, zone: 'ZONE 4 — LOW',      shift: -5,  Dd: '0.14', Vd: '0.15', Qd: '0.20' },
+];
 
-// ─── LiveDot ──────────────────────────────────────────────────────────────────
 const LiveDot = () => (
   <span className="flex items-center space-x-1">
     <span className="relative flex h-2 w-2">
@@ -87,14 +89,12 @@ const LiveDot = () => (
   </span>
 );
 
-// ─── Mini inline bar ──────────────────────────────────────────────────────────
 const Bar = ({ value, max, color }: { value: number; max: number; color: string }) => (
   <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
     <div className="h-2 rounded-full transition-all" style={{ width:`${Math.max((value/max)*100,2)}%`, backgroundColor: color }} />
   </div>
 );
 
-// ─── Weather card ─────────────────────────────────────────────────────────────
 const WeatherCard = ({ city }: { city: CityWeather }) => {
   const isHot   = city.temp >= 35;
   const isWindy = city.windSpeed >= 20;
@@ -144,9 +144,8 @@ const WeatherCard = ({ city }: { city: CityWeather }) => {
   );
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 const Weather: React.FC = () => {
-  const [tab, setTab] = useState<'weather' | 'rainfall' | 'extreme'>('weather');
+  const [tab, setTab] = useState<'weather' | 'rainfall' | 'zones' | 'extreme'>('weather');
 
   const { data, isLoading } = useQuery(['live-weather-feed'], async () => {
     const res = await api.get('/weather/live');
@@ -158,12 +157,19 @@ const Weather: React.FC = () => {
   const avgTemp    = cities.length ? cities.reduce((s,c)=>s+c.temp,0)/cities.length : 0;
   const alertCount = cities.filter(c => c.temp>=35||c.windSpeed>=20||c.rainfall>0).length;
 
+  const zoneColor = (zone: string) => {
+    if (zone.includes('ZONE 1')) return 'bg-rose-500/10 text-rose-500 border-rose-500/20';
+    if (zone.includes('ZONE 2')) return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+    if (zone.includes('ZONE 3')) return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+    return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Weather Warning Terminal</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-          Live climatic indicators, historical rainfall data and extreme event reports for Andhra Pradesh &amp; Telangana.
+          Live climatic indicators, district priority zones, historical rainfall data and extreme event reports for Andhra Pradesh &amp; Telangana.
         </p>
       </div>
 
@@ -171,15 +177,21 @@ const Weather: React.FC = () => {
       <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
         <Link to="/sos-requests" className="pb-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">SOS Requests</Link>
         <Link to="/incidents"    className="pb-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">Incidents Log</Link>
-        {(['weather','rainfall','extreme'] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)}
-            className={`pb-3 transition ${tab===t ? 'border-b-2 border-blue-500 text-blue-500' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}>
-            {t === 'weather' ? 'Weather Alerts' : t === 'rainfall' ? 'Rainfall Report' : 'Extreme Events'}
-          </button>
-        ))}
+        <button onClick={() => setTab('weather')} className={`pb-3 transition ${tab==='weather' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-slate-400 hover:text-slate-600'}`}>
+          Weather Alerts
+        </button>
+        <button onClick={() => setTab('zones')} className={`pb-3 transition ${tab==='zones' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-slate-400 hover:text-slate-600'}`}>
+          District Priority Zones
+        </button>
+        <button onClick={() => setTab('rainfall')} className={`pb-3 transition ${tab==='rainfall' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-slate-400 hover:text-slate-600'}`}>
+          Rainfall Report
+        </button>
+        <button onClick={() => setTab('extreme')} className={`pb-3 transition ${tab==='extreme' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-slate-400 hover:text-slate-600'}`}>
+          Extreme Events
+        </button>
       </div>
 
-      {/* ── WEATHER ALERTS ──────────────────────────────────────── */}
+      {/* ── WEATHER ALERTS ── */}
       {tab === 'weather' && (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -209,26 +221,81 @@ const Weather: React.FC = () => {
         </>
       )}
 
-      {/* ── RAINFALL REPORT (annual + monsoon merged) ────────────── */}
+      {/* ── DISTRICT PRIORITY ZONES (1-4) ── */}
+      {tab === 'zones' && (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Award size={16} className="text-blue-500" />
+                <h2 className="font-bold text-sm text-slate-800 dark:text-slate-100">District DDRPS Priority Scores &amp; Zones (1–4)</h2>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">ElasticNet CV Model (R² = 0.6283)</span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-slate-50 dark:bg-slate-800/40 text-[10px] uppercase tracking-wider text-slate-400">
+                    <th className="px-5 py-3 text-left">Rank</th>
+                    <th className="px-5 py-3 text-left">District &amp; State</th>
+                    <th className="px-4 py-3 text-center">DDRPS Score</th>
+                    <th className="px-4 py-3 text-left">Priority Zone</th>
+                    <th className="px-4 py-3 text-center">Pop. Exposure (Dₐ)</th>
+                    <th className="px-4 py-3 text-center">Housing Vuln. (Vₐ)</th>
+                    <th className="px-4 py-3 text-center">Rainfall Risk (Qₐ)</th>
+                    <th className="px-4 py-3 text-center">Shift</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {DISTRICT_PRIORITIES.map((d) => (
+                    <tr key={d.district} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                      <td className="px-5 py-3.5 font-black text-slate-800 dark:text-slate-100">#{d.rank}</td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center space-x-2">
+                          <MapPin size={12} className="text-blue-500 shrink-0" />
+                          <div>
+                            <p className="font-bold text-slate-800 dark:text-slate-100">{d.district}</p>
+                            <p className="text-[9px] text-slate-400">{d.state}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5 text-center font-mono font-extrabold text-slate-800 dark:text-slate-100 text-[11px]">
+                        {d.score.toFixed(4)}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <span className={`px-2.5 py-1 border rounded-lg text-[9px] font-black uppercase tracking-wider ${zoneColor(d.zone)}`}>
+                          {d.zone}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3.5 text-center font-mono text-slate-500">{d.Dd}</td>
+                      <td className="px-4 py-3.5 text-center font-mono text-slate-500">{d.Vd}</td>
+                      <td className="px-4 py-3.5 text-center font-mono text-slate-500">{d.Qd}</td>
+                      <td className="px-4 py-3.5 text-center">
+                        {d.shift > 0 ? (
+                          <span className="inline-flex items-center space-x-0.5 text-emerald-500 font-bold text-[11px]">
+                            <ChevronUp size={13} /><span>+{d.shift}</span>
+                          </span>
+                        ) : d.shift < 0 ? (
+                          <span className="inline-flex items-center space-x-0.5 text-rose-500 font-bold text-[11px]">
+                            <ChevronDown size={13} /><span>{d.shift}</span>
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 text-[11px]">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── RAINFALL REPORT ── */}
       {tab === 'rainfall' && (
         <div className="space-y-6">
-          {/* Summary KPIs */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { label:'Coastal AP Mean',  value:'1,052.9 mm', icon:<CloudRain size={18}/>, color:'bg-blue-500/10 text-blue-500' },
-              { label:'Telangana Mean',   value:'953.4 mm',   icon:<CloudRain size={18}/>, color:'bg-violet-500/10 text-violet-500' },
-              { label:'Coastal AP Peak',  value:'1,712 mm',   icon:<TrendingUp size={18}/>, color:'bg-emerald-500/10 text-emerald-500' },
-              { label:'Telangana Peak',   value:'1,544 mm',   icon:<TrendingUp size={18}/>, color:'bg-amber-500/10 text-amber-500' },
-            ].map(k => (
-              <div key={k.label} className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm flex items-center space-x-3">
-                <div className={`p-3 rounded-xl ${k.color}`}>{k.icon}</div>
-                <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{k.label}</span>
-                  <p className="text-base font-black text-slate-800 dark:text-slate-100 mt-0.5">{k.value}</p></div>
-              </div>
-            ))}
-          </div>
-
-          {/* Annual 2000-2015 */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-2">
               <BarChart3 size={16} className="text-blue-500"/>
@@ -247,108 +314,20 @@ const Weather: React.FC = () => {
                     <Bar value={row.tel} max={1800} color="#8b5cf6"/>
                     <span className="w-16 text-right font-mono text-slate-500">{row.tel.toFixed(0)} mm</span>
                   </div>
-                  {(row.cap >= 1200 || row.tel >= 1200)
-                    ? <span className="text-[9px] font-bold px-1.5 py-0.5 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded">EXTREME</span>
-                    : (row.cap <= 750 || row.tel <= 750)
-                    ? <span className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded">DEFICIT</span>
-                    : <span className="w-14"/>}
                 </div>
               ))}
-              <div className="flex items-center space-x-6 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex items-center space-x-2 text-[10px] text-slate-400"><div className="w-3 h-3 rounded-sm bg-blue-500"/><span>Coastal AP</span></div>
-                <div className="flex items-center space-x-2 text-[10px] text-slate-400"><div className="w-3 h-3 rounded-sm bg-violet-500"/><span>Telangana</span></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Monthly averages */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-2">
-                <Calendar size={16} className="text-blue-500"/>
-                <h2 className="font-bold text-sm text-slate-800 dark:text-slate-100">Monthly Average (1901–2015, mm)</h2>
-              </div>
-              <div className="px-6 py-4 space-y-2">
-                {MONTHS.map(m => {
-                  const cap = MONTHLY_AVG_MM.CAP[m as keyof typeof MONTHLY_AVG_MM.CAP];
-                  const tel = MONTHLY_AVG_MM.TEL[m as keyof typeof MONTHLY_AVG_MM.TEL];
-                  const isMonsoon = MONSOON_MONTHS.includes(m);
-                  return (
-                    <div key={m} className={`flex items-center gap-3 py-1 px-2 rounded-lg ${isMonsoon ? 'bg-blue-500/5 dark:bg-blue-500/10' : ''}`}>
-                      <span className={`text-[10px] font-bold w-7 ${isMonsoon ? 'text-blue-500' : 'text-slate-400'}`}>{m}</span>
-                      {isMonsoon ? <Waves size={10} className="text-blue-400 shrink-0"/> : <span className="w-2.5"/>}
-                      <div className="flex-1 flex items-center gap-2 text-[10px]">
-                        <Bar value={cap} max={260} color="#3b82f6"/>
-                        <span className="w-12 text-right font-mono text-slate-500">{cap}</span>
-                      </div>
-                      <div className="flex-1 flex items-center gap-2 text-[10px]">
-                        <Bar value={tel} max={260} color="#8b5cf6"/>
-                        <span className="w-12 text-right font-mono text-slate-500">{tel}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-                <div className="flex items-center space-x-4 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center space-x-2 text-[10px] text-slate-400"><div className="w-2.5 h-2.5 rounded-sm bg-blue-500"/><span>Coastal AP</span></div>
-                  <div className="flex items-center space-x-2 text-[10px] text-slate-400"><div className="w-2.5 h-2.5 rounded-sm bg-violet-500"/><span>Telangana</span></div>
-                  <div className="flex items-center space-x-2 text-[10px] text-slate-400"><Waves size={10} className="text-blue-400"/><span>Monsoon peak</span></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Decade monsoon */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-2">
-                <TrendingUp size={16} className="text-emerald-500"/>
-                <h2 className="font-bold text-sm text-slate-800 dark:text-slate-100">Monsoon by Decade (Jun–Sep, mm)</h2>
-              </div>
-              <div className="px-6 py-4 space-y-2">
-                {DECADE_MONSOON.map(row => (
-                  <div key={row.decade} className="flex items-center gap-3">
-                    <span className="text-[10px] font-bold text-slate-500 w-12">{row.decade}</span>
-                    <div className="flex-1 flex items-center gap-2 text-[10px]">
-                      <Bar value={row.cap} max={960} color="#3b82f6"/>
-                      <span className="w-14 text-right font-mono text-slate-500">{row.cap.toFixed(0)}</span>
-                    </div>
-                    <div className="flex-1 flex items-center gap-2 text-[10px]">
-                      <Bar value={row.tel} max={960} color="#8b5cf6"/>
-                      <span className="w-14 text-right font-mono text-slate-500">{row.tel.toFixed(0)}</span>
-                      {row.tel >= 900 && <span className="px-1 py-0.5 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded text-[8px] font-bold">HIGH</span>}
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── EXTREME EVENTS ──────────────────────────────────────── */}
+      {/* ── EXTREME EVENTS ── */}
       {tab === 'extreme' && (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { label:'Record (Coastal AP)', value:'1,712.4 mm', sub:'Year 2010', color:'bg-rose-500/10 text-rose-500',   icon:<CloudLightning size={18}/> },
-              { label:'Record (Telangana)',  value:'1,544.9 mm', sub:'Year 1988', color:'bg-amber-500/10 text-amber-500', icon:<CloudLightning size={18}/> },
-              { label:'Lowest (Coastal AP)', value:'703.2 mm',   sub:'Year 2002', color:'bg-cyan-500/10 text-cyan-500',   icon:<CloudSnow size={18}/> },
-              { label:'Lowest (Telangana)',  value:'437.0 mm',   sub:'All-time',  color:'bg-slate-500/10 text-slate-500', icon:<Sun size={18}/> },
-            ].map(k => (
-              <div key={k.label} className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm flex items-center space-x-3">
-                <div className={`p-3 rounded-xl ${k.color}`}>{k.icon}</div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{k.label}</span>
-                  <p className="text-base font-black text-slate-800 dark:text-slate-100 mt-0.5">{k.value}</p>
-                  <p className="text-[9px] text-slate-400">{k.sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-2">
               <Zap size={16} className="text-rose-500"/>
               <h2 className="font-bold text-sm text-slate-800 dark:text-slate-100">Top 10 Extreme Rainfall Events (1901–2015)</h2>
-              <span className="ml-auto text-[10px] text-slate-400">Threshold: ≥ 1,350 mm annual</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
@@ -358,47 +337,17 @@ const Weather: React.FC = () => {
                     <th className="px-5 py-3 text-left">Subdivision</th>
                     <th className="px-4 py-3 text-center">Year</th>
                     <th className="px-4 py-3 text-right">Annual Rainfall</th>
-                    <th className="px-4 py-3 text-right">vs. Mean</th>
-                    <th className="px-4 py-3 text-left">Intensity</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {EXTREME_YEARS.map((row, i) => {
-                    const mean = row.sub === 'Coastal AP' ? 1052.9 : 953.4;
-                    const pctAbove = (((row.mm - mean)/mean)*100).toFixed(0);
-                    const barWidth = Math.min(100, ((row.mm-1300)/450)*100);
-                    return (
-                      <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
-                        <td className="px-5 py-3.5">
-                          <span className={`w-6 h-6 inline-flex items-center justify-center rounded-full text-[10px] font-black
-                            ${i===0 ? 'bg-rose-500 text-white' : i<3 ? 'bg-amber-500/20 text-amber-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
-                            {i+1}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3.5">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border
-                            ${row.sub === 'Coastal AP'
-                              ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
-                              : 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20'}`}>
-                            {row.sub}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5 text-center font-bold text-slate-700 dark:text-slate-200">{row.year}</td>
-                        <td className="px-4 py-3.5 text-right font-black text-slate-800 dark:text-slate-100 font-mono">{row.mm.toFixed(1)} mm</td>
-                        <td className="px-4 py-3.5 text-right"><span className="text-rose-500 font-bold text-[11px]">+{pctAbove}%</span></td>
-                        <td className="px-4 py-3.5">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-20 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                              <div className="h-1.5 rounded-full bg-rose-500" style={{ width:`${barWidth}%`}}/>
-                            </div>
-                            <span className="text-[9px] font-bold text-rose-500 uppercase">
-                              {row.mm>=1600 ? 'Catastrophic' : row.mm>=1450 ? 'Severe' : 'Extreme'}
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {EXTREME_YEARS.map((row, i) => (
+                    <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                      <td className="px-5 py-3.5 font-bold">{i+1}</td>
+                      <td className="px-5 py-3.5 font-bold">{row.sub}</td>
+                      <td className="px-4 py-3.5 text-center font-bold">{row.year}</td>
+                      <td className="px-4 py-3.5 text-right font-black font-mono">{row.mm.toFixed(1)} mm</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

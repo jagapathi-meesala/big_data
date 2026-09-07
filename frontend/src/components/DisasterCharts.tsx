@@ -122,7 +122,7 @@ export const DisasterTrendsChart: React.FC<{ trends?: any[]; forecast?: any[] }>
     }
   };
 
-  return <Line data={data} options={options} />;
+  return <Line data={data} options={options as any} />;
 };
 
 export const ResourceAvailabilityChart: React.FC<{ resourceDistribution?: any[] }> = ({ resourceDistribution }) => {
@@ -197,7 +197,7 @@ export const ResourceAvailabilityChart: React.FC<{ resourceDistribution?: any[] 
     }
   };
 
-  return <Bar data={data} options={options} />;
+  return <Bar data={data} options={options as any} />;
 };
 
 export const VehicleAvailabilityChart: React.FC<{ resourceDistribution?: any[] }> = ({ resourceDistribution }) => {
@@ -264,7 +264,7 @@ export const VehicleAvailabilityChart: React.FC<{ resourceDistribution?: any[] }
     }
   };
 
-  return <Bar data={data} options={options} />;
+  return <Bar data={data} options={options as any} />;
 };
 
 export const SeverityDistributionChart: React.FC<{ severityDistribution?: any[] }> = ({ severityDistribution }) => {
@@ -310,7 +310,7 @@ export const SeverityDistributionChart: React.FC<{ severityDistribution?: any[] 
     }
   };
 
-  return <Doughnut data={data} options={options} />;
+  return <Doughnut data={data} options={options as any} />;
 };
 
 

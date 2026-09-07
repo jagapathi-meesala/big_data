@@ -48,7 +48,7 @@ app.use(limiter);
 app.use(auditLogger);
 
 // Request Logging Middleware
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   logger.info(`HTTP ${req.method} ${req.originalUrl} - IP: ${req.ip}`);
   next();
 });
@@ -62,7 +62,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Basic Status Endpoint
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.status(200).json({
     status: 'online',
     system: 'AI Powered Distributed Disaster Resource Allocation System',

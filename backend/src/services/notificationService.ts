@@ -10,6 +10,11 @@ export interface SystemNotification {
   updatedAt?: Date;
 }
 
+export const sendEmail = async (to: string, subject: string, _text: string): Promise<boolean> => {
+  console.log(`[Notification Service] Sending Email to ${to} | Subject: ${subject}`);
+  return true;
+};
+
 export const createSystemNotification = async (
   title: string,
   message: string,

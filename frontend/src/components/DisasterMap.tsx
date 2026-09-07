@@ -12,6 +12,11 @@ interface MapItem {
   affectedPeople?: number;
   timeReported?: string;
   assignedResources?: string;
+  quantity?: number;
+  occupancy?: number;
+  icuBeds?: number;
+  doctorsCount?: number;
+  ambulancesCount?: number;
 }
 
 interface DisasterMapProps {
@@ -47,14 +52,7 @@ const getMarkerIcon = (type: string, severity?: string) => {
   });
 };
 
-const getClusterIcon = (count: number) => {
-  return L.divIcon({
-    html: `<div style="background-color: #4f46e5; color: white; font-weight: bold; font-size: 11px; width: 1.75rem; height: 1.75rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.4);">${count}</div>`,
-    className: 'custom-cluster-icon',
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-  });
-};
+
 
 const renderPopupContent = (item: MapItem) => {
   const isInc = item.type === 'incident';
@@ -240,7 +238,6 @@ export const DisasterMap: React.FC<DisasterMapProps> = ({
   const [currentZoom, setCurrentZoom] = useState(zoom);
 
   const clusters = clusterMarkers(items, currentZoom);
-  const incidents = items.filter(item => item.type === 'incident');
 
   return (
     <div className="w-full h-full min-h-[400px] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-inner relative flex flex-col">

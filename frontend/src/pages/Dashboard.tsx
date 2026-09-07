@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import {
   AlertTriangle, Users, Home, Bell, Activity, ShieldAlert,
   Truck, AlertOctagon, X, Database, Wifi, Cpu,
-  Navigation2, Navigation, MapPin, Clock, Gauge, ChevronRight, ShieldCheck, Compass, ArrowRight
+  Navigation2, Navigation, MapPin, Clock, Gauge, ChevronRight, Compass, ArrowRight
 } from 'lucide-react';
 import { DisasterMap } from '../components/DisasterMap';
 import { SeverityDistributionChart } from '../components/DisasterCharts';
