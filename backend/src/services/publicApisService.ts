@@ -3,27 +3,22 @@ import logger from '../config/logger';
 
 // Types & Interfaces
 export interface LiveWeatherData {
-  temperature?: number;
-  humidity?: number;
-  rainfallMm?: number;
+  temperature: number;
+  humidity: number;
+  rainfallMm: number;
   precipitation?: number;
-  rain?: number;
-  windSpeedKmH?: number;
-  windSpeed?: number;
-  pressureHpa?: number;
-  surfacePressure?: number;
-  weatherCode?: number;
-  description?: string;
-  isHighRisk?: boolean;
+  windSpeedKmH: number;
+  pressureHpa: number;
+  weatherCode: number;
+  description: string;
+  isHighRisk: boolean;
 }
 
 export interface LiveRoadRouteData {
   distanceKm: number;
-  durationMinutes?: number;
+  durationMinutes: number;
   durationMins?: number;
-  averageSpeedKmh?: number;
   roadAccessibilityScore?: number;
-  routabilityStatus?: string;
   routeGeometry?: any;
 }
 
@@ -31,56 +26,41 @@ export interface BDAEscapeRouteCandidate {
   id: string;
   name: string;
   distanceKm: number;
-  durationMinutes?: number;
+  durationMinutes: number;
   durationMins?: number;
   roadRiskScore: number;
-  compositeBdaScore?: number;
+  compositeBdaScore: number;
   compositeScore?: number;
-  riskCategory?: string;
   recommendation: string;
   badge: string;
   color: string;
-  polyline?: any;
-  steps?: any[];
 }
 
 export interface LivePopulationData {
   country: string;
-  year?: number;
-  dataYear?: number;
-  population?: number;
+  year: number;
+  population: number;
   totalPopulation?: number;
-  source?: string;
 }
 
 export interface BDAResourceItem {
   id: string;
   name: string;
-  type?: string;
+  type: string;
   category?: string;
-  district?: string;
+  district: string;
   lat: number;
   lon: number;
   distanceKm: number;
-  durationMins?: number;
   bunksAvailable?: number;
   availableBunks?: number;
-  capacityBunks?: number;
-  occupancyPercent?: number;
   fuelAvailable?: boolean;
-  sourceApi?: string;
-  address?: string;
-  phone?: string;
 }
 
 export interface DistrictPublicApiSummary {
   district: string;
   coordinates?: { lat: number; lon: number };
   resources: BDAResourceItem[];
-  weather?: LiveWeatherData;
-  roadRoute?: LiveRoadRouteData;
-  population?: LivePopulationData;
-  ddrpsSubScores?: any;
   summaryMetrics: {
     totalHospitals: number;
     totalShelters: number;
@@ -295,7 +275,7 @@ export const computeEmergencyEscapeRoutes = async (
   }
 
   // Sort by Composite Score (lowest score is safest & best)
-  candidates.sort((a, b) => (a.compositeScore ?? 0) - (b.compositeScore ?? 0));
+  candidates.sort((a, b) => a.compositeScore - b.compositeScore);
 
   candidates[0].recommendation = 'BEST_RECOMMENDED';
   candidates[0].badge = 'Best Recommended Route';
@@ -331,10 +311,8 @@ export const fetchLiveWorldBankPopulation = async (): Promise<LivePopulationData
       const record = response.data[1][0];
       return {
         country: record.country?.value || 'India',
-        year: parseInt(record.date || '2025', 10),
-        population: record.value || 1428627663,
         totalPopulation: record.value || 1428627663,
-        dataYear: parseInt(record.date || '2025', 10),
+        dataYear: record.date || '2025',
         source: 'World Bank Open Data API'
       };
     }
@@ -344,10 +322,8 @@ export const fetchLiveWorldBankPopulation = async (): Promise<LivePopulationData
 
   return {
     country: 'India',
-    year: 2025,
-    population: 1428627663,
     totalPopulation: 1428627663,
-    dataYear: 2025,
+    dataYear: '2025',
     source: 'World Bank Open Data (Fallback)'
   };
 };
@@ -492,7 +468,7 @@ export const analyzeBDAResources = async (
   const totalHospitals = allResources.filter(r => r.category === 'HOSPITAL').length;
   const totalShelters = allResources.filter(r => r.category === 'SHELTER').length;
   const totalFuelPoints = allResources.filter(r => r.category === 'FUEL').length;
-  const availableBunksSum = allResources.reduce((sum, r) => sum + (r.availableBunks ?? 0), 0);
+  const availableBunksSum = allResources.reduce((sum, r) => sum + r.availableBunks, 0);
   const avgDistanceKm = allResources.length > 0 ? parseFloat((allResources.reduce((s, r) => s + r.distanceKm, 0) / allResources.length).toFixed(2)) : 0;
 
   return {
@@ -524,26 +500,18 @@ export const getDistrictPublicApiSummary = async (
     fetchLiveWorldBankPopulation()
   ]);
 
-  const Qd = Math.min(1.0, Math.max(0.05, ((weather.precipitation ?? 0) * 10 + (weather.temperature ?? 30) / 40.0) / 2.0));
+  const Qd = Math.min(1.0, Math.max(0.05, (weather.precipitation * 10 + weather.temperature / 40.0) / 2.0));
   const Dd = 0.65;
   const Hd = 0.45;
-  const Md = parseFloat((1.0 - (roadRoute.roadAccessibilityScore ?? 0.8)).toFixed(3));
+  const Md = parseFloat((1.0 - roadRoute.roadAccessibilityScore).toFixed(3));
   const Vd = 0.50;
 
   return {
     district,
     coordinates: { lat, lon },
-    resources: [],
     weather,
     roadRoute,
     population,
-    ddrpsSubScores: { Qd, Dd, Hd, Md, Vd },
-    summaryMetrics: {
-      totalHospitals: 0,
-      totalShelters: 0,
-      totalFuelPoints: 0,
-      availableBunksSum: 0,
-      avgDistanceKm: 0
-    }
+    ddrpsSubScores: { Qd, Dd, Hd, Md, Vd }
   };
 };

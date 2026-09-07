@@ -1,6 +1,32 @@
 import { sequelize } from '../config/db';
 import { redisClient } from '../config/redis';
 
+// SMTP delivery for transactional mail (password reset). When SMTP env vars
+// are absent the mail is logged instead of sent — forgot-password stays
+// functional in dev without an SMTP server.
+export const sendEmail = async (to: string, subject: string, text: string): Promise<void> => {
+  const host = process.env.SMTP_HOST;
+  if (!host) {
+    console.warn(`[email:dev-only] to=${to} subject="${subject}" body=${text}`);
+    return;
+  }
+  const nodemailer = await import('nodemailer');
+  const transporter = nodemailer.createTransport({
+    host,
+    port: parseInt(process.env.SMTP_PORT || '587', 10),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: process.env.SMTP_USER
+      ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+      : undefined
+  });
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || 'no-reply@aid-dras.org',
+    to,
+    subject,
+    text
+  });
+};
+
 export interface SystemNotification {
   id?: number;
   title: string;
@@ -9,11 +35,6 @@ export interface SystemNotification {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
-export const sendEmail = async (to: string, subject: string, _text: string): Promise<boolean> => {
-  console.log(`[Notification Service] Sending Email to ${to} | Subject: ${subject}`);
-  return true;
-};
 
 export const createSystemNotification = async (
   title: string,

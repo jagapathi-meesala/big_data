@@ -1,11 +1,22 @@
 import { Router } from 'express';
 import { register, login, refresh, forgotPassword, resetPassword, recoverEmail } from '../controllers/authController';
 import { registerValidator, loginValidator } from '../middlewares/validators';
+import { protect, restrictTo } from '../middlewares/auth';
+import { UserRole } from '../models/User';
 import { seedDatabase } from '../config/seed';
 
 const router = Router();
 
-router.get('/seed', async (_req, res) => {
+// Destructive: wipes and reseeds users/incidents/resources/allocations.
+// Admin-only AND gated behind ?confirm=yes so it can never be triggered by
+// accident (it used to be a fully unauthenticated GET).
+router.get('/seed', protect, restrictTo(UserRole.ADMIN), async (req, res) => {
+  if (req.query.confirm !== 'yes') {
+    res.status(400).json({
+      message: 'Refusing to reseed. This drops all data. Call /auth/seed?confirm=yes as an ADMIN to proceed.'
+    });
+    return;
+  }
   try {
     await seedDatabase();
     res.status(200).json({ message: 'Seeder completed successfully!' });

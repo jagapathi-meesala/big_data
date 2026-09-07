@@ -9,3 +9,14 @@ backend/logs/
 frontend/dist/
 frontend/node_modules/
 backend/node_modules/
+
+# secrets — never commit
+.env
+.env.*
+backend/.env
+
+# RADAR: downloaded raw data + pipeline artifacts (reproducible via scripts)
+datasets/raw/
+bigdata/research/
+bigdata/legacy/
+*.grd

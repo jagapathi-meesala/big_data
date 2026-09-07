@@ -154,7 +154,7 @@ export const optimizeAllocation = async (
 };
 
 export const getActiveAllocations = async (
-  _req: AuthenticatedRequest,
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   try {

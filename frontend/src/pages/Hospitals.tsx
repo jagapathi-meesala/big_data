@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Building2, Bed, Navigation, Activity, RefreshCw } from 'lucide-react';
+import { Building2, Bed, MapPin, Navigation, Activity, ShieldAlert, Fuel, Home, RefreshCw } from 'lucide-react';
 import api from '../services/api';
 
 export const Hospitals: React.FC = () => {

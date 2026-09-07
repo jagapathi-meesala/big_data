@@ -1,72 +1,59 @@
-# AI-Powered Distributed Disaster Resource Allocation System (AID-DRAS)
+# AID-DRAS / RADAR
 
-AID-DRAS is a production-grade, highly available, distributed emergency management application designed to coordinate resource dispatches, analyze meteorological hazard indices, predict disaster severities, and optimize relief routes.
+**AID-DRAS** — AI-Powered Distributed Disaster Resource Allocation System for
+Andhra Pradesh & Telangana — now carries **RADAR** (Risk-Aware District
+Allocation & Response), a research-grade big-data pipeline whose outputs are
+served through the web dashboard.
 
----
+> **Paper working title:** *From Meteorological Risk to Response Priority:
+> Uncertainty-Aware District-Level Disaster Resource Pre-Positioning Validated
+> on Historical Flood Events (Andhra Pradesh & Telangana, on Hadoop/Spark).*
+> See `paper/paper.md` and `bigdata/README_RADAR.md`.
 
-## 1. System Architecture & Tech Stack
-- **Frontend Panel**: React.js (TypeScript, Vite, Tailwind CSS, Redux Toolkit, Leaflet mapping).
-- **Backend Services**: Node.js (Express, Sequelize PostGIS ORM, WebSocket gateway, Winston logs).
-- **AI Microservice**: Python 3.12 (FastAPI, Scikit-learn, XGBoost, SHAP Explainer model caches).
-- **Big Data Module**: Apache Hadoop (HDFS distributed datastores) and Apache Spark (PySpark ETL + Spark MLlib).
-- **Distributed Cache & Broker**: Redis (WebSocket load-balancing + Pub/Sub telemetry).
+## What is where
 
----
+| Path | What it is |
+|---|---|
+| `bigdata/` | **The research core (RADAR).** IMD gridded rainfall → district-day panel (PySpark), Spark MLlib hazard models, isotonic+conformal uncertainty, DDRPS 2.0 response-priority ranking, budget-constrained pre-positioning evaluated on historical flood events, Spark Structured Streaming live alerts, scalability benchmarks. Guide: [`bigdata/README_RADAR.md`](bigdata/README_RADAR.md) |
+| `backend/` | Node.js/Express + Sequelize + PostGIS API. Serves incidents/resources/allocations **and** the RADAR results via `/api/v1/research/*` |
+| `frontend/` | React + Vite + Leaflet dashboard, including the **Research Console** (`/research`) that renders pipeline outputs (calibrated risk, ranking, replay metrics, live alerts) |
+| `ai-service/` | Legacy FastAPI ML microservice from the pre-RADAR build. **Kept for reference, not part of the paper path** |
+| `datasets/` | Static inputs: Census-2011, hospitals, district registry. `datasets/raw/` (git-ignored) holds downloaded IMD/events data |
+| `paper/` | IEEE-style paper draft + how to build it |
+| `run_pipeline.sh` | One-command runner for the whole research pipeline |
 
-## 2. Directory Layout
-- `backend/`: Node.js Express controllers and PostGIS configurations.
-- `frontend/`: React components, layouts, maps, and state management.
-- `ai-service/`: FastAPI model training and inference scripts.
-- `bigdata/`: Hadoop configs and PySpark batch routines.
-- `datasets/`: Census demographics, EM-DAT historical charts, and meteorological rainfall statistics.
+## Quick start
 
----
-
-## 3. Deployment Guide
-
-### Prerequisites
-Ensure `docker` and `docker-compose` are active.
-
-### Bootstrapping Services
-To initialize database migrations, create environment configs, and spin up Namenodes and Spark Master worker servers, run:
 ```bash
-bash deploy.sh
+# 0. infra (postgres+postgis, redis, hadoop, 3x spark workers)
+docker compose up -d
+
+# 1. data + pipeline (downloads on first run; heavy steps run in Spark)
+./run_pipeline.sh download
+./run_pipeline.sh all
+
+# 2. dashboard
+cd backend  && npm install && npm run dev     # API on :5000
+cd frontend && npm install && npm run dev     # app on :3000
+# -> /research = RADAR console; backend login seeded on first boot
 ```
 
----
+Run unit tests (no Spark needed): `python -m unittest discover -s bigdata/tests -v`
 
-## 4. API Documentation
+## Stack
 
-### Public API Integrations (GitHub public-apis Repository)
-- **Open-Meteo Weather & Rainfall API**: Real-time precipitation (mm), temperature, wind speed, relative humidity, and atmospheric pressure.
-- **OSRM (Open Source Routing Machine) Road API**: Real-time road routing, travel duration, distance, and road accessibility scoring ($R_d$).
-- **World Bank Open Data API**: National and regional population metrics for exposure estimation ($D_d$).
-- **GDACS GeoJSON API**: Real-time satellite-tracked global disaster alerts.
-- **OpenStreetMap Overpass API**: Live hospital & shelter infrastructure spatial mapping.
+React 18 · Redux Toolkit · React Query · Leaflet · Node/Express · Sequelize +
+PostGIS · Socket.IO + Redis · FastAPI (legacy) · **Hadoop HDFS · PySpark
+(ETL, MLlib, Structured Streaming)** · scikit-learn/isotonic + split-conformal
+· PuLP (allocation LP) · IMD 0.25° gridded observational data · EM-DAT / IFI /
+GDACS ground truth.
 
-### Backend endpoints
-- **Authentication**: `POST /api/v1/auth/register`, `POST /api/v1/auth/login`
-- **Incidents**: `GET /api/v1/incidents`, `POST /api/v1/incidents`
-- **Public Multi-Source APIs**:
-  - `GET /api/v1/public-apis/weather` (Open-Meteo Rainfall & Weather)
-  - `GET /api/v1/public-apis/roads` (OSRM Transport Routing & Accessibility)
-  - `GET /api/v1/public-apis/population` (World Bank Population Indicators)
-  - `GET /api/v1/public-apis/summary` (Multi-Source District DDRPS Summary)
-- **IoT Registries**: `POST /api/v1/iot/register`, `POST /api/v1/iot/telemetry`
+## Honest limitations (documented, not hidden)
 
-### AI Solver endpoints
-- **Predict Severity**: `POST http://localhost:8000/predict/severity`
-- **Disaster Simulation**: `POST http://localhost:8000/simulate`
-- **Allocation Scores**: `POST http://localhost:8000/recommend/allocation-score`
-
----
-
-## 5. Developer Guide
-To verify compilation and run load testing suites:
-```bash
-# Verify Python syntax
-python3 -m py_compile ai-service/app/main.py
-
-# Execute concurrent authentication load check
-node backend/tests/load_test.js
-```
+- Radar (hazard) features are meteorological; flood-event ground truth starts
+  in 1978 and is event-sparse in some districts — see the paper's threats section.
+- Legacy-district (23) vs current-district (46) mismatch is handled by a
+  population-weighted mapping table; boundary changes within Telangana after
+  2018 are approximate.
+- The web dashboard's operational "AI" claims from the old build were
+  removed; only pipeline-published numbers are shown.

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, Compass, Layers, RefreshCw } from 'lucide-react';
+import { Navigation, ShieldAlert, CheckCircle2, AlertTriangle, XCircle, ArrowRight, Activity, MapPin, Clock, Compass, Layers, RefreshCw } from 'lucide-react';
 import api from '../services/api';
 
 // Custom Leaflet Icons

@@ -5,7 +5,7 @@ import Incident, { IncidentStatus, SeverityLevel } from '../models/Incident';
 import Resource, { ResourceType, ResourceStatus } from '../models/Resource';
 import { sequelize } from '../config/db';
 
-export const getDashboardStats = async (_req: Request, res: Response): Promise<void> => {
+export const getDashboardStats = async (req: Request, res: Response): Promise<void> => {
   try {
     const activeIncidents = await Incident.count({
       where: {

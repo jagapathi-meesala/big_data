@@ -30,7 +30,7 @@ const CITIES_COORDS = [
   { name: 'Bhadrachalam', lat: 17.6700, lon: 80.8900 }
 ];
 
-export const getLiveWeather = async (_req: Request, res: Response): Promise<void> => {
+export const getLiveWeather = async (req: Request, res: Response): Promise<void> => {
   try {
     const weatherData = await Promise.all(
       CITIES_COORDS.map(async (city) => {

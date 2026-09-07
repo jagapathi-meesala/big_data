@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  AlertOctagon, ShieldCheck, MapPin, Radio, Users,
-  Building2, Home, Clock, UserCheck,
-  Flame, Waves, Wind
+  AlertOctagon, ShieldCheck, MapPin, Radio, Activity, Users,
+  Building2, Home, Clock, UserCheck, HeartPulse, AlertTriangle,
+  Flame, CloudRain, Shield, Navigation, Waves, Wind, Mountain
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
@@ -26,212 +26,52 @@ function formatTimeAgo(dateString?: string): string {
   return 'Just now';
 }
 
-// Authentic, documented historical disaster profiles (IMD, APSDMA, TSDMA & National Disaster Records)
-const DISTRICT_HISTORICAL_DISASTERS: Record<string, { title: string; category: string; label: string; color: string }> = {
-  // Telangana Inland Urban & Plateau Districts
-  'RANGAREDDY': { title: 'Urban Heatwave & Seasonal Dengue Outbreak', category: 'HEATWAVE', label: '☀️ Severe Heatwave & Health Outbreak', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-  'RANGA REDDY': { title: 'Urban Heatwave & Seasonal Dengue Outbreak', category: 'HEATWAVE', label: '☀️ Severe Heatwave & Health Outbreak', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-  'HYDERABAD': { title: 'Musi Basin Urban Waterlogging Alert', category: 'FLOOD', label: '🌊 Urban Inundation (Musi River)', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-  'KHAMMAM': { title: 'Godavari Basin Flash Flood (Bhadrachalam)', category: 'FLOOD', label: '🌊 Godavari River Inundation', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-  'KARIMNAGAR': { title: 'Kakatiya Canal Discharge & Extreme Heat', category: 'HEATWAVE', label: '☀️ Thermal Emergency & Irrigation Alert', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-  'NALGONDA': { title: 'Nagarjuna Sagar Discharge & Drought Risk', category: 'DROUGHT', label: '☀️ Reservoir Catchment & Drought Alert', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-  'WARANGAL': { title: 'Urban Inundation & Seasonal Outbreak Alert', category: 'EPIDEMIC', label: '🦠 Seasonal Outbreak & Health Alert', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' },
-  'MEDAK': { title: 'Manjira Basin Inundation & Industrial Fire', category: 'FIRE', label: '🔥 Industrial & Catchment Emergency', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' },
-  'SANGAREDDY': { title: 'Patancheru Industrial Chemical Emergency', category: 'FIRE', label: '🔥 Industrial Chemical Hazard', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' },
-  'NIZAMABAD': { title: 'Sri Ram Sagar Reservoir Surge Inflow', category: 'FLOOD', label: '🌊 Sri Ram Sagar Flood Discharge', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-  'ADILABAD': { title: 'Pranahita Basin Flash Flood & Malaria Risk', category: 'EPIDEMIC', label: '🦠 Pranahita Basin Monsoon & Health Alert', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' },
-  'MAHBUBNAGAR': { title: 'Jurala Krishna Inflow & Semi-Arid Drought', category: 'DROUGHT', label: '☀️ Krishna Catchment & Drought Belt', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-
-  // Coastal Andhra Pradesh Districts
-  'VISAKHAPATNAM': { title: 'Cyclone Hudhud Storm & Industrial Hazard', category: 'CYCLONE', label: '🌀 Cyclonic Storm & Coastal Surge', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
-  'SRIKAKULAM': { title: 'Severe Cyclone Titli Landfall (Palasa Corridor)', category: 'CYCLONE', label: '🌀 Severe Cyclonic Storm (Titli)', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
-  'EAST GODAVARI': { title: 'Dowleswaram Godavari Delta Inundation', category: 'FLOOD', label: '🌊 Godavari Delta 15L+ Cusec Flood', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-  'WEST GODAVARI': { title: 'Tammileru River & Kolleru Lake Breach', category: 'FLOOD', label: '🌊 Tammileru / Kolleru Lake Inundation', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-  'KRISHNA': { title: 'Budameru Rivulet & Prakasam Barrage Discharge', category: 'FLOOD', label: '🌊 Budameru Flash Flood (Vijayawada)', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-  'GUNTUR': { title: 'Cyclone Michaung Bapatla Inundation Alert', category: 'CYCLONE', label: '🌀 Cyclone Michaung Delta Alert', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
-  'SRI POTTI SRIRAMULU NELLORE': { title: 'Penna River Inundation & Bay Cyclone Alert', category: 'CYCLONE', label: '🌀 Coastal Storm Surge & Penna Flood', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
-  'PRAKASAM': { title: 'Ongole Coastal Cyclone & Dryland Risk', category: 'CYCLONE', label: '🌀 Coastal Storm Surge & Semi-Arid Risk', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
-  'VIZIANAGARAM': { title: 'Nagavali River Overflow & Cyclonic Surge', category: 'FLOOD', label: '🌊 Nagavali River Flash Inundation', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-
-  // Rayalaseema Southern Districts
-  'ANANTAPUR': { title: 'Rayalaseema Rain-Shadow Drought & Extreme Heat', category: 'DROUGHT', label: '☀️ Severe Rayalaseema Drought', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-  'KURNOOL': { title: 'Tungabhadra / Hundri River Flash Flood', category: 'FLOOD', label: '🌊 Hundri River Flash Inundation', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-  'CUDDAPAH': { title: 'Annamayya Dam Failure & Penna River Breach', category: 'FLOOD', label: '🌊 Penna River Dam Breach Alert', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-  'CHITTOOR': { title: 'Swarnamukhi River Overflow & Tirupati Flood', category: 'FLOOD', label: '🌊 Tirupati Swarnamukhi Flash Flood', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-};
-
-// Maps generic titles to specific disaster types strictly aligned with dataset and geographical reality
-function getDisasterCategory(title: string, district: string, _index: number, disasterType?: string) {
+// Maps generic titles to specific disaster types (Flood, Cyclone, Earthquake, etc.)
+function getDisasterCategory(title: string, district: string, index: number, disasterType?: string) {
   const dt = (disasterType || '').toUpperCase();
   const t = (title || '').toUpperCase();
-  const distKey = (district || '').toUpperCase().trim();
 
-  // 1. Explicit keyword checks from live feeds or reported distress signals
-  if (dt.includes('EPIDEMIC') || dt.includes('HEALTH') || t.includes('EPIDEMIC') || t.includes('HEALTH') || t.includes('PATIENT') || t.includes('OUTBREAK')) {
+  if (dt.includes('FLOOD') || t.includes('FLOOD') || index % 5 === 0) {
     return {
-      titleName: title || `Epidemic Outbreak Emergency — ${district || 'Zone'}`,
-      category: 'EPIDEMIC',
-      label: '🦠 Epidemic / Outbreak Alert',
-      color: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
-      icon: Radio
-    };
-  }
-
-  if (dt.includes('FLOOD') || t.includes('FLOOD')) {
-    return {
-      titleName: title || `Riverine / Urban Flood Inundation — ${district || 'Zone'}`,
+      titleName: `Flash Flood Crisis — ${district || 'Zone'}`,
       category: 'FLOOD',
-      label: '🌊 Inundation / Flood Alert',
+      label: '🌊 Flash Flood',
       color: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
       icon: Waves
     };
-  }
-
-  if (dt.includes('CYCLONE') || dt.includes('HURRICANE') || t.includes('CYCLONE') || t.includes('STORM')) {
+  } else if (dt.includes('CYCLONE') || t.includes('CYCLONE') || index % 5 === 1) {
     return {
-      titleName: title || `Severe Cyclonic Storm Warning — ${district || 'Zone'}`,
+      titleName: `Severe Cyclone Alert — ${district || 'Zone'}`,
       category: 'CYCLONE',
       label: '🌀 Cyclone Warning',
       color: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
       icon: Wind
     };
-  }
-
-  if (dt.includes('EARTHQUAKE') || t.includes('QUAKE') || t.includes('SEISMIC') || dt.includes('SEISMIC')) {
+  } else if (dt.includes('EARTHQUAKE') || t.includes('QUAKE') || index % 5 === 2) {
     return {
-      titleName: title || `Seismic Earthquake Tremor Signal — ${district || 'Zone'}`,
+      titleName: `Earthquake Tremor Signal — ${district || 'Zone'}`,
       category: 'EARTHQUAKE',
-      label: '🌋 Earthquake Tremor',
+      label: '🌋 Earthquake',
       color: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
       icon: AlertOctagon
     };
-  }
-
-  if (dt.includes('FIRE') || t.includes('FIRE')) {
+  } else if (dt.includes('FIRE') || t.includes('FIRE') || index % 5 === 3) {
     return {
-      titleName: title || `Industrial Fire & Chemical Hazard — ${district || 'Zone'}`,
+      titleName: `Industrial Fire & Chemical Emergency — ${district || 'Zone'}`,
       category: 'FIRE',
-      label: '🔥 Industrial Fire Hazard',
+      label: '🔥 Fire Hazard',
       color: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
       icon: Flame
     };
-  }
-
-  if (dt.includes('HEAT') || t.includes('HEATWAVE')) {
+  } else {
     return {
-      titleName: title || `Extreme Pre-Monsoon Heatwave — ${district || 'Zone'}`,
-      category: 'HEATWAVE',
-      label: '☀️ Extreme Heatwave',
-      color: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-      icon: Radio
+      titleName: `Landslide & Heavy Mudslide — ${district || 'Zone'}`,
+      category: 'LANDSLIDE',
+      label: '⛰️ Landslide Hazard',
+      color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+      icon: Mountain
     };
   }
-
-  // 2. Lookup exact historical documented disaster for this district
-  const matchedDist = Object.keys(DISTRICT_HISTORICAL_DISASTERS).find(key => distKey.includes(key));
-  if (matchedDist) {
-    const info = DISTRICT_HISTORICAL_DISASTERS[matchedDist];
-    let iconChoice = Radio;
-    if (info.category === 'FLOOD') iconChoice = Waves;
-    else if (info.category === 'CYCLONE') iconChoice = Wind;
-    else if (info.category === 'FIRE') iconChoice = Flame;
-
-    return {
-      titleName: title && !title.toLowerCase().includes('health alert') ? title : `${info.title} — ${district}`,
-      category: info.category,
-      label: info.label,
-      color: info.color,
-      icon: iconChoice
-    };
-  }
-
-  return {
-    titleName: title || `Emergency Relief Request — ${district || 'Zone'}`,
-    category: dt || 'OTHER',
-    label: '🚨 Emergency Response Alert',
-    color: 'bg-slate-500/10 text-slate-500 border-slate-500/20',
-    icon: AlertOctagon
-  };
-}
-
-// District-aware authentic hospital & shelter helper
-function getDistrictFacilities(district?: string) {
-  const d = (district || '').toUpperCase();
-  if (d.includes('RANGA') || d.includes('HYDERABAD') || d.includes('MEDCHAL')) {
-    return {
-      hospital: 'Continental Hospital Gachibowli / Osmania General Hospital',
-      shelter: 'GHMC Emergency Relief Shelter, Serilingampally'
-    };
-  } else if (d.includes('KHAMMAM')) {
-    return {
-      hospital: 'Government General Hospital Khammam',
-      shelter: 'Bhadrachalam Flood Relief Camp'
-    };
-  } else if (d.includes('KARIMNAGAR')) {
-    return {
-      hospital: 'District Headquarter Hospital Karimnagar',
-      shelter: 'Karimnagar Indoor Stadium Shelter'
-    };
-  } else if (d.includes('NALGONDA')) {
-    return {
-      hospital: 'Nalgonda Government General Hospital',
-      shelter: 'Nalgonda Town Hall Emergency Camp'
-    };
-  } else if (d.includes('GUNTUR')) {
-    return {
-      hospital: 'Guntur General Hospital',
-      shelter: 'Guntur Multi-Purpose Disaster Shelter'
-    };
-  } else if (d.includes('KRISHNA') || d.includes('VIJAYAWADA')) {
-    return {
-      hospital: 'Government General Hospital Vijayawada',
-      shelter: 'Vijayawada Flood Relief Shelter (Budameru Zone)'
-    };
-  } else if (d.includes('VISAKHAPATNAM') || d.includes('VIZAG')) {
-    return {
-      hospital: 'King George Hospital (KGH) Visakhapatnam',
-      shelter: 'APSDMA Cyclone Relief Center Visakhapatnam'
-    };
-  } else if (d.includes('SRIKAKULAM')) {
-    return {
-      hospital: 'RIMS Super Specialty Hospital Srikakulam',
-      shelter: 'Palasa Cyclone Relief Shelter'
-    };
-  } else if (d.includes('EAST GODAVARI') || d.includes('KAKINADA')) {
-    return {
-      hospital: 'Kakinada Government General Hospital',
-      shelter: 'Dowleswaram Delta Relief Camp'
-    };
-  } else if (d.includes('WEST GODAVARI') || d.includes('ELURU')) {
-    return {
-      hospital: 'Government General Hospital Eluru',
-      shelter: 'Kolleru Disaster Relief Shelter'
-    };
-  } else if (d.includes('CHITTOOR') || d.includes('TIRUPATI')) {
-    return {
-      hospital: 'SVIMS Super Specialty Hospital Tirupati',
-      shelter: 'Tirupati Municipal Cyclone Shelter'
-    };
-  } else if (d.includes('ANANTAPUR')) {
-    return {
-      hospital: 'Government General Hospital Anantapur',
-      shelter: 'Anantapur Drought Relief Center'
-    };
-  } else if (d.includes('KURNOOL')) {
-    return {
-      hospital: 'Government General Hospital Kurnool',
-      shelter: 'Kurnool Hundri Relief Camp'
-    };
-  } else if (d.includes('CUDDAPAH') || d.includes('KADAPA')) {
-    return {
-      hospital: 'RIMS Hospital Kadapa',
-      shelter: 'Rajampet Penna Basin Relief Camp'
-    };
-  }
-  return {
-    hospital: 'District Headquarters General Hospital',
-    shelter: 'APSDMA / TSDMA Multi-Purpose Disaster Shelter'
-  };
 }
 
 export const EmergencyRequests: React.FC = () => {
@@ -264,7 +104,7 @@ export const EmergencyRequests: React.FC = () => {
         });
         return { previousData };
       },
-      onError: (err: any, _id: string, context: any) => {
+      onError: (err: any, id: string, context: any) => {
         if (context?.previousData) {
           queryClient.setQueryData(['sos-requests'], context.previousData);
         }
@@ -389,11 +229,11 @@ export const EmergencyRequests: React.FC = () => {
             const timeAgo = formatTimeAgo(req.createdAt);
             const disMeta = getDisasterCategory(req.title, req.district, index, req.disasterType);
 
-            const facilities = getDistrictFacilities(req.district);
+            // Deterministic synthetic fallback values for comprehensive view based on incident ID hash
             const affectedCount = req.affectedPeople ?? (65 + (index * 23) % 180);
-            const nearbyVolunteers = req.assignedVolunteer ? 1 : (3 + (index % 3));
-            const hospitalName = req.assignedHospital || facilities.hospital;
-            const shelterName = facilities.shelter;
+            const nearbyVolunteers = req.assignedVolunteer ? 1 : (3 + index % 5);
+            const hospitalName = req.assignedHospital || (index % 2 === 0 ? 'SVIMS Tirupati' : 'Guntur General Hospital');
+            const shelterName = index % 2 === 0 ? 'Karimnagar Indoor Stadium Shelter' : 'Rangareddy Relief Camp #2';
 
             return (
               <div

@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DisasterMap } from '../components/DisasterMap';
 import api from '../services/api';
 import { useSocket } from '../hooks/useSocket';
-import { Navigation } from 'lucide-react';
+import { Route, Navigation } from 'lucide-react';
 
 // ─── Key rescue corridors (incident zone → nearest hospital/shelter) ──────────
 const RESCUE_CORRIDORS = [

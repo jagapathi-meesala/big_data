@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { RootState } from '../store';
 import { setCredentials } from '../store/slices/authSlice';
 import api from '../services/api';
-import { Shield, Calendar, MapPin, Phone, Mail, UserCircle, User, Settings, Edit3, Lock, ShieldCheck, Activity, UserCheck } from 'lucide-react';
+import { Shield, Calendar, MapPin, Phone, Mail, UserCircle, User, Settings, Edit3, X, Lock, ShieldCheck, Activity, UserCheck } from 'lucide-react';
 
 
 export const UserProfile: React.FC = () => {

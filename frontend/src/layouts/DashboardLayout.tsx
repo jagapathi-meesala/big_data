@@ -6,7 +6,7 @@ import { logout } from '../store/slices/authSlice';
 import { toggleTheme, initializeTheme } from '../store/slices/themeSlice';
 import {
   Menu, Sun, Moon, LogOut, LayoutDashboard, MapPin, Shield,
-  Activity, Bell, AlertOctagon, Compass
+  Activity, Bell, Compass, FlaskConical, AlertOctagon
 } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
@@ -30,6 +30,7 @@ export const DashboardLayout: React.FC = () => {
   const navigationItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Disaster Map', path: '/live-map', icon: MapPin },
+    { name: 'Research Console', path: '/research', icon: FlaskConical },
     { name: 'Escape Routes', path: '/escape-routes', icon: Compass },
     { name: 'SOS Requests', path: '/sos-requests', icon: AlertOctagon },
     { name: 'Resources', path: '/resources', icon: Shield },

@@ -197,7 +197,7 @@ export const deleteIncident = async (
 };
 
 export const uploadImage = async (
-  _req: AuthenticatedRequest,
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   try {

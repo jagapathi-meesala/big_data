@@ -24,6 +24,7 @@ import weatherRoutes from './routes/weatherRoutes';
 import reportRoutes from './routes/reportRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import publicApisRoutes from './routes/publicApisRoutes';
+import researchRoutes from './routes/researchRoutes';
 import helmet from 'helmet';
 import { syncGDACSDisasters } from './services/gdacsService';
 import rateLimit from 'express-rate-limit';
@@ -48,7 +49,7 @@ app.use(limiter);
 app.use(auditLogger);
 
 // Request Logging Middleware
-app.use((req, _res, next) => {
+app.use((req, res, next) => {
   logger.info(`HTTP ${req.method} ${req.originalUrl} - IP: ${req.ip}`);
   next();
 });
@@ -62,7 +63,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Basic Status Endpoint
-app.get('/', (_req, res) => {
+app.get('/', (req, res) => {
   res.status(200).json({
     status: 'online',
     system: 'AI Powered Distributed Disaster Resource Allocation System',
@@ -83,6 +84,7 @@ app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/public-apis', publicApisRoutes);
+app.use('/api/v1/research', researchRoutes);
 
 // Global Error Handler Middleware (MUST be registered last)
 app.use(errorHandler);

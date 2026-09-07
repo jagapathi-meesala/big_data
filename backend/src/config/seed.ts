@@ -93,7 +93,7 @@ export const seedDatabase = async () => {
       state: 'Telangana',
     });
 
-    await User.create({
+    const volunteer = await User.create({
       firstName: 'Ravi',
       lastName: 'Teja',
       email: 'ravi.vol@aid-dras.gov',
@@ -130,7 +130,7 @@ export const seedDatabase = async () => {
       state: 'Andhra Pradesh',
     });
 
-    await User.create({
+    const officer = await User.create({
       firstName: 'Kalyan',
       lastName: 'Officer',
       email: 'officer@aid-dras.gov',
@@ -288,61 +288,22 @@ export const seedDatabase = async () => {
         
         const incidentDate = parseDiagnosedDate(diagnosedDate);
         
-        const cityUpper = city.toUpperCase();
-        let seedType = DisasterType.EPIDEMIC;
-        let seedTitle = `Epidemic Outbreak Emergency — ${city}`;
-        let assignedHosp = 'SVIMS Super Specialty Hospital Tirupati';
-
-        if (cityUpper.includes('RANGA') || cityUpper.includes('HYDERABAD')) {
-          seedType = DisasterType.HEATWAVE;
-          seedTitle = `Urban Heatwave & Seasonal Outbreak — ${city}`;
-          assignedHosp = 'Continental Hospital Gachibowli / Osmania General';
-        } else if (cityUpper.includes('KRISHNA') || cityUpper.includes('VIJAYAWADA')) {
-          seedType = DisasterType.FLOOD;
-          seedTitle = `Budameru Rivulet Flash Flood — ${city}`;
-          assignedHosp = 'Government General Hospital Vijayawada';
-        } else if (cityUpper.includes('KHAMMAM')) {
-          seedType = DisasterType.FLOOD;
-          seedTitle = `Godavari Basin Flood (71.3 ft Mark) — ${city}`;
-          assignedHosp = 'Government General Hospital Khammam';
-        } else if (cityUpper.includes('VISAKHAPATNAM')) {
-          seedType = DisasterType.CYCLONE;
-          seedTitle = `Severe Cyclone Hudhud Storm — ${city}`;
-          assignedHosp = 'King George Hospital (KGH) Visakhapatnam';
-        } else if (cityUpper.includes('SRIKAKULAM')) {
-          seedType = DisasterType.CYCLONE;
-          seedTitle = `Severe Cyclone Titli Landfall — ${city}`;
-          assignedHosp = 'RIMS Hospital Srikakulam';
-        } else if (cityUpper.includes('EAST GODAVARI') || cityUpper.includes('WEST GODAVARI')) {
-          seedType = DisasterType.FLOOD;
-          seedTitle = `Godavari Delta Flood Discharge — ${city}`;
-          assignedHosp = 'Kakinada / Eluru Government General Hospital';
-        } else if (cityUpper.includes('GUNTUR')) {
-          seedType = DisasterType.CYCLONE;
-          seedTitle = `Cyclone Michaung Delta Inundation — ${city}`;
-          assignedHosp = 'Guntur General Hospital';
-        } else if (cityUpper.includes('ANANTAPUR') || cityUpper.includes('KURNOOL')) {
-          seedType = DisasterType.HEATWAVE;
-          seedTitle = `Rayalaseema Chronic Drought & Heatwave — ${city}`;
-          assignedHosp = 'Government General Hospital Anantapur / Kurnool';
-        }
-
         try {
           await Incident.create({
             reporterId: citizenId,
             reporter_id: citizenId,
-            title: seedTitle,
-            description: `Patients & Emergency Dataset Record: ${notes}. Field intervention & containment active.`,
+            title: `Health Alert - ${city}`,
+            description: notes,
             severity: severity,
             status: status,
-            disasterType: seedType,
+            disasterType: DisasterType.OTHER,
             geom: {
               type: 'Point',
               coordinates: [lon, lat],
             },
             district: city,
             state: state,
-            assignedHospital: assignedHosp,
+            assignedHospital: 'SVIMS Tirupati',
             assignedVolunteer: 'Ravi Teja',
             estimatedDamage: Math.floor(Math.random() * 500000) + 50000,
             createdAt: incidentDate,
@@ -422,7 +383,7 @@ export const seedDatabase = async () => {
                 type: 'Point',
                 coordinates: [lon, lat],
               },
-              name: (names as any)[type],
+              name: names[type],
               district: district === '-' ? city : district,
               state: state,
             });

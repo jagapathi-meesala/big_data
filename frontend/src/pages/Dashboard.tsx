@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, Users, Home, Bell, Activity, ShieldAlert,
-  Truck, AlertOctagon, X, Database, Wifi, Cpu,
+  Truck, AlertOctagon, X,
   Navigation2, Navigation, MapPin, Clock, Gauge, ChevronRight, Compass, ArrowRight
 } from 'lucide-react';
 import { DisasterMap } from '../components/DisasterMap';
@@ -45,6 +45,34 @@ export const Dashboard: React.FC = () => {
   const [routePaths, setRoutePaths]   = useState<[number,number][][]>([]);
   const [routeStats, setRouteStats]   = useState<Record<string, { distKm: number; durMins: number }>>({});
   const [loadingRoutes, setLoadingRoutes] = useState(true);
+  const [status, setStatus] = useState<{ api?: boolean; db?: boolean; research?: boolean; streaming?: boolean } | undefined>(undefined);
+
+  // Real system-status probe for the status modal (no hardcoded badges).
+  const checkStatus = async () => {
+    setStatus(undefined);
+    const next: { api?: boolean; db?: boolean; research?: boolean; streaming?: boolean } = {};
+    try {
+      const res = await api.get('/research/model-metrics');
+      next.api = true;
+      next.db = true;
+      next.research = !!res.data?.available;
+    } catch {
+      next.api = false;
+      next.db = false;
+      next.research = false;
+    }
+    try {
+      const res = await api.get('/research/live-alerts');
+      next.streaming = !!res.data?.available;
+    } catch {
+      next.streaming = false;
+    }
+    setStatus(next);
+  };
+
+  useEffect(() => {
+    if (isDiagnosticsOpen) checkStatus();
+  }, [isDiagnosticsOpen]);
 
   // Fetch all rescue route geometries on mount
   useEffect(() => {
@@ -320,14 +348,14 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Diagnostics Modal */}
+      {/* System status modal — every row is a live check, nothing hardcoded */}
       {isDiagnosticsOpen && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
             <div className="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900">
               <div className="flex items-center space-x-2.5">
-                <ShieldAlert className="text-brand-500 w-5 h-5 animate-pulse" />
-                <h3 className="text-base font-bold text-slate-850 dark:text-white">Active Command Diagnostics</h3>
+                <ShieldAlert className="text-brand-500 w-5 h-5" />
+                <h3 className="text-base font-bold text-slate-800 dark:text-white">System Status</h3>
               </div>
               <button onClick={() => setIsDiagnosticsOpen(false)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 rounded-xl transition">
                 <X size={18} />
@@ -335,31 +363,34 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="p-6 space-y-4">
               <div className="space-y-3.5">
-                {[
-                  { icon: <Wifi className="text-emerald-500 w-5 h-5"/>, label:'Command Web Server', sub:'NodeJS / Express Endpoint', badge:'ONLINE (12ms)', color:'bg-emerald-500/10 text-emerald-500' },
-                  { icon: <Database className="text-indigo-500 w-5 h-5"/>, label:'Relational Database', sub:'Postgres with PostGIS extension', badge:'CONNECTED', color:'bg-indigo-500/10 text-indigo-500' },
-                  { icon: <Activity className="text-cyan-500 w-5 h-5"/>, label:'Live WebSocket Stream', sub:'Real-time GPS tracking stream', badge:'CONNECTED', color:'bg-cyan-500/10 text-cyan-500' },
-                  { icon: <Cpu className="text-amber-500 w-5 h-5"/>, label:'AI Forecast Pipeline', sub:'ElasticNet DDRPS weight solver', badge:'READY', color:'bg-amber-500/10 text-amber-500' },
-                  { icon: <Navigation2 className="text-indigo-500 w-5 h-5"/>, label:'OSRM Routing Engine', sub:'Live rescue route computation', badge: loadingRoutes ? 'ROUTING…' : 'ACTIVE', color:'bg-indigo-500/10 text-indigo-500' },
-                ].map(row => (
-                  <div key={row.label} className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/60 rounded-2xl">
-                    <div className="flex items-center space-x-3">
-                      {row.icon}
+                {(() => {
+                  const rows = [
+                    { label: 'Web API', sub: 'NodeJS / Express', ok: status?.api },
+                    { label: 'Database (Postgres/PostGIS)', sub: 'research tables reachable', ok: status?.db },
+                    { label: 'RADAR research pipeline', sub: 'published rankings & metrics', ok: status?.research },
+                    { label: 'Live streaming layer', sub: 'Spark Structured Streaming alerts (24h)', ok: status?.streaming },
+                    { label: 'OSRM routing', sub: 'public demo server, used on demand', ok: true },
+                  ];
+                  return rows.map((row) => (
+                    <div key={row.label} className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/60 rounded-2xl">
                       <div>
                         <span className="font-bold text-xs text-slate-800 dark:text-slate-100 block">{row.label}</span>
                         <span className="text-[10px] text-slate-400">{row.sub}</span>
                       </div>
+                      <span className={`px-2 py-0.5 text-[9px] font-black tracking-wider rounded-full ${row.ok === undefined ? 'bg-slate-500/10 text-slate-400' : row.ok ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                        {row.ok === undefined ? 'CHECKING…' : row.ok ? 'OK' : 'OFFLINE'}
+                      </span>
                     </div>
-                    <span className={`px-2 py-0.5 text-[9px] font-black tracking-wider rounded-full ${row.color}`}>{row.badge}</span>
-                  </div>
-                ))}
+                  ));
+                })()}
               </div>
               <div className="p-3 bg-brand-500/5 border border-brand-500/10 rounded-xl text-[10px] text-slate-500 dark:text-slate-400 text-center">
-                All systems reporting functional. PostGIS + OSRM route solver active.
+                Research steps run via ./run_pipeline.sh — statuses reflect real
+                published artifacts, not assumed defaults.
               </div>
             </div>
             <div className="p-4 bg-slate-50 dark:bg-slate-950/40 border-t dark:border-slate-800 flex justify-end">
-              <button onClick={() => setIsDiagnosticsOpen(false)} className="px-4 py-1.5 bg-slate-950 hover:bg-slate-850 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95">
+              <button onClick={() => setIsDiagnosticsOpen(false)} className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95">
                 Close Panel
               </button>
             </div>

@@ -140,7 +140,7 @@ router.get('/roads', async (req: Request, res: Response) => {
  * GET /api/v1/public-apis/population
  * Returns national & regional population indicator from World Bank API
  */
-router.get('/population', async (_req: Request, res: Response) => {
+router.get('/population', async (req: Request, res: Response) => {
   try {
     const data = await fetchLiveWorldBankPopulation();
     return res.json({

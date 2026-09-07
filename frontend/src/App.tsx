@@ -23,6 +23,7 @@ import Volunteers from './pages/Volunteers';
 import EmergencyRequests from './pages/EmergencyRequests';
 import Weather from './pages/Weather';
 import Analytics from './pages/Analytics';
+import ResearchDashboard from './pages/ResearchDashboard';
 import Reports from './pages/Reports';
 import UserProfile from './pages/UserProfile';
 import Settings from './pages/Settings';
@@ -62,6 +63,7 @@ export const App: React.FC = () => {
         <Route path="/sos-requests" element={<EmergencyRequests />} />
         <Route path="/weather" element={<Weather />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/research" element={<ResearchDashboard />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/settings" element={<Settings />} />

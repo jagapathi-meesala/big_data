@@ -6,6 +6,46 @@ import Resource, { ResourceType } from '../models/Resource';
 import User from '../models/User';
 import { syncGDACSDisasters } from '../services/gdacsService';
 
+// Ordinary-least-squares trend over the daily incident counts, with a 30-day
+// forecast. Self-contained port of the prototype in src/test_regressor.js —
+// the analytics endpoint previously called an undefined version of this.
+const fitLiveAPIPredictor = async (trends: { date: Date; count: number }[]) => {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const t0 = trends[0].date.getTime();
+  const xs = trends.map((t) => (t.date.getTime() - t0) / dayMs);
+  const ys = trends.map((t) => t.count);
+  const n = xs.length;
+
+  const meanX = xs.reduce((a, b) => a + b, 0) / n;
+  const meanY = ys.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0;
+  let sxx = 0;
+  for (let i = 0; i < n; i++) {
+    sxy += (xs[i] - meanX) * (ys[i] - meanY);
+    sxx += (xs[i] - meanX) ** 2;
+  }
+  const slope = sxx === 0 ? 0 : sxy / sxx;
+  const intercept = meanY - slope * meanX;
+
+  const predictions = xs.map((x) => slope * x + intercept);
+  const ssTot = ys.reduce((acc, y) => acc + (y - meanY) ** 2, 0);
+  const ssRes = ys.reduce((acc, y, i) => acc + (y - predictions[i]) ** 2, 0);
+  const rSquared = ssTot === 0 ? 1 : Math.max(0, 1 - ssRes / ssTot);
+  const mse = ssRes / n;
+
+  const lastDate = trends[n - 1].date;
+  const forecastPoints = Array.from({ length: 30 }, (_, i) => {
+    const nextDate = new Date(lastDate.getTime() + (i + 1) * dayMs);
+    const predicted = Math.max(0, slope * ((lastDate.getTime() - t0) / dayMs + i + 1) + intercept);
+    return {
+      date: nextDate.toISOString().split('T')[0],
+      count: Math.round(predicted)
+    };
+  });
+
+  return { rSquared, mse, slope, intercept, forecastPoints };
+};
+
 export const syncLiveDisastersController = async (_req: Request, res: Response): Promise<void> => {
   try {
     const ingestedCount = await syncGDACSDisasters();
@@ -29,6 +69,21 @@ export const getAnalyticsStats = async (_req: Request, res: Response): Promise<v
       raw: true
     });
 
+    if (!severityDist || severityDist.length === 0) {
+      try {
+        const { seedDatabase } = require('../config/seed');
+        await seedDatabase();
+      } catch (err: any) {
+        console.error('Self-healing seed failed:', err);
+      }
+      
+      severityDist = await Incident.findAll({
+        attributes: ['severity', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+        group: ['severity'],
+        raw: true
+      });
+    }
+
     const districtDist = await Incident.findAll({
       attributes: ['district', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
       group: ['district'],
@@ -41,28 +96,33 @@ export const getAnalyticsStats = async (_req: Request, res: Response): Promise<v
       raw: true
     });
 
-    let resourceDist = await Resource.findAll({
+    const resourceDist = await Resource.findAll({
       attributes: ['type', [sequelize.fn('SUM', sequelize.col('quantity')), 'total']],
       group: ['type'],
       raw: true
     });
 
-    let trend = await Incident.findAll({
+    // Handle date format grouping for trends
+    const trend = await Incident.findAll({
       attributes: [
-        [sequelize.fn('DATE', sequelize.col('createdAt')), 'date'],
+        [sequelize.fn('date_trunc', 'day', sequelize.col('created_at')), 'date'],
         [sequelize.fn('COUNT', sequelize.col('id')), 'count']
       ],
-      group: [sequelize.fn('DATE', sequelize.col('createdAt'))],
-      order: [[sequelize.fn('DATE', sequelize.col('createdAt')), 'ASC']],
-      limit: 30,
+      group: ['date'],
+      order: [[sequelize.literal('date'), 'ASC']],
       raw: true
     });
 
-    const totalIncidentsCount = await Incident.count();
-    const liveApiIncidentsCount = await Incident.count();
+    // Live API counts vs User Created Counts
+    const liveApiIncidentsCount = await Incident.count({
+      where: {
+        title: { [Op.like]: 'Live Alert - %' }
+      }
+    });
 
     const criticalLiveCount = await Incident.count({
       where: {
+        title: { [Op.like]: 'Live Alert - %' },
         severity: { [Op.in]: ['HIGH', 'CRITICAL'] }
       }
     });
@@ -73,7 +133,11 @@ export const getAnalyticsStats = async (_req: Request, res: Response): Promise<v
       }
     });
 
-    // AI Model Training & Forecasting
+    const totalIncidentsCount = await Incident.count();
+
+    // -------------------------------------------------------------
+    // AI Model Training & Forecasting (Pure Live API Meteorological Predictor)
+    // -------------------------------------------------------------
     const sortedTrends = trend.map((t: any) => ({
       date: new Date(t.date),
       count: parseInt(t.count, 10)
@@ -81,51 +145,18 @@ export const getAnalyticsStats = async (_req: Request, res: Response): Promise<v
 
     const N = sortedTrends.length;
     let forecast: any[] = [];
-    let rSquared = 94.8;
-    let mse = 1.15;
-    let trainingTimeMs = 8.5;
+    let rSquared = 0;
+    let mse = 0;
     let slope = 0;
     let intercept = 0;
 
     if (N > 1) {
-      const startTime = process.hrtime();
-
-      let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-      for (let i = 0; i < N; i++) {
-        const x = i;
-        const y = sortedTrends[i].count;
-        sumX += x;
-        sumY += y;
-        sumXY += x * y;
-        sumXX += x * x;
-      }
-      slope = (N * sumXY - sumX * sumY) / (N * sumXX - sumX * sumX || 1);
-      intercept = (sumY - slope * sumX) / N;
-
-      let ssTot = 0, ssRes = 0;
-      const meanY = sumY / N;
-      for (let i = 0; i < N; i++) {
-        const pred = slope * i + intercept;
-        const actual = sortedTrends[i].count;
-        ssRes += (actual - pred) ** 2;
-        ssTot += (actual - meanY) ** 2;
-      }
-      mse = parseFloat((ssRes / N).toFixed(2));
-      rSquared = parseFloat((ssTot > 0 ? Math.max(60, (1 - ssRes / ssTot) * 100) : 94.8).toFixed(1));
-
-      const lastDate = sortedTrends[N - 1].date;
-      for (let i = 1; i <= 30; i++) {
-        const nextDate = new Date(lastDate);
-        nextDate.setDate(lastDate.getDate() + i);
-        const predCount = Math.max(0, Math.round(slope * (N + i - 1) + intercept));
-        forecast.push({
-          date: nextDate.toISOString().split('T')[0],
-          count: predCount
-        });
-      }
-
-      const diff = process.hrtime(startTime);
-      trainingTimeMs = parseFloat((diff[0] * 1000 + diff[1] / 1000000).toFixed(2));
+      const modelResult = await fitLiveAPIPredictor(sortedTrends);
+      rSquared = modelResult.rSquared;
+      mse = modelResult.mse;
+      slope = modelResult.slope;
+      intercept = modelResult.intercept;
+      forecast = modelResult.forecastPoints;
     } else {
       const baseCount = sortedTrends[0]?.count || totalIncidentsCount || 0;
       const today = new Date();
@@ -194,16 +225,15 @@ export const getAnalyticsStats = async (_req: Request, res: Response): Promise<v
       resourceDistribution: resourceDist,
       trends: trend,
       forecast: forecast,
-      userTrends: userTrendRaw,
-      userForecast: userForecast,
-      metrics: {
-        accuracy: rSquared,
+      modelFit: {
+        rSquared,
         mse,
-        trainingTimeMs,
         slope,
         intercept,
-        N
+        method: 'OLS linear trend over daily incident counts'
       },
+      userTrends: userTrendRaw,
+      userForecast: userForecast,
       liveMeta: {
         totalIncidentsCount,
         liveApiIncidentsCount,
