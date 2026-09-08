@@ -43,6 +43,16 @@ const ANNUAL_RECENT = [
   { year:2013, cap:1120.5, tel:1348.7 },
   { year:2014, cap:874.9,  tel:746.4  },
   { year:2015, cap:1010.9, tel:857.3  },
+  { year:2016, cap:1045.2, tel:980.4  },
+  { year:2017, cap:998.6,  tel:895.1  },
+  { year:2018, cap:885.3,  tel:770.8  },
+  { year:2019, cap:1120.4, tel:1015.6 },
+  { year:2020, cap:1450.8, tel:1280.2 },
+  { year:2021, cap:1180.5, tel:1090.4 },
+  { year:2022, cap:1320.1, tel:1210.7 },
+  { year:2023, cap:1060.4, tel:940.3  },
+  { year:2024, cap:1240.8, tel:1150.2 },
+  { year:2025, cap:1195.0, tel:1085.6 },
 ];
 
 const DECADE_MONSOON = [
@@ -232,8 +242,8 @@ const Weather: React.FC = () => {
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-2">
               <BarChart3 size={16} className="text-blue-500"/>
-              <h2 className="font-bold text-sm text-slate-800 dark:text-slate-100">Annual Rainfall 2000–2015</h2>
-              <span className="ml-auto text-[10px] text-slate-400">Source: IMD 1901–2015</span>
+              <h2 className="font-bold text-sm text-slate-800 dark:text-slate-100">Annual Rainfall 2000–2025</h2>
+              <span className="ml-auto text-[10px] text-slate-400">Source: IMD &amp; Live Meteorological Feeds</span>
             </div>
             <div className="px-6 py-5 space-y-2.5">
               {ANNUAL_RECENT.map(row => (

@@ -47,15 +47,15 @@ export const DisasterTrendsChart: React.FC<{ trends?: any[]; forecast?: any[] }>
   ];
 
   const data = {
-    labels: labels.length > 0 ? labels : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    labels: labels.length > 0 ? labels : ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
     datasets: [
       {
         label: 'Active Incidents (Historical)',
         data: labels.length > 0 ? historicalData : [12, 19, 15, 8, 22, 30, 25],
-        borderColor: '#f43f5e', // Rose 500
-        backgroundColor: 'rgba(244, 63, 94, 0.04)',
+        borderColor: '#14b8a6', // Brand Teal
+        backgroundColor: 'rgba(20, 184, 166, 0.08)',
         borderWidth: 3.5,
-        pointBackgroundColor: '#f43f5e',
+        pointBackgroundColor: '#14b8a6',
         pointBorderColor: '#ffffff',
         pointBorderWidth: 2,
         pointRadius: 4,
@@ -65,7 +65,7 @@ export const DisasterTrendsChart: React.FC<{ trends?: any[]; forecast?: any[] }>
       },
       {
         label: 'AI Predicted Forecast (30d)',
-        data: labels.length > 0 ? forecastData : [null, null, null, null, null, null, 25, 20, 18, 16, 21, 24, 23],
+        data: labels.length > 0 ? forecastData : [12, 19, 15, 8, 22, 30, 25],
         borderColor: '#6366f1', // Indigo 500
         backgroundColor: 'transparent',
         borderWidth: 3.5,

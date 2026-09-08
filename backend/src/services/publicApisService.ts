@@ -213,7 +213,7 @@ export const computeEmergencyEscapeRoutes = async (
     const osrmUrl = `${OSRM_ROUTING_URL}/${originLon},${originLat};${destLon},${destLat}`;
     const res = await axios.get(osrmUrl, {
       params: {
-        alternatives: 'true',
+        alternatives: 3,
         steps: 'true',
         geometries: 'geojson',
         overview: 'full'
@@ -243,19 +243,49 @@ export const computeEmergencyEscapeRoutes = async (
       polyline = rData.geometry.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
       steps = rData.legs[0]?.steps?.map((s: any) => s.maneuver?.instruction || s.name).filter(Boolean) || [];
     } else {
-      const factor = 1.0 + (i * 0.14);
-      const baseDist = calculateHaversineKm(originLat, originLon, destLat, destLon) * 1.15;
-      distanceKm = parseFloat((baseDist * factor).toFixed(2));
-      durationMins = parseFloat((distanceKm / 35 * 60).toFixed(1));
-      
-      const midLat = (originLat + destLat) / 2 + (i * 0.012);
-      const midLon = (originLon + destLon) / 2 - (i * 0.010);
-      polyline = [[originLat, originLon], [midLat, midLon], [destLat, destLon]];
-      steps = [`Proceed towards ${targetName} via Corridor ${i+1}`, `Follow regional bypass road`, `Arrive at destination: ${targetName}`];
+      // Generate a road-following alternative via an offset waypoint
+      const offsetLat = (originLat + destLat) / 2 + (i === 1 ? 0.08 : -0.08);
+      const offsetLon = (originLon + destLon) / 2 + (i === 1 ? -0.06 : 0.06);
+      try {
+        const waypointUrl = `${OSRM_ROUTING_URL}/${originLon},${originLat};${offsetLon},${offsetLat};${destLon},${destLat}`;
+        const wpRes = await axios.get(waypointUrl, {
+          params: { steps: 'true', geometries: 'geojson', overview: 'full' },
+          timeout: 5000
+        });
+        if (wpRes.data?.code === 'Ok' && wpRes.data?.routes?.[0]) {
+          const wpRoute = wpRes.data.routes[0];
+          distanceKm = parseFloat((wpRoute.distance / 1000).toFixed(2));
+          durationMins = parseFloat((wpRoute.duration / 60).toFixed(1));
+          polyline = wpRoute.geometry.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
+          const allSteps = wpRoute.legs.flatMap((leg: any) => 
+            leg.steps?.map((s: any) => s.maneuver?.instruction || s.name).filter(Boolean) || []
+          );
+          steps = allSteps.length > 0 ? allSteps : [`Proceed towards ${targetName} via alternate corridor`, `Arrive at destination: ${targetName}`];
+        } else {
+          throw new Error('No waypoint route returned');
+        }
+      } catch {
+        // Last resort: use first route's data with slight adjustment
+        const baseRoute = osrmRoutes[0];
+        if (baseRoute) {
+          distanceKm = parseFloat((baseRoute.distance / 1000 * (1 + i * 0.12)).toFixed(2));
+          durationMins = parseFloat((baseRoute.duration / 60 * (1 + i * 0.15)).toFixed(1));
+          polyline = baseRoute.geometry.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
+          steps = baseRoute.legs[0]?.steps?.map((s: any) => s.maneuver?.instruction || s.name).filter(Boolean) || [];
+        } else {
+          const baseDist = calculateHaversineKm(originLat, originLon, destLat, destLon) * 1.15;
+          distanceKm = parseFloat((baseDist * (1 + i * 0.14)).toFixed(2));
+          durationMins = parseFloat((distanceKm / 35 * 60).toFixed(1));
+          polyline = [[originLat, originLon], [destLat, destLon]];
+          steps = [`Proceed towards ${targetName}`, `Arrive at destination: ${targetName}`];
+        }
+      }
     }
 
-    // Road Risk Score (Based on hazard exposure & transit friction)
-    const roadRiskScore = i === 0 ? 15 : (i === 1 ? 42 : 72);
+    // Road Risk Score derived from route characteristics
+    // Longer routes and more steps = higher risk exposure
+    const baseRisk = Math.min(90, Math.max(5, Math.round(distanceKm * 0.3 + durationMins * 0.2 + steps.length * 2)));
+    const roadRiskScore = Math.min(95, baseRisk + (i * 8));
     const compScore = parseFloat((0.35 * distanceKm + 0.35 * durationMins + 0.30 * roadRiskScore).toFixed(1));
 
     candidates.push({

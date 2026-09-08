@@ -47,15 +47,16 @@ export const Volunteers: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {data?.users?.map((vol: any) => {
-            
+            const volName = [vol.firstName, vol.lastName].filter(Boolean).join(' ') || vol.name || vol.email?.split('@')[0] || 'Volunteer Rescuer';
+            const initial = (vol.firstName || vol.name || 'V')[0].toUpperCase();
             return (
               <div key={vol.id} className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center font-bold text-lg">
-                    {vol.firstName ? vol.firstName[0] : 'V'}
+                    {initial}
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm">{vol.firstName} {vol.lastName}</h3>
+                    <h3 className="font-bold text-sm">{volName}</h3>
                     <span className="text-[10px] uppercase font-bold text-slate-400">On-Duty Responder</span>
                   </div>
                 </div>

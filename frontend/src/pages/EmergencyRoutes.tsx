@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
-import { Link } from 'react-router-dom';
-import { Navigation, ShieldAlert, CheckCircle2, AlertTriangle, XCircle, ArrowRight, Activity, MapPin, Clock, Compass, Layers, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Compass, Layers, RefreshCw } from 'lucide-react';
 import api from '../services/api';
 
 // Custom Leaflet Icons
@@ -85,18 +84,7 @@ export const EmergencyRoutes: React.FC = () => {
         </button>
       </div>
 
-      {/* Sub-navigation tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
-        <Link to="/hospitals" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
-          Hospitals &amp; Resources
-        </Link>
-        <Link to="/escape-routes" className="border-b-2 border-brand-500 pb-3 text-brand-500">
-          Escape Route Engine
-        </Link>
-        <Link to="/shelters" className="pb-3 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 transition">
-          Refuge Shelters
-        </Link>
-      </div>
+
 
       {/* BDA Architecture Card */}
       <div className="p-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/20 rounded-2xl text-white shadow-xl space-y-3">

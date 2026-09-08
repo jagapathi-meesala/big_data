@@ -106,6 +106,58 @@ export const seedDatabase = async () => {
       state: 'Telangana',
     });
 
+    await User.create({
+      firstName: 'Priya',
+      lastName: 'Sharma',
+      email: 'priya.vol@aid-dras.gov',
+      passwordHash,
+      phoneNumber: '+919876543210',
+      role: UserRole.VOLUNTEER,
+      status: UserStatus.ACTIVE,
+      availability: 'AVAILABLE',
+      district: 'Hyderabad',
+      state: 'Telangana',
+    });
+
+    await User.create({
+      firstName: 'Anjaneyulu',
+      lastName: 'Naidu',
+      email: 'anjaneyulu.vol@aid-dras.gov',
+      passwordHash,
+      phoneNumber: '+919848022334',
+      role: UserRole.VOLUNTEER,
+      status: UserStatus.ACTIVE,
+      availability: 'AVAILABLE',
+      district: 'Visakhapatnam',
+      state: 'Andhra Pradesh',
+    });
+
+    await User.create({
+      firstName: 'Sneha',
+      lastName: 'Reddy',
+      email: 'sneha.vol@aid-dras.gov',
+      passwordHash,
+      phoneNumber: '+919949112233',
+      role: UserRole.VOLUNTEER,
+      status: UserStatus.ACTIVE,
+      availability: 'AVAILABLE',
+      district: 'Guntur',
+      state: 'Andhra Pradesh',
+    });
+
+    await User.create({
+      firstName: 'Vikram',
+      lastName: 'Varma',
+      email: 'vikram.vol@aid-dras.gov',
+      passwordHash,
+      phoneNumber: '+919701234567',
+      role: UserRole.VOLUNTEER,
+      status: UserStatus.ACTIVE,
+      availability: 'AVAILABLE',
+      district: 'Rangareddy',
+      state: 'Telangana',
+    });
+
     const hospitalAdmin = await User.create({
       firstName: 'Dr. Srinivas',
       lastName: 'Rao',

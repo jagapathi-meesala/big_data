@@ -30,7 +30,6 @@ export const DashboardLayout: React.FC = () => {
   const navigationItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Disaster Map', path: '/live-map', icon: MapPin },
-    { name: 'Research Console', path: '/research', icon: FlaskConical },
     { name: 'Escape Routes', path: '/escape-routes', icon: Compass },
     { name: 'SOS Requests', path: '/sos-requests', icon: AlertOctagon },
     { name: 'Resources', path: '/resources', icon: Shield },

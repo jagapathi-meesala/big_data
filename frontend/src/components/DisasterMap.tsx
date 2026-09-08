@@ -235,8 +235,6 @@ export const DisasterMap: React.FC<DisasterMapProps> = ({
   routePath,
   routePaths,
 }) => {
-  const [showAIZones, setShowAIZones] = useState(true);
-  const [showRoutes, setShowRoutes] = useState(true);
   const [currentZoom, setCurrentZoom] = useState(zoom);
 
   const clusters = clusterMarkers(items, currentZoom);
@@ -244,28 +242,6 @@ export const DisasterMap: React.FC<DisasterMapProps> = ({
 
   return (
     <div className="w-full h-full min-h-[400px] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-inner relative flex flex-col">
-      <div className="absolute top-4 right-4 z-[1000] p-4 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg flex flex-col space-y-2 text-xs backdrop-blur-sm">
-        <span className="font-bold border-b pb-1 dark:border-slate-800">Map Layers</span>
-        <label className="flex items-center space-x-2 cursor-pointer font-semibold text-slate-800 dark:text-slate-200">
-          <input
-            type="checkbox"
-            checked={showAIZones}
-            onChange={(e) => setShowAIZones(e.target.checked)}
-            className="rounded text-brand-500 cursor-pointer"
-          />
-          <span>AI Risk Buffers</span>
-        </label>
-        <label className="flex items-center space-x-2 cursor-pointer font-semibold text-slate-800 dark:text-slate-200">
-          <input
-            type="checkbox"
-            checked={showRoutes}
-            onChange={(e) => setShowRoutes(e.target.checked)}
-            className="rounded text-brand-500 cursor-pointer"
-          />
-          <span>Rescue Routes</span>
-        </label>
-      </div>
-
       <div className="flex-1 text-slate-800">
         <MapContainer center={center} zoom={zoom} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
           <TileLayer
@@ -289,7 +265,7 @@ export const DisasterMap: React.FC<DisasterMapProps> = ({
             </Marker>
           ))}
 
-          {showAIZones && clusters.map((cluster, idx) => {
+          {clusters.map((cluster, idx) => {
             const clusterIncidents = cluster.items.filter(item => item.type === 'incident');
             if (clusterIncidents.length === 0) return null;
             
@@ -297,7 +273,7 @@ export const DisasterMap: React.FC<DisasterMapProps> = ({
             const radius = 1000 + (clusterIncidents.length - 1) * 150;
             return (
               <Circle
-                key={`ai-cluster-${idx}-${showAIZones}`}
+                key={`ai-cluster-${idx}`}
                 center={cluster.center}
                 pathOptions={{ 
                   color: '#ef4444', 
@@ -310,9 +286,9 @@ export const DisasterMap: React.FC<DisasterMapProps> = ({
             );
           })}
 
-          {showRoutes && routePaths && routePaths.map((path, idx) => (
+          {routePaths && routePaths.map((path, idx) => (
             <Polyline
-              key={`route-path-${idx}-${showRoutes}`}
+              key={`route-path-${idx}`}
               positions={path}
               color="#6366f1"
               weight={4}
@@ -320,9 +296,9 @@ export const DisasterMap: React.FC<DisasterMapProps> = ({
             />
           ))}
 
-          {showRoutes && (!routePaths || routePaths.length === 0) && routePath && routePath.length > 1 && (
+          {(!routePaths || routePaths.length === 0) && routePath && routePath.length > 1 && (
             <Polyline 
-              key={`route-${showRoutes}`}
+              key="route-fallback"
               positions={routePath} 
               color="#6366f1" 
               weight={4} 

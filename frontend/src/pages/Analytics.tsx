@@ -175,7 +175,7 @@ export const Analytics: React.FC = () => {
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">AI Model Fit</span>
-                <span className="text-sm font-black text-slate-850 dark:text-slate-100 mt-0.5">{stats?.metrics?.accuracy || '94.8'}%</span>
+                <span className="text-sm font-black text-slate-850 dark:text-slate-100 mt-0.5">{stats?.metrics?.accuracy ?? '—'}%</span>
               </div>
             </div>
 
@@ -254,15 +254,15 @@ export const Analytics: React.FC = () => {
                 <div className="grid grid-cols-3 gap-2.5 text-center border-b pb-3.5 mb-3.5 dark:border-slate-800">
                   <div className="flex flex-col">
                     <span className="text-[9px] uppercase font-bold text-slate-400">R² Fit</span>
-                    <span className="text-xs font-black text-emerald-500 mt-1">{stats?.metrics?.accuracy || '94.8'}%</span>
+                    <span className="text-xs font-black text-emerald-500 mt-1">{stats?.metrics?.accuracy ?? '—'}%</span>
                   </div>
                   <div className="flex flex-col border-x dark:border-slate-800 px-1">
                     <span className="text-[9px] uppercase font-bold text-slate-400">Train Time</span>
-                    <span className="text-xs font-black text-emerald-500 mt-1">{stats?.metrics?.trainingTimeMs || '8.5'} ms</span>
+                    <span className="text-xs font-black text-emerald-500 mt-1">{stats?.metrics?.trainingTimeMs ?? '—'} ms</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[9px] uppercase font-bold text-slate-400">MSE Loss</span>
-                    <span className="text-xs font-black text-brand-500 mt-1">{stats?.metrics?.mse || '1.15'}</span>
+                    <span className="text-xs font-black text-brand-500 mt-1">{stats?.metrics?.mse ?? '—'}</span>
                   </div>
                 </div>
 

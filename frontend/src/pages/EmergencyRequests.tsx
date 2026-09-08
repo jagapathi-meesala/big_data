@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   AlertOctagon, ShieldCheck, MapPin, Radio, Activity, Users,
   Building2, Home, Clock, UserCheck, HeartPulse, AlertTriangle,
-  Flame, CloudRain, Shield, Navigation, Waves, Wind, Mountain
+  Flame, Waves, Wind, Mountain
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
@@ -27,49 +27,57 @@ function formatTimeAgo(dateString?: string): string {
 }
 
 // Maps generic titles to specific disaster types (Flood, Cyclone, Earthquake, etc.)
-function getDisasterCategory(title: string, district: string, index: number, disasterType?: string) {
+function getDisasterCategory(title: string, district: string, _index: number, disasterType?: string) {
   const dt = (disasterType || '').toUpperCase();
   const t = (title || '').toUpperCase();
 
-  if (dt.includes('FLOOD') || t.includes('FLOOD') || index % 5 === 0) {
+  if (dt.includes('FLOOD') || t.includes('FLOOD')) {
     return {
-      titleName: `Flash Flood Crisis — ${district || 'Zone'}`,
+      titleName: title || `Flood Alert — ${district || 'Zone'}`,
       category: 'FLOOD',
-      label: '🌊 Flash Flood',
+      label: '🌊 Flood',
       color: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
       icon: Waves
     };
-  } else if (dt.includes('CYCLONE') || t.includes('CYCLONE') || index % 5 === 1) {
+  } else if (dt.includes('CYCLONE') || t.includes('CYCLONE') || dt.includes('HURRICANE') || t.includes('HURRICANE')) {
     return {
-      titleName: `Severe Cyclone Alert — ${district || 'Zone'}`,
+      titleName: title || `Cyclone Alert — ${district || 'Zone'}`,
       category: 'CYCLONE',
-      label: '🌀 Cyclone Warning',
+      label: '🌀 Cyclone',
       color: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
       icon: Wind
     };
-  } else if (dt.includes('EARTHQUAKE') || t.includes('QUAKE') || index % 5 === 2) {
+  } else if (dt.includes('EARTHQUAKE') || t.includes('EARTHQUAKE') || t.includes('QUAKE') || t.includes('SEISMIC')) {
     return {
-      titleName: `Earthquake Tremor Signal — ${district || 'Zone'}`,
+      titleName: title || `Earthquake Alert — ${district || 'Zone'}`,
       category: 'EARTHQUAKE',
       label: '🌋 Earthquake',
       color: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
       icon: AlertOctagon
     };
-  } else if (dt.includes('FIRE') || t.includes('FIRE') || index % 5 === 3) {
+  } else if (dt.includes('FIRE') || t.includes('FIRE') || t.includes('WILDFIRE')) {
     return {
-      titleName: `Industrial Fire & Chemical Emergency — ${district || 'Zone'}`,
+      titleName: title || `Fire Emergency — ${district || 'Zone'}`,
       category: 'FIRE',
-      label: '🔥 Fire Hazard',
+      label: '🔥 Fire',
       color: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
       icon: Flame
     };
-  } else {
+  } else if (dt.includes('LANDSLIDE') || t.includes('LANDSLIDE') || t.includes('MUDSLIDE')) {
     return {
-      titleName: `Landslide & Heavy Mudslide — ${district || 'Zone'}`,
+      titleName: title || `Landslide Alert — ${district || 'Zone'}`,
       category: 'LANDSLIDE',
-      label: '⛰️ Landslide Hazard',
+      label: '⛰️ Landslide',
       color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
       icon: Mountain
+    };
+  } else {
+    return {
+      titleName: title || `Emergency Alert — ${district || 'Zone'}`,
+      category: 'OTHER',
+      label: '⚠️ Emergency',
+      color: 'bg-slate-500/10 text-slate-500 border-slate-500/20',
+      icon: AlertTriangle
     };
   }
 }
@@ -104,7 +112,7 @@ export const EmergencyRequests: React.FC = () => {
         });
         return { previousData };
       },
-      onError: (err: any, id: string, context: any) => {
+      onError: (err: any, _id: string, context: any) => {
         if (context?.previousData) {
           queryClient.setQueryData(['sos-requests'], context.previousData);
         }
@@ -230,10 +238,9 @@ export const EmergencyRequests: React.FC = () => {
             const disMeta = getDisasterCategory(req.title, req.district, index, req.disasterType);
 
             // Deterministic synthetic fallback values for comprehensive view based on incident ID hash
-            const affectedCount = req.affectedPeople ?? (65 + (index * 23) % 180);
-            const nearbyVolunteers = req.assignedVolunteer ? 1 : (3 + index % 5);
-            const hospitalName = req.assignedHospital || (index % 2 === 0 ? 'SVIMS Tirupati' : 'Guntur General Hospital');
-            const shelterName = index % 2 === 0 ? 'Karimnagar Indoor Stadium Shelter' : 'Rangareddy Relief Camp #2';
+            const affectedCount = req.affectedPeople;
+            const hospitalName = req.assignedHospital;
+            const shelterName = req.assignedShelter;
 
             return (
               <div
@@ -275,7 +282,7 @@ export const EmergencyRequests: React.FC = () => {
                 <p className="text-xs text-slate-650 dark:text-slate-350 leading-relaxed pl-2">
                   {req.description && req.description !== 'Details awaited'
                     ? req.description
-                    : `Critical ${disMeta.category.toLowerCase()} distress signal received from field sensors. Immediate emergency medical response required.`}
+                    : 'Details awaited — field assessment in progress.'}
                 </p>
 
                 {/* ── RICH DETAILS GRID ── */}
@@ -287,7 +294,7 @@ export const EmergencyRequests: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Affected People</span>
-                      <span className="font-black text-xs text-slate-800 dark:text-slate-100">{affectedCount} Displaced</span>
+                      <span className="font-black text-xs text-slate-800 dark:text-slate-100">{affectedCount ? `${affectedCount} Displaced` : 'Pending assessment'}</span>
                     </div>
                   </div>
 
@@ -299,7 +306,7 @@ export const EmergencyRequests: React.FC = () => {
                     <div>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Nearby Volunteers</span>
                       <span className="font-black text-xs text-slate-800 dark:text-slate-100">
-                        {req.assignedVolunteer ? `Assigned: ${req.assignedVolunteer}` : `${nearbyVolunteers} On Duty`}
+                        {req.assignedVolunteer ? `Assigned: ${req.assignedVolunteer}` : 'Awaiting assignment'}
                       </span>
                     </div>
                   </div>
@@ -311,7 +318,7 @@ export const EmergencyRequests: React.FC = () => {
                     </div>
                     <div className="truncate">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Hospital Node</span>
-                      <span className="font-black text-xs text-slate-800 dark:text-slate-100 truncate block">{hospitalName}</span>
+                      <span className="font-black text-xs text-slate-800 dark:text-slate-100 truncate block">{hospitalName || 'Locating nearest facility…'}</span>
                     </div>
                   </div>
 
@@ -322,7 +329,7 @@ export const EmergencyRequests: React.FC = () => {
                     </div>
                     <div className="truncate">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Refuge Shelter</span>
-                      <span className="font-black text-xs text-slate-800 dark:text-slate-100 truncate block">{shelterName}</span>
+                      <span className="font-black text-xs text-slate-800 dark:text-slate-100 truncate block">{shelterName || 'Locating nearest shelter…'}</span>
                     </div>
                   </div>
                 </div>

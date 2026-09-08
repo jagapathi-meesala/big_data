@@ -146,7 +146,7 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Hero banner */}
-      <div className="p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-brand-950 border border-slate-800 rounded-3xl shadow-lg relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between">
+      <div className="p-6 bg-gradient-to-r from-brand-600 via-teal-600 to-cyan-700 border border-brand-700 rounded-3xl shadow-lg relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between">
         <div className="space-y-1 relative z-10">
           <h1 className="text-3xl font-extrabold tracking-tight text-white">
             Welcome, {user?.firstName || 'User'}
@@ -160,7 +160,7 @@ export const Dashboard: React.FC = () => {
           <ShieldAlert size={16} className="text-red-400 animate-pulse" />
           <span>Active Command System</span>
         </button>
-        <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-brand-500/10 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-white/10 blur-3xl rounded-full pointer-events-none" />
       </div>
 
       {/* KPI strip */}
