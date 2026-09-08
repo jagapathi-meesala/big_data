@@ -6249,3 +6249,21 @@ Stack: Error:
 [2026-09-08 18:41:17:4117] [[32minfo[39m]: [32m[NASA EONET Sync] Querying live NASA satellite event tracker...[39m
 [2026-09-08 18:41:19:4119] [[32minfo[39m]: [32m[NASA EONET Sync] Completed. Ingested 25 new satellite event incidents.[39m
 [2026-09-08 18:42:20:4220] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: value too long for type character varying(100)[39m
+[2026-09-08 19:11:15:1115] [[32minfo[39m]: [32m[Live Disasters Sync] Querying live feeds (GDACS, USGS, NASA EONET, Open-Meteo)...[39m
+[2026-09-08 19:11:15:1115] [[32minfo[39m]: [32m[USGS Sync] Querying live seismic earthquake feed...[39m
+[2026-09-08 19:11:16:1116] [[32minfo[39m]: [32m[USGS Sync] Completed. Ingested 0 new seismic incidents.[39m
+[2026-09-08 19:11:16:1116] [[32minfo[39m]: [32m[NASA EONET Sync] Querying live NASA satellite event tracker...[39m
+[2026-09-08 19:11:20:1120] [[32minfo[39m]: [32m[NASA EONET Sync] Completed. Ingested 0 new satellite event incidents.[39m
+[2026-09-08 19:11:41:1141] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: value too long for type character varying(100)[39m
+[2026-09-08 19:41:15:4115] [[32minfo[39m]: [32m[Live Disasters Sync] Querying live feeds (GDACS, USGS, NASA EONET, Open-Meteo)...[39m
+[2026-09-08 19:41:15:4115] [[32minfo[39m]: [32m[USGS Sync] Querying live seismic earthquake feed...[39m
+[2026-09-08 19:41:16:4116] [[32minfo[39m]: [32m[USGS Sync] Completed. Ingested 0 new seismic incidents.[39m
+[2026-09-08 19:41:16:4116] [[32minfo[39m]: [32m[NASA EONET Sync] Querying live NASA satellite event tracker...[39m
+[2026-09-08 19:41:19:4119] [[32minfo[39m]: [32m[NASA EONET Sync] Completed. Ingested 0 new satellite event incidents.[39m
+[2026-09-08 19:42:25:4225] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: value too long for type character varying(100)[39m
+[2026-09-08 20:22:01:221] [[32minfo[39m]: [32m[Live Disasters Sync] Querying live feeds (GDACS, USGS, NASA EONET, Open-Meteo)...[39m
+[2026-09-08 20:22:01:221] [[32minfo[39m]: [32m[USGS Sync] Querying live seismic earthquake feed...[39m
+[2026-09-08 20:22:02:222] [[32minfo[39m]: [32m[USGS Sync] Completed. Ingested 0 new seismic incidents.[39m
+[2026-09-08 20:22:02:222] [[32minfo[39m]: [32m[NASA EONET Sync] Querying live NASA satellite event tracker...[39m
+[2026-09-08 20:22:08:228] [[32minfo[39m]: [32m[NASA EONET Sync] Completed. Ingested 0 new satellite event incidents.[39m
+[2026-09-08 20:23:00:230] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: value too long for type character varying(100)[39m

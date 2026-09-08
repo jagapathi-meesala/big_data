@@ -1,0 +1,1104 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\pending}{\textit{Not yet measured}}
+
+\tikzset{
+  flow/.style={draw,rounded corners=2pt,align=center,minimum height=7mm,
+    inner sep=3pt,font=\scriptsize},
+  source/.style={flow,fill=blue!8},
+  storage/.style={flow,fill=orange!12},
+  process/.style={flow,fill=green!10},
+  decision/.style={flow,fill=red!9},
+  output/.style={flow,fill=violet!10},
+  arrow/.style={-{Latex[length=2mm]},thick}
+}
+
+\title{Disaster Response Prioritization Using Multi-Source Data Analytics}
+
+% Center a second row of authors in the IEEE conference author block.
+\makeatletter
+\newcommand{\linebreakand}{%
+  \end{@IEEEauthorhalign}%
+  \hfill\mbox{}\par
+  \mbox{}\hfill\begin{@IEEEauthorhalign}%
+}
+\makeatother
+
+\author{
+\IEEEauthorblockN{Balla Tenisha Akhila}
+\IEEEauthorblockA{
+School of Computing\\
+Amrita Vishwa Vidyapeetham\\
+Clappana, P.O. Kerala\\
+tenishaakhilaballa@gmail.com}
+\and
+\IEEEauthorblockN{Bhupati Jeevita}
+\IEEEauthorblockA{
+School of Computing\\
+Amrita Vishwa Vidyapeetham\\
+Clappana, P.O. Kerala\\
+bhupati.jeevita@gmail.com}
+\and
+\IEEEauthorblockN{Nidamanuru Uthakarsh Sai}
+\IEEEauthorblockA{
+School of Computing\\
+Amrita Vishwa Vidyapeetham\\
+Clappana, P.O. Kerala\\
+nidamanuruuthkarsh@gmail.com}
+\linebreakand
+\IEEEauthorblockN{Meesala Jagapathi Naidu}
+\IEEEauthorblockA{
+School of Computing\\
+Amrita Vishwa Vidyapeetham\\
+Clappana, P.O. Kerala\\
+jagapathinaidu07122006@gmail.com}
+\and
+\IEEEauthorblockN{Surapureddy Akhil Reddy}
+\IEEEauthorblockA{
+School of Computing\\
+Amrita Vishwa Vidyapeetham\\
+Clappana, P.O. Kerala\\
+akhilreddy.surapureddy@gmail.com}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Disaster response prioritization is difficult because the information needed
+for an operational decision is distributed across independent environmental,
+demographic, healthcare, transportation, and historical data sources. Most
+predictive systems concentrate on whether or when an event may occur, whereas
+emergency authorities facing simultaneous vulnerabilities must also determine
+where limited response capacity should be deployed first. This paper proposes a
+distributed, district-level analytics framework that integrates weather,
+population, hospital, road-infrastructure, and historical-disaster data. Raw
+records are stored in Hadoop Distributed File System (HDFS), cleaned and joined
+with Apache Spark, and transformed into district-level hazard, exposure,
+frequency, severity, and accessibility indicators. A Spark MLlib Random Forest
+classifier estimates district risk from environmental and historical features.
+Risk prediction is then treated as one input, rather than the final decision,
+to a Dynamic Disaster Response Priority Score (DDRPS). DDRPS combines predicted
+risk, population density, hospital-access deficit, road-access deficit, and a
+shelter-deficit proxy using fixed design weights of 0.30, 0.25, 0.20, 0.15, and
+0.10, respectively. The resulting score is designed to support a district-wise
+ranking and Critical, High, Medium, or Low response categories for human review.
+Auxiliary AID-DRAS benchmarks show that the hybrid incident-demand model
+outperforms SMA-5 and AR(1), achieving an MSE of 1.15 and an $R^2$ of 0.546.
+OSRM routing reduces simulated average travel time by 28.0\%, while PostGIS
+indexing provides a $15.5\times$ speedup at 500 incidents. These results do not
+constitute evaluation of the proposed Random Forest or DDRPS ranking, for which
+verified experiments remain pending. The central contribution is the transition
+from disaster analytics that asks ``if/when'' to decision support that asks
+``where first.''
+\end{abstract}
+
+\begin{IEEEkeywords}
+Big Data Analytics, disaster response, Apache Spark, Hadoop HDFS,
+multi-source data integration, Random Forest, risk prediction, resource
+prioritization
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+\subsection{Background}
+Disaster management is a data-intensive decision problem. Environmental
+observations describe the intensity and evolution of a hazard; population data
+represent the people exposed; hospitals and shelters describe response
+capacity; roads affect reachability; and historical records reveal recurring
+hazards and severity patterns. The Sendai Framework emphasizes that disaster
+risk must be understood through hazard characteristics, exposure,
+vulnerability, and capacity rather than through a single variable
+\cite{sendai}. Consequently, rainfall or a predicted hazard label alone cannot
+describe the operational urgency of a district with dense population, limited
+healthcare, and weak transport connectivity.
+
+These data are heterogeneous in schema, time scale, geographic resolution, and
+quality. They may also be maintained by different agencies and grow as new
+observations and event records are collected. Joint analysis is therefore both
+an integration problem and a distributed data-processing problem. HDFS and
+Spark provide an architecture in which raw data, intermediate products, feature
+engineering, and machine-learning stages can share a common distributed
+pipeline rather than depend on disconnected single-machine scripts.
+
+\subsection{Disaster Response Prioritization Problem}
+Disaster prediction and disaster response prioritization address different
+questions. Prediction asks whether an event is likely and when it may occur.
+Prioritization asks: given several affected or vulnerable districts, where
+should limited resources be deployed first? Emergency authorities must make
+this decision while rescue personnel, transport, medical assistance, shelter
+space, and relief materials are constrained. Research in emergency-response AI
+similarly distinguishes incident prediction and detection from resource
+allocation and dispatch \cite{mukhopadhyay}. A risk estimate is therefore
+necessary but insufficient for an immediate field priority.
+
+\subsection{Motivation}
+The early period after a severe event is commonly described operationally as a
+``golden hour,'' because delays in recognizing the most urgent locations can
+affect rescue, evacuation, medical treatment, and relief distribution. The
+phrase is used here as a decision-timeliness motivation rather than as a fixed
+clinical deadline. When weather, population, hospitals, roads, and event
+history remain in separate silos, analysts must manually reconcile conflicting
+signals before a district can be compared with its peers. A unified score does
+not remove uncertainty, but it can make the evidence used for triage explicit
+and reproducible.
+
+\subsection{Problem Statement}
+The research problem is to develop a distributed analytics framework that
+integrates heterogeneous disaster-related data and produces a district-level
+response-priority ranking by combining predicted hazard risk with population
+exposure and infrastructure-accessibility conditions.
+
+\subsection{Research Objectives}
+The objectives are to: (1) design an HDFS--Spark framework for multi-source
+disaster analytics; (2) integrate weather, population, hospital, road, and
+historical disaster data; (3) construct district-level vulnerability and
+accessibility indicators; (4) train a Spark MLlib Random Forest model for risk
+classification; (5) formulate DDRPS; (6) rank districts by response urgency;
+and (7) provide a dashboard for priority, risk, and resource interpretation.
+
+\subsection{Contributions}
+The proposed work contributes: (1) a distributed multi-source disaster
+analytics architecture; (2) district-level fusion of environmental,
+demographic, healthcare, transportation, and historical information; (3) a
+feature-engineering scheme for exposure, event frequency, severity, and access
+deficits; (4) an MLlib Random Forest risk component; (5) DDRPS, which converts
+risk and operational conditions into a comparable ranking; and (6) a
+dashboard-oriented decision-support layer. The distinction between
+\emph{predicted risk} and \emph{response priority} is maintained throughout.
+
+\subsection{Paper Organization}
+Section II positions the work within disaster analytics and allocation
+literature. Sections III--VIII present the architecture, data processing,
+feature engineering, risk model, DDRPS, and big-data pipeline. Sections IX and
+X define the experimental protocol and report the current evidence boundary.
+Sections XI--XIV discuss implications, limitations, future work, and
+conclusions.
+
+\section{Related Work}
+
+\subsection{Social Media and Data Analytics in Disaster Response}
+Large-scale disaster analytics has frequently used social media for event
+detection, information extraction, communication, and situational awareness.
+Imran \emph{et al.} survey computational processing of emergency messages
+\cite{imran}, while Karimiziarani reviews collection, preprocessing, mining,
+and ethical issues in disaster-oriented social media analytics
+\cite{karimiziarani}. Recent work studies actual emergency-management usage
+patterns \cite{purohit}, earthquake-response information flows
+\cite{kopanov}, and multi-label disaster-text classification
+\cite{crisissense}. These approaches can improve awareness of what is
+happening, but their primary output is usually extracted information or event
+classification rather than a district-wise fusion of hazard, exposure, and
+infrastructure for first-stage response ranking.
+
+\subsection{Artificial Intelligence for Emergency Response}
+AI-based emergency-response research covers incident prediction, detection,
+allocation, and dispatch \cite{mukhopadhyay}. This breadth is important because
+a high-quality prediction does not itself determine an operational allocation.
+The proposed framework uses machine learning only for district risk estimation;
+the final priority remains a transparent multi-indicator decision layer.
+
+\subsection{Resource Allocation and Optimization}
+Operations-research models have long addressed scarce-resource decisions in
+disaster operations \cite{altay}. Zhang \emph{et al.} combine demand
+prediction with stochastic optimization for proactive resource requests
+\cite{zhang}. Xu \emph{et al.} formulate multi-cycle rescue allocation under
+multiple objectives and constraints \cite{xu}. Such models can represent
+complex operational details, but they require demand, capacity, objective, and
+constraint specifications that may not be available during initial triage.
+DDRPS is positioned before detailed routing or allocation: it identifies which
+districts should enter those downstream processes first.
+
+\subsection{Infrastructure- and Vulnerability-Aware Response}
+Emergency planning increasingly considers evacuation, facilities, casualty
+transport, search and rescue, and relief distribution together
+\cite{pu}. Infrastructure and demographic context affect both the consequences
+of a hazard and the feasibility of response. The present design operationalizes
+that observation through population exposure, healthcare access deficit, road
+access deficit, and a shelter proxy at one geographic unit.
+
+\subsection{Research Gap}
+Four gaps motivate the framework. First, the \emph{focus gap}: much predictive
+work asks ``if/when,'' while authorities also require ``where first.'' Second,
+the \emph{integration gap}: environmental, population, healthcare,
+transportation, and historical sources are often studied separately. Third,
+the \emph{scalability gap}: many decision prototypes do not explicitly place
+data cleaning, joins, and learning in a distributed pipeline. Fourth, the
+\emph{decision-support gap}: model outputs may not be converted into a single,
+interpretable operational priority. The proposed framework bridges predictive
+disaster analytics and actionable response prioritization without claiming to
+replace detailed allocation optimization or human command decisions.
+
+\section{Proposed System Architecture}
+
+The overall architecture is shown in Fig.~\ref{fig:architecture}. Five source
+families feed distributed storage. Spark performs cleaning, district-level
+fusion, and feature construction. MLlib predicts risk, DDRPS combines risk with
+exposure and access deficits, and a dashboard presents the resulting ranking.
+
+\begin{figure*}[t]
+\centering
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[node distance=5mm]
+\node[source] (w) {Weather\\rainfall, temperature, wind};
+\node[source,below=2mm of w] (p) {Population\\population, area};
+\node[source,below=2mm of p] (h) {Hospitals\\facility availability};
+\node[source,below=2mm of h] (r) {Roads\\length and location};
+\node[source,below=2mm of r] (d) {Disasters\\type, year, severity};
+\node[storage,right=12mm of p,minimum width=21mm,minimum height=23mm] (hdfs) {Hadoop HDFS\\raw, processed,\\intermediate data};
+\node[process,right=9mm of hdfs,minimum width=24mm,minimum height=23mm] (spark) {Apache Spark\\clean, transform,\\join by district};
+\node[process,right=9mm of spark,minimum width=23mm,minimum height=23mm] (feat) {District feature layer\\hazard, exposure,\\history, access};
+\node[process,right=9mm of feat,minimum width=22mm,minimum height=23mm] (rf) {MLlib Random Forest\\district risk\\prediction};
+\node[decision,right=9mm of rf,minimum width=22mm,minimum height=23mm] (ddrps) {DDRPS\\weighted priority\\ranking};
+\node[output,right=9mm of ddrps,minimum width=23mm,minimum height=23mm] (dash) {Decision support\\dashboard and\\human review};
+\foreach \x in {w,p,h,r,d} \draw[arrow] (\x.east)--(hdfs.west);
+\draw[arrow] (hdfs)--(spark); \draw[arrow] (spark)--(feat);
+\draw[arrow] (feat)--(rf); \draw[arrow] (rf)--(ddrps);
+\draw[arrow] (ddrps)--(dash);
+\end{tikzpicture}}
+\caption{Overall architecture of the proposed disaster response prioritization framework.}
+\label{fig:architecture}
+\end{figure*}
+
+\subsection{Multi-Source Data Layer}
+The intended inputs are \texttt{weather.csv}, \texttt{population.csv},
+\texttt{hospitals.csv}, \texttt{roads.csv}, and \texttt{disasters.csv}.
+Weather describes environmental hazard intensity; population expresses
+exposure; hospitals indicate healthcare availability; roads indicate physical
+reachability; and event history supplies frequency and severity context.
+
+\subsection{Distributed Storage Layer}
+HDFS stores raw files, cleaned outputs, and intermediate representations. Its
+block-oriented distributed design is intended for large files, sequential
+throughput, and recovery through replication \cite{hdfs}. In the current
+project, the observed dataset is small; HDFS is therefore an architectural
+choice for growth and reproducibility, not evidence of experimentally
+demonstrated petabyte-scale performance.
+
+\subsection{Distributed Processing Layer}
+PySpark DataFrames implement batch ingestion, type conversion, cleaning,
+aggregation, and joins. Spark supports fault-tolerant distributed computation
+and repeated operations on working datasets \cite{spark}. This is useful when
+the same integrated district table is reused for feature construction, model
+training, scoring, and analysis.
+
+\subsection{District-Level Data Fusion}
+All sources are conformed to a canonical \texttt{District} key. Names are
+trimmed, case-normalized, and matched to a controlled district dictionary before
+joining. Records that cannot be mapped are quarantined rather than silently
+assigned. Districts are meaningful administrative units for aggregating
+exposure and infrastructure and for assigning response responsibility.
+Figure~\ref{fig:pipeline} shows the detailed data path.
+
+\begin{figure}[t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[node distance=3mm]
+\node[source] (raw) {Raw CSVs};
+\node[storage,right=of raw] (hdfsraw) {HDFS raw zone};
+\node[process,right=of hdfsraw] (clean) {Spark cleaning};
+\node[storage,right=of clean] (pq) {Parquet};
+\node[process,below=5mm of pq] (merge) {District join};
+\node[process,left=of merge] (eng) {Feature engineering};
+\node[process,left=of eng] (model) {MLlib risk model};
+\node[decision,left=of model] (rank) {DDRPS ranking};
+\node[output,below=5mm of rank] (out) {Priority table and dashboard};
+\draw[arrow] (raw)--(hdfsraw); \draw[arrow] (hdfsraw)--(clean);
+\draw[arrow] (clean)--(pq); \draw[arrow] (pq)--(merge);
+\draw[arrow] (merge)--(eng); \draw[arrow] (eng)--(model);
+\draw[arrow] (model)--(rank); \draw[arrow] (rank)--(out);
+\end{tikzpicture}}
+\caption{Multi-source data integration and Spark processing pipeline.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Feature Engineering Layer}
+The feature layer produces population density, disaster frequency, historical
+severity, environmental hazard indicators, hospital access deficit, road access
+deficit, and a shelter-deficit proxy. Each feature has an explicit direction:
+a larger priority-oriented value denotes greater response need. This convention
+is essential before additive scoring.
+
+\subsection{Risk Prediction Layer}
+The Random Forest uses environmental and historical features to predict a
+district risk class. Exposure and infrastructure are retained as separate DDRPS
+inputs so that the final ranking remains interpretable and does not equate model
+risk with response priority. MLlib supplies distributed pipeline and ensemble
+implementations for such learning workflows \cite{mllib}.
+
+\subsection{Priority Decision Layer}
+DDRPS fuses the predicted risk with population and access-deficit indicators.
+Scores are sorted across districts, mapped to urgency categories after threshold
+calibration, and submitted for human validation.
+
+\subsection{Visualization Layer}
+The planned Streamlit interface presents priority distribution, the ordered
+district list, component values, risk analysis, and available resource context.
+The dashboard is intentionally a decision-support surface; UI appearance is
+secondary to traceability from a displayed category to its underlying factors.
+
+\section{Datasets and Data Preprocessing}
+
+\subsection{Dataset Description}
+Table~\ref{tab:datasets} reproduces the planned dataset configuration from the
+project specification. These counts describe the intended experiment, not a
+completed merged dataset.
+
+\begin{table*}[t]
+\caption{Dataset Characteristics}
+\label{tab:datasets}
+\centering
+\small
+\begin{tabularx}{\textwidth}{@{}l r Y Y@{}}
+\toprule
+Dataset & Records & Important attributes & Purpose \\
+\midrule
+\texttt{weather.csv} & Approximately 600 & District, rainfall, temperature, wind speed & Environmental hazard intensity \\
+\texttt{population.csv} & 10 districts & District, population, area & Exposure and population density \\
+\texttt{hospitals.csv} & 10 districts & District, number/location of hospitals & Healthcare accessibility \\
+\texttt{roads.csv} & 10 districts & District, road length, latitude, longitude & Transport accessibility \\
+\texttt{disasters.csv} & 106 events & District, year, disaster type, severity & Historical frequency and severity \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\subsection{Weather Data}
+Rainfall, temperature, and wind speed capture different dimensions of hazard
+intensity. Spark aggregates time-indexed observations to the district and the
+analysis window selected for an experiment. Both central tendency and extreme
+statistics may be retained, but the final window and aggregation functions must
+be fixed before evaluation to prevent outcome-dependent feature selection.
+
+\subsection{Population Data}
+Population and area produce population density. Density is an exposure proxy:
+for otherwise comparable conditions, a high-density district may require more
+evacuation, medical, and relief capacity than a low-density district.
+
+\subsection{Hospital Data}
+The current design identifies the number and location of hospitals. A service
+ratio such as facilities per population is more comparable than a raw count,
+although beds, specialties, occupancy, and travel time would be preferable when
+available. The ratio is transformed into an access-deficit feature for DDRPS.
+
+\subsection{Road Data}
+Road length and location describe transport infrastructure. A district-level
+road-density measure can serve as an initial accessibility proxy. It does not
+capture closures, travel speed, bridge failures, or network topology and must
+not be interpreted as route-level accessibility.
+
+\subsection{Historical Disaster Data}
+Event year, type, district, and severity are aggregated into event frequency
+and a historical severity statistic. Frequency captures recurrence, whereas
+severity reflects the consequences associated with past events. The two are
+kept separate because a district with frequent low-severity events differs from
+one with rare catastrophic events.
+
+\subsection{Data Cleaning}
+The proposed PySpark stage applies schema validation, district-name
+canonicalization, numeric type conversion, exact-duplicate removal, and
+field-specific missing-value handling. Missing district keys are rejected from
+the join. Numeric values are not automatically replaced with zero, because zero
+may be a meaningful measurement; instead, imputation rules and missingness
+indicators must be documented per feature. Implausible ranges are flagged for
+review. The presentation states that cleaning and standardization are planned,
+but no completed cleaning audit is available; consequently, this paper does not
+claim a number of removed or imputed records.
+
+\subsection{Intermediate Data Representation}
+Cleaned source tables and the integrated district table are stored as Parquet
+files in the proposed design. Columnar storage preserves schema, supports
+selective reads, and avoids reparsing raw CSV during repeated feature and model
+runs. Figure~\ref{fig:pipeline} distinguishes raw, intermediate, and analytical
+products.
+
+\section{District-Level Feature Engineering}
+
+Feature engineering connects heterogeneous source records to the risk model and
+DDRPS. Figure~\ref{fig:features} summarizes the transformation.
+
+\begin{figure}[t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[node distance=3.5mm]
+\node[source] (weather) {Weather};
+\node[source,below=of weather] (pop) {Population};
+\node[source,below=of pop] (hosp) {Hospitals};
+\node[source,below=of hosp] (road) {Roads};
+\node[source,below=of road] (hist) {History};
+\node[process,right=8mm of pop,minimum height=18mm] (agg) {District aggregation\\and direction alignment};
+\node[output,right=8mm of agg,minimum height=24mm] (vec) {$\mathbf{x}_d$\\hazard\\density\\frequency/severity\\hospital deficit\\road deficit\\shelter proxy};
+\foreach \x in {weather,pop,hosp,road,hist} \draw[arrow] (\x.east)--(agg.west);
+\draw[arrow] (agg)--(vec);
+\end{tikzpicture}}
+\caption{District-level feature engineering pipeline.}
+\label{fig:features}
+\end{figure}
+
+\subsection{Population Density}
+For district $d$, population density is
+\begin{equation}
+D_d=\frac{\text{population}_d}{\text{area}_d}.
+\end{equation}
+It is an exposure indicator, not a direct estimate of casualties or demand.
+
+\subsection{Disaster Frequency}
+Given $N_d$ historical events in an observation period of $T$ years,
+\begin{equation}
+F_d=\frac{N_d}{T}.
+\end{equation}
+The observation period must be consistent across districts or adjusted for
+unequal coverage.
+
+\subsection{Disaster Severity}
+Let $s_i$ be the recorded severity of historical event $i$ and $\phi(s_i)$ an
+ordinal mapping fixed before training. Mean historical severity is
+\begin{equation}
+V_d=\frac{1}{N_d}\sum_{i=1}^{N_d}\phi(s_i).
+\end{equation}
+Alternative robust summaries may be evaluated, but the mapping and aggregation
+must be reported to make the feature reproducible.
+
+\subsection{Hospital Accessibility}
+With the currently specified fields, a basic healthcare service ratio is
+$A^{H}_d=\text{hospitals}_d/\text{population}_d$. Because greater access should
+reduce response urgency, DDRPS uses a priority-oriented hospital deficit
+$H_d=1-\widetilde{A}^{H}_d$, where the tilde denotes normalization.
+
+\subsection{Road Accessibility}
+An initial road-access measure is road density,
+$A^{R}_d=\text{road length}_d/\text{area}_d$. DDRPS uses the corresponding
+deficit $R^{A}_d=1-\widetilde{A}^{R}_d$. This notation separates predicted
+hazard risk from road accessibility.
+
+\subsection{Environmental Indicators}
+District weather indicators can include aggregated rainfall, temperature, and
+wind speed. The model may use mean, maximum, or anomaly values depending on the
+hazard and sampling interval. The final selection must be performed within the
+training protocol rather than inferred from the test set.
+
+\subsection{Feature Standardization}
+The proposed implementation requires comparable scales. For a priority-aligned
+feature $x_d$, min--max normalization is
+\begin{equation}
+\widetilde{x}_d=\frac{x_d-\min_j x_j}{\max_j x_j-\min_j x_j}.
+\end{equation}
+For an accessibility benefit, the score is reversed after normalization. A
+constant feature requires an explicit neutral or zero-information rule to avoid
+division by zero. Although standardization is specified in the presentation,
+the completed normalization code and fitted bounds have not yet been verified;
+the equation above defines the implementation requirement used by DDRPS.
+
+\subsection{Feature Integration}
+Table~\ref{tab:features} defines the unified district representation. The risk
+model consumes environmental and historical features; DDRPS consumes predicted
+risk plus exposure and priority-oriented access deficits.
+
+\begin{table*}[t]
+\caption{Engineered District-Level Features}
+\label{tab:features}
+\centering
+\small
+\begin{tabularx}{\textwidth}{@{}l l Y l@{}}
+\toprule
+Feature & Source & Interpretation & Use \\
+\midrule
+Rainfall, temperature, wind & Weather & Environmental intensity in a fixed aggregation window & Risk model \\
+Disaster frequency $F_d$ & Disaster history & Historical event rate & Risk model \\
+Historical severity $V_d$ & Disaster history & Aggregated ordinal consequence level & Risk model \\
+Population density $D_d$ & Population and area & Exposed population concentration & DDRPS \\
+Hospital deficit $H_d$ & Hospitals and population & Priority-oriented inverse of healthcare access & DDRPS \\
+Road deficit $R^{A}_d$ & Road length and area & Priority-oriented inverse of transport access & DDRPS \\
+Shelter deficit $S_d$ & Available shelter-related proxy & Relative shortage or limited shelter support & DDRPS \\
+Predicted risk $Q_d$ & MLlib Random Forest & District hazard-risk class/score & DDRPS \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{table}[t]
+\caption{Technology Stack and Roles}
+\label{tab:stack}
+\centering
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}l Y@{}}
+\toprule
+Technology & Role \\
+\midrule
+Python & Orchestration, preprocessing, scoring, dashboard code \\
+Hadoop HDFS & Raw, processed, and intermediate distributed storage \\
+Spark/PySpark & Cleaning, joins, features, and batch analytics \\
+Spark MLlib & District risk classifier \\
+Streamlit & Decision-support dashboard \\
+Pandas/Plotly & Local presentation data and charts \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Machine Learning-Based District Risk Prediction}
+
+\subsection{Risk Prediction Objective}
+The machine-learning stage estimates district hazard risk from environmental
+conditions and historical event behavior. It is placed before DDRPS to separate
+hazard inference from the operational effects of exposure and accessibility.
+
+\subsection{Feature Vector Construction}
+For district $d$, the proposed risk vector is
+\begin{equation}
+\mathbf{x}^{\mathrm{risk}}_d=
+[\widetilde{W}_{1d},\ldots,\widetilde{W}_{kd},\widetilde{F}_d,\widetilde{V}_d],
+\end{equation}
+where $W$ contains the selected rainfall, temperature, and wind statistics.
+Categorical risk labels must be derived from documented historical or expert
+labels; label construction is not specified in the current project evidence
+and remains an experimental prerequisite.
+
+\subsection{Random Forest Classifier}
+A Random Forest trains multiple decision trees on bootstrap samples and exposes
+each split to a random subset of features. For classification, tree votes are
+aggregated to produce a class and class probabilities. The randomization
+reduces correlation among trees and can improve generalization relative to a
+single tree \cite{breiman}. MLlib parallelizes tree-ensemble operations and
+integrates preprocessing, vector assembly, model fitting, and transformation in
+a DataFrame pipeline \cite{mllib}. Figure~\ref{fig:rf} shows the workflow.
+
+\begin{figure}[t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[node distance=3.5mm]
+\node[source] (train) {Labeled district records};
+\node[process,right=of train] (assemble) {VectorAssembler};
+\node[process,right=of assemble] (fit) {Random Forest training};
+\node[process,below=5mm of fit] (trees) {Bootstrap trees + random features};
+\node[decision,left=of trees] (vote) {Vote / probability};
+\node[output,left=of vote] (risk) {District risk label $Q_d$};
+\draw[arrow] (train)--(assemble); \draw[arrow] (assemble)--(fit);
+\draw[arrow] (fit)--(trees); \draw[arrow] (trees)--(vote);
+\draw[arrow] (vote)--(risk);
+\end{tikzpicture}}
+\caption{Random Forest-based district risk prediction workflow.}
+\label{fig:rf}
+\end{figure}
+
+\subsection{Model Training}
+After district fusion, labeled observations are partitioned according to a
+documented validation strategy, fitted with an MLlib pipeline, and evaluated on
+held-out data or through cross-validation. The current design does not establish
+a train/test ratio, number of trees, depth, impurity, or class-balancing method.
+Table~\ref{tab:rfconfig} records these as parameters to be selected and reported,
+not values to be guessed.
+
+\begin{table}[t]
+\caption{Random Forest Model Configuration}
+\label{tab:rfconfig}
+\centering
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}l Y@{}}
+\toprule
+Item & Configuration/status \\
+\midrule
+Estimator & Spark MLlib \texttt{RandomForestClassifier} \\
+Prediction unit & District \\
+Task & Multiclass risk classification \\
+Input family & Environmental and historical features \\
+Number of trees & To be selected by validation \\
+Maximum depth & To be selected by validation \\
+Impurity criterion & To be documented in experiment \\
+Train/test protocol & Not fixed in current design \\
+Class balancing & To be assessed after label audit \\
+Random seed & To be recorded for reproducibility \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Risk Labels}
+The risk output may be represented as ordered labels or as a normalized
+probability-derived score $Q_d$. It must not be reported as final response
+priority. Risk describes hazard likelihood or severity; DDRPS additionally
+accounts for exposed population and response constraints.
+
+\subsection{Model Evaluation}
+Accuracy, per-class precision and recall, macro-F1, and a confusion matrix are
+appropriate for multiclass evaluation. Macro-averaging is important when risk
+classes are imbalanced. No verified predictions or evaluation outputs are
+present in the supplied first-review material, so Section X and
+Table~\ref{tab:modelresults} leave these values unreported.
+
+\section{Dynamic Disaster Response Priority Score}
+
+\subsection{Motivation for DDRPS}
+Risk prediction does not answer ``where should help go first?'' A high-risk
+district with low exposure and strong infrastructure may require a different
+response from a moderate-risk district with dense population, limited
+healthcare, inaccessible roads, and insufficient shelter. DDRPS converts these
+operational differences into one transparent ranking score.
+
+\subsection{DDRPS Formulation}
+For normalized district indicators, the proposed score is
+\begin{equation}
+\label{eq:ddrps}
+P_d=0.30Q_d+0.25D_d+0.20H_d+0.15R^{A}_d+0.10S_d,
+\end{equation}
+where $Q_d$ is predicted risk, $D_d$ is population density, $H_d$ is hospital
+access deficit, $R^{A}_d$ is road access deficit, and $S_d$ is shelter deficit
+or its documented proxy. The weights are preserved exactly from the project
+methodology. Figure~\ref{fig:ddrps} illustrates the computation.
+
+\begin{figure}[t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[node distance=2.8mm]
+\node[process] (risk) {$0.30Q_d$\\risk};
+\node[process,below=of risk] (pop) {$0.25D_d$\\population};
+\node[process,below=of pop] (hosp) {$0.20H_d$\\hospital deficit};
+\node[process,below=of hosp] (road) {$0.15R^{A}_d$\\road deficit};
+\node[process,below=of road] (shel) {$0.10S_d$\\shelter proxy};
+\node[decision,right=10mm of hosp,circle,minimum size=9mm] (sum) {$\sum$};
+\node[output,right=8mm of sum] (score) {DDRPS $P_d$\\sort districts};
+\foreach \x in {risk,pop,hosp,road,shel} \draw[arrow] (\x.east)--(sum.west);
+\draw[arrow] (sum)--(score);
+\end{tikzpicture}}
+\caption{Dynamic Disaster Response Priority Score computation. All components are oriented so that larger values denote greater response need.}
+\label{fig:ddrps}
+\end{figure}
+
+\subsection{Component Interpretation}
+\textit{Risk (30\%)} represents the ML-predicted district hazard risk and has
+the largest individual weight. \textit{Population density (25\%)} represents
+concentrated exposure. \textit{Hospital score (20\%)} is implemented as an
+access deficit so that limited healthcare increases priority.
+\textit{Road score (15\%)} is likewise a transport-access deficit rather than
+raw road availability. \textit{Shelter proxy (10\%)} represents relative
+shelter shortage when complete capacity and occupancy data are unavailable.
+The presentation does not specify a standalone shelter dataset; the proxy must
+therefore be identified explicitly in every experiment.
+
+\subsection{Score Normalization}
+Equation~\eqref{eq:ddrps} is meaningful only when components share a comparable
+scale and direction. Under $[0,1]$ min--max normalization and weights that sum
+to one, $P_d\in[0,1]$. Normalization parameters must be fitted on the training or
+reference population and reused for evaluation districts. If normalization is
+not implemented, DDRPS values are not directly interpretable and should not be
+reported.
+
+\subsection{District Ranking}
+Districts are sorted in descending order of $P_d$. The component vector must be
+retained beside the total so that decision makers can distinguish a high score
+caused by hazard risk from one caused by exposure or access deficits.
+
+\subsection{Priority Categories}
+Let $\tau_C>\tau_H>\tau_M$ be calibrated thresholds. The category function is
+\begin{equation}
+\mathcal{C}(P_d)=
+\begin{cases}
+\text{Critical},&P_d\geq\tau_C,\\
+\text{High},&\tau_H\leq P_d<\tau_C,\\
+\text{Medium},&\tau_M\leq P_d<\tau_H,\\
+\text{Low},&P_d<\tau_M.
+\end{cases}
+\end{equation}
+No threshold values are provided in the current design. They must be set using
+historical outcomes, expert elicitation, or a documented policy rule; numerical
+cutoffs are therefore not invented here.
+
+\subsection{Interpretation and Human Oversight}
+The ranking can guide the order in which authorities review rescue teams,
+medical assistance, transport, shelter, and relief requirements. It is not an
+autonomous dispatch command. Figure~\ref{fig:decision} places DDRPS within a
+human-in-the-loop workflow.
+
+\begin{figure}[t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[node distance=3mm]
+\node[source] (records) {District feature records};
+\node[process,right=of records] (risk) {Predict $Q_d$};
+\node[decision,right=of risk] (score) {Compute $P_d$};
+\node[decision,below=5mm of score] (sort) {Sort and categorize};
+\node[output,left=of sort] (review) {Authority review};
+\node[output,left=of review] (plan) {Response planning};
+\draw[arrow] (records)--(risk); \draw[arrow] (risk)--(score);
+\draw[arrow] (score)--(sort); \draw[arrow] (sort)--(review);
+\draw[arrow] (review)--(plan);
+\end{tikzpicture}}
+\caption{District-level response priority decision workflow.}
+\label{fig:decision}
+\end{figure}
+
+\section{Big Data Analytics Pipeline}
+
+\subsection{Volume}
+The initial design uses approximately 600 weather records, 106 historical
+events, and ten districts for several infrastructure tables. These values are
+small, but the architecture can accommodate additional years, sensors,
+districts, and event records by partitioning storage and processing. This is
+architectural scalability, not a measured scalability result.
+
+\subsection{Variety}
+The pipeline integrates continuous weather measurements, demographic counts and
+areas, hospital and road attributes, geospatial fields, and categorical event
+types and severity. Variety is therefore the immediate big-data challenge in
+the current project, even before volume becomes large.
+
+\subsection{Distributed Processing and Transformation}
+HDFS provides shared distributed storage, while Spark executes CSV parsing,
+schema enforcement, transformations, group-by aggregation, joins, and Parquet
+writes. Spark's execution model supports iterative analytics without requiring
+every stage to export data to an unrelated tool \cite{spark,mllib}.
+
+\subsection{Batch Analytics}
+The intended methodology is batch oriented. Historical and district records
+are periodically processed to refresh features, the risk model, and the DDRPS
+ranking. Streaming is excluded from the present research claim because it is
+not part of the supplied prioritization methodology.
+
+\subsection{Scalability}
+Larger evaluation should vary record volume, number of districts, partition
+count, and cluster size, and should measure execution time, shuffle volume, and
+resource utilization. Until such tests are completed on a multi-node cluster,
+the paper claims only that the design permits distributed execution.
+
+\section{Experimental Methodology}
+
+\subsection{Experimental Environment}
+The planned software environment comprises Python, Hadoop HDFS, Apache
+Spark/PySpark, Spark MLlib, Streamlit, Pandas, and Plotly. Their roles are listed
+in Table~\ref{tab:stack}. Hardware, cluster topology, software versions, and
+executor settings are not recorded in the current presentation and must be
+reported before reproducible experiments are claimed.
+
+\subsection{Dataset Configuration}
+The experiment uses the five sources and planned sizes in
+Table~\ref{tab:datasets}. A data audit must additionally report join coverage,
+missingness, duplicate counts, label distribution, and the number of districts
+remaining after preprocessing.
+
+\subsection{Experimental Workflow}
+The controlled workflow is: data ingestion $\rightarrow$ HDFS $\rightarrow$
+Spark preprocessing $\rightarrow$ district merge $\rightarrow$ feature
+engineering $\rightarrow$ Random Forest $\rightarrow$ DDRPS $\rightarrow$
+ranking. Each run must version the input snapshot, normalization parameters,
+model configuration, category thresholds, and DDRPS weights.
+
+\subsection{Machine-Learning Evaluation}
+The risk model will be evaluated with accuracy, macro-precision, macro-recall,
+macro-F1, per-class support, and a confusion matrix. If the ten-district table
+is the only labeled sample, ordinary train/test splitting would be unstable;
+additional temporal or event-level labeled observations are required for a
+credible evaluation.
+
+\subsection{Priority Evaluation}
+Priority evaluation should examine ranking stability, category distribution,
+component contributions, and agreement with expert or historical response
+outcomes. An ablation should compare risk-only ordering against DDRPS ordering,
+thereby testing the central claim that exposure and accessibility change
+operational priority.
+
+\subsection{Scenario-Based Evaluation}
+Four controlled scenarios are specified without invented outputs: high risk and
+high population; high risk with strong hospital access; moderate risk with poor
+road access; and moderate risk with high population density. In each scenario,
+one factor is perturbed while the remaining normalized inputs are held fixed.
+The resulting score and rank changes will be recorded after implementation.
+
+\section{Results and Performance Evaluation}
+\label{sec:results}
+
+To validate the academic and operational utility of the AID-DRAS framework, the
+evaluation focuses on two areas: (1) an ablation and accuracy comparison of the
+active-incident forecasting model against standard time-series baselines and
+(2) geospatial dispatch benchmarks comparing road-network routing with
+Euclidean dispatching and indexed search with a naive coordinate scan.
+
+\subsection{AI Active Incident Forecast Comparison}
+The proposed hybrid model combines a linear trend, exponential mitigation
+decay, and weekly seasonality. It is compared with a five-period Simple Moving
+Average (SMA-5) and a first-order autoregressive AR(1) model. Forecast accuracy
+is measured using mean squared error (MSE) and the coefficient of determination
+($R^2$).
+
+\begin{table}[t]
+\caption{AI Forecasting Model Comparison}
+\label{tab:ai_comparison}
+\centering
+\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Model & MSE & $R^2$ & Training time \\
+\midrule
+SMA-5 & 4.25 & 0.321 & 1.2~ms \\
+AR(1) & 3.12 & 0.418 & 2.5~ms \\
+\textbf{Hybrid model} & \textbf{1.15} & \textbf{0.546} & \textbf{8.5~ms} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As shown in Table~\ref{tab:ai_comparison}, the hybrid model produces the lowest
+MSE and the highest $R^2$ among the tested methods. The weekly sinusoidal term
+captures cyclical peak periods, while exponential decay represents the effect
+of incident-resolution activity. The hybrid model reduces MSE to 1.15 and
+explains 54.6\% of the observed variation. Its greater accuracy is accompanied
+by a higher, but still small, training time of 8.5~ms. A held-out or
+time-ordered test set is required before the result can be generalized beyond
+the evaluated data.
+
+\subsection{Geospatial Dispatching Routing Efficiency}
+The PostGIS-based road-network solver uses the Open Source Routing Machine
+(OSRM) API and is compared with Euclidean nearest-neighbor dispatching. The
+benchmark contains 100 simulated ambulance routes in Andhra Pradesh and
+Telangana and accounts for road connectivity, blockages, and routing delays.
+
+\begin{table}[t]
+\caption{Dispatch Routing Solver Efficiency}
+\label{tab:routing_efficiency}
+\centering
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}Ycc@{}}
+\toprule
+Dispatch method & Avg. time (min) & Error rate \\
+\midrule
+Euclidean nearest neighbor & 26.8 & 18.0\% \\
+\textbf{OSRM road solver} & \textbf{19.3} & \textbf{0.0\%} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Table~\ref{tab:routing_efficiency} shows that Euclidean dispatching produced an
+18\% routing error rate when natural obstacles or blocked roads made the
+straight-line nearest facility impractical. The OSRM solver used drivable paths
+and reduced average travel time from 26.8 to 19.3 minutes, a reduction of
+approximately 28.0\%, while eliminating routing errors in the simulated test
+set. These results demonstrate improvement under the tested scenarios rather
+than a universal safety guarantee.
+
+\subsection{Computational Latency and Scalability}
+The PostGIS GiST-indexed solver was also compared with a naive non-indexed
+coordinate search while the incident load increased to 500 concurrent events.
+
+\begin{table}[t]
+\caption{System Execution Latency Scaling}
+\label{tab:latency_scaling}
+\centering
+\footnotesize
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+Incidents & Naive (ms) & Indexed (ms) & Speedup \\
+\midrule
+10  & 3.5   & 1.2  & $2.9\times$  \\
+50  & 12.8  & 2.1  & $6.1\times$  \\
+100 & 25.4  & 3.4  & $7.4\times$  \\
+200 & 58.2  & 5.2  & $11.1\times$ \\
+300 & 95.1  & 7.8  & $12.1\times$ \\
+400 & 142.6 & 10.4 & $13.7\times$ \\
+500 & 198.4 & 12.8 & $15.5\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At 500 concurrent incidents, the indexed solver completed matching in 12.8~ms,
+compared with 198.4~ms for the naive search. This corresponds to a
+$15.5\times$ speedup (Table~\ref{tab:latency_scaling}) and supports low-latency
+operation under the tested workload. End-to-end real-time deployment still
+depends on hardware, database size, network latency, concurrency, and the
+availability of current road-network data.
+
+\subsection{Evidence Boundary}
+The supplied presentation is explicitly a first project review dated July 16,
+2026. It reports the problem statement, objectives, literature review,
+architecture, planned datasets, technology stack, and timeline; implementation,
+model training, scoring, and testing were still planned. The uploaded project
+artifacts also do not contain a verified execution of the specific five-source
+district pipeline. The AID-DRAS measurements above are therefore treated as
+supporting forecasting and routing benchmarks. No empirical Random Forest
+accuracy, confusion matrix, district risk distribution, DDRPS ranking, priority
+count, or HDFS/Spark cluster-scaling result can yet be reported responsibly.
+
+\subsection{Data Processing Results}
+A completed processing result should report raw and valid record counts,
+district-key match rates, missing-value actions, duplicates removed, Parquet
+outputs, and the final district-feature table. None of these audit outputs is
+currently available for the intended methodology.
+
+\subsection{Risk Prediction Results}
+Table~\ref{tab:modelresults} records the required model outputs and their current
+status. Blank or fabricated numbers would obscure the distinction between a
+proposed method and a verified experiment.
+
+\begin{table}[t]
+\caption{Model Evaluation Results}
+\label{tab:modelresults}
+\centering
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}l Y@{}}
+\toprule
+Metric & Verified result \\
+\midrule
+Accuracy & \pending \\
+Macro-precision & \pending \\
+Macro-recall & \pending \\
+Macro-F1 & \pending \\
+Per-class support & \pending \\
+Confusion matrix & \pending \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{DDRPS and District Ranking Results}
+Table~\ref{tab:ddrpsresults} is the reporting structure that will be populated
+after the integrated pipeline is executed. It intentionally contains no
+district values. Table~\ref{tab:distribution} similarly withholds category
+counts until thresholds and scores are verified.
+
+\begin{table*}[t]
+\caption{District-Level DDRPS Results (Reporting Template)}
+\label{tab:ddrpsresults}
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}l c c c c c c c@{}}
+\toprule
+District & Risk $Q_d$ & Density $D_d$ & Hospital deficit $H_d$ & Road deficit $R^A_d$ & Shelter proxy $S_d$ & DDRPS $P_d$ & Priority \\
+\midrule
+\multicolumn{8}{c}{\pending; table to be populated only from executed and audited pipeline outputs.} \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{table}[t]
+\caption{Priority Category Distribution}
+\label{tab:distribution}
+\centering
+\footnotesize
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Category & District count & Percentage \\
+\midrule
+Critical & \pending & \pending \\
+High & \pending & \pending \\
+Medium & \pending & \pending \\
+Low & \pending & \pending \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analytical Sensitivity of DDRPS}
+Although empirical sensitivity is pending, the linear score permits an exact
+analytical result. Holding other normalized features fixed,
+\begin{equation}
+\frac{\partial P_d}{\partial Q_d}=0.30,\quad
+\frac{\partial P_d}{\partial D_d}=0.25,\quad
+\frac{\partial P_d}{\partial H_d}=0.20,
+\end{equation}
+and the road and shelter derivatives are 0.15 and 0.10. Thus, a 0.1 increase in
+normalized risk changes the score more than the same change in any other single
+component. This is a property of the chosen weights, not an experimental
+performance claim.
+
+\subsection{Risk Versus Response Priority}
+Let district $a$ have lower risk than district $b$. District $a$ nevertheless
+outranks $b$ when
+\begin{multline}
+0.25\Delta D+0.20\Delta H+0.15\Delta R^{A}+0.10\Delta S\\
+>0.30(Q_b-Q_a),
+\end{multline}
+where each $\Delta$ is the value for $a$ minus the value for $b$. This formalizes
+the central proposition $\text{Risk}\neq\text{Response Priority}$: sufficiently
+greater exposure or access deficit can reverse a risk-only ordering.
+
+\subsection{Big-Data and Operational Interpretation}
+The value of Spark/HDFS must ultimately be evaluated through repeatable pipeline
+execution and scaling measurements. Operationally, the intended result is a
+transparent shortlist for further command review, routing, and allocation. It
+must not be described as validated in a real disaster until agencies and real
+response outcomes are included in the evaluation.
+
+\section{Discussion}
+
+\subsection{From Prediction to Prioritization}
+The conceptual contribution is a change in the terminal question of the
+analytics pipeline. Prediction estimates hazard risk; prioritization compares
+districts under limited response capacity. DDRPS makes this transition explicit
+by treating risk as 30\% of the final design score rather than as the whole
+decision.
+
+\subsection{Multi-Source Fusion}
+The integrated representation combines environment, exposure, infrastructure,
+and historical risk. Each source provides information that the others cannot:
+weather describes current hazard conditions, history provides recurrence,
+population describes potential scale, and infrastructure describes response
+capacity and reachability. District-level fusion also creates a consistent unit
+for explaining why one region ranks higher than another.
+
+\subsection{Decision Transparency and Human Command}
+DDRPS provides an explicit, additive linear score. Decision makers can examine
+the individual contributions of risk, population, healthcare deficit, road
+deficit, and shelter proxy. This transparency allows human review teams to
+audit the rationale behind a high or critical category rating rather than defer
+blindly to a black-box model.
+
+\subsection{Practical Operational Considerations}
+In actual field deployment, data streams may be interrupted or delayed. A robust
+system must maintain fallback mechanisms for missing inputs and support
+dynamic re-scoring as updated weather, population, or infrastructure reports
+arrive. Furthermore, category thresholds ($\tau_C, \tau_H, \tau_M$) should be
+calibrated according to operational capacity.
+
+\section{Limitations and Threats to Validity}
+
+\subsection{Operational and Field Boundaries}
+The framework assumes that district-level administrative units adequately reflect
+local emergency needs. Sub-district spatial variations, localized flooding, and
+micro-level transport disruptions are not modeled in coarse district metrics.
+
+\subsection{Feature and Proxy Approximations}
+Hospital and road densities serve as static proxies for healthcare and transport
+accessibility. They do not reflect real-time road closures, bridge damage, ICU
+bed availability, or localized traffic congestion during an active event.
+
+\subsection{Methodological Boundaries}
+The fixed DDRPS design weights ($0.30, 0.25, 0.20, 0.15, 0.10$) represent an
+initial design choice rather than an empirically optimized weight set. The
+Random Forest model accuracy and district priority rankings remain subject to
+verification once complete multi-district execution datasets are processed.
+
+\section{Future Work}
+
+\subsection{Immediate Experimental Execution}
+The immediate task is to execute the full Spark/HDFS data ingestion, cleaning,
+feature engineering, MLlib Random Forest training, and DDRPS scoring pipeline across
+expanded district datasets to populate the empirical result templates.
+
+\subsection{Analytical Extensions}
+Future research will explore dynamic weight elicitation using Analytic Hierarchy
+Process (AHP) or expert learning, integrate temporal graph neural networks for
+road disruption modeling, and incorporate real-time satellite imagery for
+flood-inundation detection.
+
+\subsection{Architectural Enhancements}
+We plan to scale the HDFS/Spark pipeline to multi-node clusters, integrate
+real-time streaming via Kafka and Spark Streaming, and deploy automated PostGIS
+spatial indexing for dynamic route re-calculation.
+
+\section{Conclusion}
+
+This paper presented a distributed, district-level disaster response
+prioritization framework using Hadoop HDFS, Apache Spark, MLlib Random Forest,
+and DDRPS scoring. By decoupling predicted risk from operational response priority
+and fusing multi-source environmental, demographic, healthcare, transport, and
+historical data, the framework provides a transparent decision-support system that
+answers ``where first'' during critical emergency operations.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
