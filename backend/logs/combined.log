@@ -8315,3 +8315,9 @@ Stack: Error:
 [2026-09-21 18:59:00:590] [[32minfo[39m]: [32m[NASA EONET Sync] Querying live NASA satellite event tracker...[39m
 [2026-09-21 18:59:05:595] [[33mwarn[39m]: [33m[NASA EONET Sync] Failed: timeout of 5000ms exceeded[39m
 [2026-09-21 18:59:11:5911] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: timeout of 6000ms exceeded[39m
+[2026-09-21 19:28:55:2855] [[32minfo[39m]: [32m[Live Disasters Sync] Querying live feeds (GDACS, USGS, NASA EONET, Open-Meteo)...[39m
+[2026-09-21 19:28:55:2855] [[32minfo[39m]: [32m[USGS Sync] Querying live seismic earthquake feed...[39m
+[2026-09-21 19:29:00:290] [[33mwarn[39m]: [33m[USGS Sync] Failed: timeout of 5000ms exceeded[39m
+[2026-09-21 19:29:00:290] [[32minfo[39m]: [32m[NASA EONET Sync] Querying live NASA satellite event tracker...[39m
+[2026-09-21 19:29:03:293] [[32minfo[39m]: [32m[NASA EONET Sync] Completed. Ingested 0 new satellite event incidents in India.[39m
+[2026-09-21 19:29:18:2918] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: read ECONNRESET[39m

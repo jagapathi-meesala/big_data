@@ -129,3 +129,4 @@
 [2026-09-21 17:59:25:5925] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: read ECONNRESET[39m
 [2026-09-21 18:29:20:2920] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: stream has been aborted[39m
 [2026-09-21 18:59:11:5911] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: timeout of 6000ms exceeded[39m
+[2026-09-21 19:29:18:2918] [[31merror[39m]: [31m[GDACS Sync] Error syncing disasters: read ECONNRESET[39m
