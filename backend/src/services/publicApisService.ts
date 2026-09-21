@@ -5,69 +5,89 @@ import logger from '../config/logger';
 export interface LiveWeatherData {
   temperature: number;
   humidity: number;
-  rainfallMm: number;
+  rainfallMm?: number;
   precipitation?: number;
-  windSpeedKmH: number;
-  pressureHpa: number;
-  weatherCode: number;
-  description: string;
-  isHighRisk: boolean;
+  rain?: number;
+  windSpeedKmH?: number;
+  windSpeed?: number;
+  pressureHpa?: number;
+  surfacePressure?: number;
+  weatherCode?: number;
+  description?: string;
+  isHighRisk?: boolean;
 }
 
 export interface LiveRoadRouteData {
   distanceKm: number;
-  durationMinutes: number;
+  durationMinutes?: number;
   durationMins?: number;
   roadAccessibilityScore?: number;
   routeGeometry?: any;
+  averageSpeedKmh?: number;
+  routabilityStatus?: string;
 }
 
 export interface BDAEscapeRouteCandidate {
   id: string;
   name: string;
   distanceKm: number;
-  durationMinutes: number;
+  durationMinutes?: number;
   durationMins?: number;
   roadRiskScore: number;
-  compositeBdaScore: number;
+  compositeBdaScore?: number;
   compositeScore?: number;
   recommendation: string;
   badge: string;
   color: string;
+  polyline?: [number, number][];
+  steps?: string[];
+  riskCategory?: string;
 }
 
 export interface LivePopulationData {
   country: string;
-  year: number;
-  population: number;
+  year?: number;
+  population?: number;
   totalPopulation?: number;
+  dataYear?: string;
+  source?: string;
 }
 
 export interface BDAResourceItem {
   id: string;
   name: string;
-  type: string;
+  type?: string;
   category?: string;
-  district: string;
+  district?: string;
   lat: number;
   lon: number;
   distanceKm: number;
   bunksAvailable?: number;
   availableBunks?: number;
   fuelAvailable?: boolean;
+  sourceApi?: string;
+  address?: string;
+  durationMins?: number;
+  capacityBunks?: number;
+  occupancyPercent?: number;
+  phone?: string;
 }
 
 export interface DistrictPublicApiSummary {
   district: string;
   coordinates?: { lat: number; lon: number };
-  resources: BDAResourceItem[];
-  summaryMetrics: {
+  resources?: BDAResourceItem[];
+  summaryMetrics?: {
     totalHospitals: number;
     totalShelters: number;
     totalFuelPoints: number;
     availableBunksSum: number;
     avgDistanceKm: number;
   };
+  weather?: LiveWeatherData;
+  roadRoute?: LiveRoadRouteData;
+  population?: LivePopulationData;
+  ddrpsSubScores?: { Qd: number; Dd: number; Hd: number; Md: number; Vd: number };
 }
 
 export function calculateHaversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -208,116 +228,111 @@ export const computeEmergencyEscapeRoutes = async (
   routes: BDAEscapeRouteCandidate[];
   formula: string;
 }> => {
-  let osrmRoutes: any[] = [];
-  try {
-    const osrmUrl = `${OSRM_ROUTING_URL}/${originLon},${originLat};${destLon},${destLat}`;
-    const res = await axios.get(osrmUrl, {
+  const routeRequest = async (coordinates: string) => {
+    const response = await axios.get(`${OSRM_ROUTING_URL}/${coordinates}`, {
       params: {
-        alternatives: 3,
+        alternatives: true,
         steps: 'true',
         geometries: 'geojson',
         overview: 'full'
       },
-      timeout: 5000
+      timeout: 7000
     });
+    return response.data?.code === 'Ok' ? response.data.routes || [] : [];
+  };
 
-    if (res.data?.code === 'Ok' && res.data?.routes) {
-      osrmRoutes = res.data.routes;
-    }
+  const directCoordinates = `${originLon},${originLat};${destLon},${destLat}`;
+  let osrmRoutes: any[] = [];
+  try {
+    osrmRoutes = await routeRequest(directCoordinates);
   } catch (err: any) {
     logger.warn(`[Public-APIs] OSRM multi-route query failed: ${err.message}`);
   }
 
-  const routeLabels = ['Route A (Express Highway)', 'Route B (Arterial Bypass)', 'Route C (Perimeter Detour)'];
-  const candidates: BDAEscapeRouteCandidate[] = [];
-
-  for (let i = 0; i < 3; i++) {
-    let rData = osrmRoutes[i];
-    let distanceKm: number, durationMins: number;
-    let polyline: [number, number][] = [];
-    let steps: string[] = [];
-
-    if (rData) {
-      distanceKm = parseFloat((rData.distance / 1000).toFixed(2));
-      durationMins = parseFloat((rData.duration / 60).toFixed(1));
-      polyline = rData.geometry.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
-      steps = rData.legs[0]?.steps?.map((s: any) => s.maneuver?.instruction || s.name).filter(Boolean) || [];
-    } else {
-      // Generate a road-following alternative via an offset waypoint
-      const offsetLat = (originLat + destLat) / 2 + (i === 1 ? 0.08 : -0.08);
-      const offsetLon = (originLon + destLon) / 2 + (i === 1 ? -0.06 : 0.06);
+  // OSRM can return fewer alternatives than requested. Ask for missing
+  // candidates through real via points; never reuse a geometry with invented
+  // distance/time values or draw a straight line as a road.
+  if (osrmRoutes.length < 3) {
+    const midLat = (originLat + destLat) / 2;
+    const midLon = (originLon + destLon) / 2;
+    const viaPoints = [
+      `${midLon + 0.08},${midLat - 0.08}`,
+      `${midLon - 0.08},${midLat + 0.08}`
+    ];
+    const missingRoutes = await Promise.all(viaPoints.map(async (via) => {
       try {
-        const waypointUrl = `${OSRM_ROUTING_URL}/${originLon},${originLat};${offsetLon},${offsetLat};${destLon},${destLat}`;
-        const wpRes = await axios.get(waypointUrl, {
-          params: { steps: 'true', geometries: 'geojson', overview: 'full' },
-          timeout: 5000
-        });
-        if (wpRes.data?.code === 'Ok' && wpRes.data?.routes?.[0]) {
-          const wpRoute = wpRes.data.routes[0];
-          distanceKm = parseFloat((wpRoute.distance / 1000).toFixed(2));
-          durationMins = parseFloat((wpRoute.duration / 60).toFixed(1));
-          polyline = wpRoute.geometry.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
-          const allSteps = wpRoute.legs.flatMap((leg: any) => 
-            leg.steps?.map((s: any) => s.maneuver?.instruction || s.name).filter(Boolean) || []
-          );
-          steps = allSteps.length > 0 ? allSteps : [`Proceed towards ${targetName} via alternate corridor`, `Arrive at destination: ${targetName}`];
-        } else {
-          throw new Error('No waypoint route returned');
-        }
-      } catch {
-        // Last resort: use first route's data with slight adjustment
-        const baseRoute = osrmRoutes[0];
-        if (baseRoute) {
-          distanceKm = parseFloat((baseRoute.distance / 1000 * (1 + i * 0.12)).toFixed(2));
-          durationMins = parseFloat((baseRoute.duration / 60 * (1 + i * 0.15)).toFixed(1));
-          polyline = baseRoute.geometry.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
-          steps = baseRoute.legs[0]?.steps?.map((s: any) => s.maneuver?.instruction || s.name).filter(Boolean) || [];
-        } else {
-          const baseDist = calculateHaversineKm(originLat, originLon, destLat, destLon) * 1.15;
-          distanceKm = parseFloat((baseDist * (1 + i * 0.14)).toFixed(2));
-          durationMins = parseFloat((distanceKm / 35 * 60).toFixed(1));
-          polyline = [[originLat, originLon], [destLat, destLon]];
-          steps = [`Proceed towards ${targetName}`, `Arrive at destination: ${targetName}`];
-        }
+        const routes = await routeRequest(`${originLon},${originLat};${via};${destLon},${destLat}`);
+        return routes[0];
+      } catch (err: any) {
+        logger.warn(`[Public-APIs] OSRM via-point route failed: ${err.message}`);
+        return null;
       }
-    }
+    }));
+    osrmRoutes = [...osrmRoutes, ...missingRoutes.filter(Boolean)];
+  }
 
-    // Road Risk Score derived from route characteristics
-    // Longer routes and more steps = higher risk exposure
-    const baseRisk = Math.min(90, Math.max(5, Math.round(distanceKm * 0.3 + durationMins * 0.2 + steps.length * 2)));
-    const roadRiskScore = Math.min(95, baseRisk + (i * 8));
-    const compScore = parseFloat((0.35 * distanceKm + 0.35 * durationMins + 0.30 * roadRiskScore).toFixed(1));
+  const uniqueRoutes = osrmRoutes.filter((route, index, routes) => {
+    const coordinates = route?.geometry?.coordinates;
+    if (!Array.isArray(coordinates) || coordinates.length < 2) return false;
+    const first = coordinates[0];
+    const last = coordinates[coordinates.length - 1];
+    const signature = `${first.join(',')}:${last.join(',')}:${coordinates.length}`;
+    return routes.findIndex((candidate) => {
+      const candidateCoordinates = candidate?.geometry?.coordinates;
+      if (!candidateCoordinates?.length) return false;
+      const candidateFirst = candidateCoordinates[0];
+      const candidateLast = candidateCoordinates[candidateCoordinates.length - 1];
+      return `${candidateFirst.join(',')}:${candidateLast.join(',')}:${candidateCoordinates.length}` === signature;
+    }) === index;
+  }).slice(0, 3);
 
-    candidates.push({
-      id: `route-${i + 1}`,
-      name: routeLabels[i],
+  if (uniqueRoutes.length === 0) {
+    throw new Error('OSRM routing unavailable for the selected city pair');
+  }
+
+  const candidates: BDAEscapeRouteCandidate[] = uniqueRoutes.map((route: any) => {
+    const distanceKm = parseFloat((route.distance / 1000).toFixed(2));
+    const durationMins = parseFloat((route.duration / 60).toFixed(1));
+    const polyline = route.geometry.coordinates.map(([lon, lat]: [number, number]) => [lat, lon] as [number, number]);
+    const steps = route.legs.flatMap((leg: any) =>
+      leg.steps?.map((step: any) => step.maneuver?.instruction || step.name).filter(Boolean) || []
+    );
+    const roadRiskScore = Math.min(95, Math.max(5, Math.round(
+      distanceKm * 0.3 + durationMins * 0.2 + steps.length * 2
+    )));
+    const compositeScore = parseFloat(
+      (0.35 * distanceKm + 0.35 * durationMins + 0.30 * roadRiskScore).toFixed(1)
+    );
+    return {
+      id: 'route-pending',
+      name: 'Route',
       distanceKm,
       durationMins,
       roadRiskScore,
-      compositeScore: compScore,
-      riskCategory: roadRiskScore > 50 ? 'HIGH' : (roadRiskScore > 25 ? 'MEDIUM' : 'LOW'),
+      compositeScore,
+      riskCategory: roadRiskScore > 50 ? 'HIGH' : roadRiskScore > 25 ? 'MEDIUM' : 'LOW',
       recommendation: 'CAUTION',
-      badge: '',
+      badge: 'Caution Route',
       color: '#f59e0b',
       polyline,
       steps: steps.slice(0, 6)
-    });
-  }
+    };
+  });
 
-  // Sort by Composite Score (lowest score is safest & best)
-  candidates.sort((a, b) => a.compositeScore - b.compositeScore);
-
-  candidates[0].recommendation = 'BEST_RECOMMENDED';
-  candidates[0].badge = 'Best Recommended Route';
-  candidates[0].color = '#10b981'; // Emerald Green
-
-  candidates[1].recommendation = 'CAUTION';
-  candidates[1].badge = 'Caution Route';
-  candidates[1].color = '#f59e0b'; // Amber Yellow
-
-  candidates[2].recommendation = 'HIGH_HAZARD';
-  candidates[2].badge = 'High Hazard Route';
-  candidates[2].color = '#ef4444'; // Bright Red
+  candidates.sort((a, b) => (a.compositeScore ?? Infinity) - (b.compositeScore ?? Infinity));
+  const routePresentation = [
+    { name: 'Route A (Express Highway)', color: '#10b981', recommendation: 'BEST_RECOMMENDED', badge: 'Best Recommended Route' },
+    { name: 'Route B (Arterial Bypass)', color: '#f59e0b', recommendation: 'CAUTION', badge: 'Caution Route' },
+    { name: 'Route C (Perimeter Detour)', color: '#ef4444', recommendation: 'HIGH_HAZARD', badge: 'High Hazard Route' }
+  ];
+  candidates.forEach((candidate, index) => {
+    const presentation = routePresentation[index];
+    candidate.id = `route-${index + 1}`;
+    candidate.name = presentation.name;
+    candidate.color = presentation.color;
+    candidate.recommendation = presentation.recommendation;
+    candidate.badge = presentation.badge;
+  });
 
   return {
     origin: { lat: originLat, lon: originLon },
@@ -498,7 +513,7 @@ export const analyzeBDAResources = async (
   const totalHospitals = allResources.filter(r => r.category === 'HOSPITAL').length;
   const totalShelters = allResources.filter(r => r.category === 'SHELTER').length;
   const totalFuelPoints = allResources.filter(r => r.category === 'FUEL').length;
-  const availableBunksSum = allResources.reduce((sum, r) => sum + r.availableBunks, 0);
+  const availableBunksSum = allResources.reduce((sum, r) => sum + (r.availableBunks || 0), 0);
   const avgDistanceKm = allResources.length > 0 ? parseFloat((allResources.reduce((s, r) => s + r.distanceKm, 0) / allResources.length).toFixed(2)) : 0;
 
   return {
@@ -530,10 +545,10 @@ export const getDistrictPublicApiSummary = async (
     fetchLiveWorldBankPopulation()
   ]);
 
-  const Qd = Math.min(1.0, Math.max(0.05, (weather.precipitation * 10 + weather.temperature / 40.0) / 2.0));
+  const Qd = Math.min(1.0, Math.max(0.05, ((weather.precipitation || 0) * 10 + weather.temperature / 40.0) / 2.0));
   const Dd = 0.65;
   const Hd = 0.45;
-  const Md = parseFloat((1.0 - roadRoute.roadAccessibilityScore).toFixed(3));
+  const Md = parseFloat((1.0 - (roadRoute.roadAccessibilityScore || 0)).toFixed(3));
   const Vd = 0.50;
 
   return {

@@ -448,7 +448,7 @@ export const seedDatabase = async () => {
     }
     console.log(`Seeded ${shelterCount} shelters and ${resourceCount} supply depots from places dataset.`);
     
-    // 5. Seed System Notifications
+    // 5. Seed System Notifications with AP & Telangana Cities
     console.log('Seeding system notifications table...');
     await sequelize.query(`DROP TABLE IF EXISTS system_notifications;`);
     await sequelize.query(`
@@ -462,9 +462,16 @@ export const seedDatabase = async () => {
       );
     `);
     
-    // Clear notifications log to allow real-time events to build up naturally
-    await sequelize.query(`TRUNCATE TABLE system_notifications;`);
-    console.log('System notifications seeded.');
+    await sequelize.query(`
+      INSERT INTO system_notifications (title, message, type, "createdAt", "updatedAt")
+      VALUES
+        ('Flash Flood Advisory', 'Prakasam Barrage discharge level monitoring active for Vijayawada, Andhra Pradesh.', 'ALERT', NOW() - INTERVAL '5 minutes', NOW() - INTERVAL '5 minutes'),
+        ('Cyclone Preparedness Alert', 'Visakhapatnam disaster response units positioned at coastal emergency shelters.', 'WARNING', NOW() - INTERVAL '15 minutes', NOW() - INTERVAL '15 minutes'),
+        ('Urban Drainage Inundation Alert', 'Heavy rainfall advisory in effect for Musi catchment sectors across Hyderabad, Telangana.', 'WARNING', NOW() - INTERVAL '35 minutes', NOW() - INTERVAL '35 minutes'),
+        ('Hospital Bed Allocation Verified', 'Guntur General Hospital & Apollo ER Hyderabad added 120 standby ICU beds to active registry.', 'SUCCESS', NOW() - INTERVAL '1 hour', NOW() - INTERVAL '1 hour'),
+        ('Supply Depot Standby Status', 'Kurnool & Warangal regional supply depots pre-positioned 500 food & water parcels.', 'INFO', NOW() - INTERVAL '2 hours', NOW() - INTERVAL '2 hours');
+    `);
+    console.log('System notifications seeded with AP & Telangana dataset locations.');
     console.log('All dataset-driven database records seeded successfully.');
   } catch (error) {
     console.error('Seeder execution failed:', error);

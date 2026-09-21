@@ -1,10 +1,22 @@
 import { Router } from 'express';
-import { createIncident, getIncidents, updateIncident, deleteIncident, uploadImage, updateIncidentStatus } from '../controllers/incidentController';
+import {
+  createIncident,
+  getIncidents,
+  updateIncident,
+  deleteIncident,
+  uploadImage,
+  updateIncidentStatus,
+  simulateDisasterAlert,
+  resetSimulations
+} from '../controllers/incidentController';
 import { protect, restrictTo } from '../middlewares/auth';
 import { UserRole } from '../models/User';
 import { incidentValidator } from '../middlewares/validators';
 
 const router = Router();
+
+router.post('/simulate', simulateDisasterAlert);
+router.post('/simulation/reset', resetSimulations);
 
 router.use(protect);
 
@@ -21,3 +33,4 @@ router.route('/:id')
   .delete(restrictTo(UserRole.ADMIN, UserRole.DISASTER_OFFICER), deleteIncident);
 
 export default router;
+

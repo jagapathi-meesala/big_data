@@ -119,6 +119,20 @@ class TestAllocation(unittest.TestCase):
         self.assertAlmostEqual(x.sum(), 100.0)
         self.assertTrue((np.diff(x) > 0).all())
 
+    def test_zero_weights_fall_back_to_uniform(self):
+        from optimize_prepositioning import stock_proportional
+
+        x = stock_proportional(np.array([0.0, 0.0, 0.0]), 90)
+        self.assertAlmostEqual(x.sum(), 90.0)
+        self.assertTrue(np.allclose(x, [30.0, 30.0, 30.0]))
+
+    def test_neighbour_matrix_excludes_self(self):
+        from optimize_prepositioning import neighbour_matrix
+
+        ctx = self._ctx()
+        nb = neighbour_matrix(ctx)
+        self.assertTrue(np.allclose(np.diag(nb), 0.0))
+
     def test_unmet_monotone_in_stock(self):
         from optimize_prepositioning import (
             neighbour_matrix,

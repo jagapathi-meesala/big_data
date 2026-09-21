@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DisasterMap } from '../components/DisasterMap';
 import api from '../services/api';
 import { useSocket } from '../hooks/useSocket';
-import { Route, Navigation } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 
 // ─── Key rescue corridors (incident zone → nearest hospital/shelter) ──────────
 const RESCUE_CORRIDORS = [
@@ -19,11 +19,20 @@ async function fetchOSRMRoute(from: [number,number], to: [number,number]): Promi
     const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`;
     const res = await fetch(url);
     const data = await res.json();
-    if (data.code !== 'Ok' || !data.routes?.[0]) return [from, to];
+    if (data.code !== 'Ok' || !data.routes?.[0]) return [];
     return data.routes[0].geometry.coordinates.map(([lng, lat]: [number,number]) => [lat, lng]);
   } catch {
-    return [from, to];
+    return [];
   }
+}
+
+function toLeafletPoint(geom: any): [number, number] | null {
+  const coordinates = geom?.coordinates;
+  if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
+  const [lon, lat] = coordinates;
+  return Number.isFinite(Number(lat)) && Number.isFinite(Number(lon))
+    ? [Number(lat), Number(lon)]
+    : null;
 }
 
 export const LiveDisaster: React.FC = () => {
@@ -37,11 +46,9 @@ export const LiveDisaster: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
     (async () => {
-      const paths: [number,number][][] = [];
-      for (const corridor of RESCUE_CORRIDORS) {
-        const routeCoords = await fetchOSRMRoute(corridor.from, corridor.to);
-        if (isMounted) paths.push(routeCoords);
-      }
+      const paths = await Promise.all(RESCUE_CORRIDORS.map((corridor) =>
+        fetchOSRMRoute(corridor.from, corridor.to)
+      ));
       if (isMounted) {
         setRescuePaths(paths);
         setLoadingRoutes(false);
@@ -60,11 +67,13 @@ export const LiveDisaster: React.FC = () => {
     const items: any[] = [];
     
     resInc.data?.incidents?.forEach((inc: any) => {
+      const coordinates = toLeafletPoint(inc.geom);
+      if (!coordinates) return;
       items.push({
         id: inc.id,
         title: inc.title,
         type: 'incident',
-        coordinates: [inc.geom.coordinates[1], inc.geom.coordinates[0]],
+        coordinates,
         severity: inc.severity,
         affectedPeople: inc.estimatedDamage ? Math.ceil(inc.estimatedDamage / 5000) : 45,
         timeReported: inc.createdAt,
@@ -73,7 +82,8 @@ export const LiveDisaster: React.FC = () => {
     });
 
     resHosp.data?.resources?.forEach((hosp: any) => {
-      if (hosp.geom?.coordinates && hosp.geom.coordinates.length >= 2) {
+      const coordinates = toLeafletPoint(hosp.geom);
+      if (coordinates) {
         let cleanTitle = hosp.name || `Hospital ${hosp.id.slice(0, 5)}`;
         if (cleanTitle.startsWith('-')) {
           cleanTitle = cleanTitle.replace(/^-\s*/, '');
@@ -83,7 +93,7 @@ export const LiveDisaster: React.FC = () => {
           id: hosp.id,
           title: cleanTitle,
           type: 'hospital',
-          coordinates: [hosp.geom.coordinates[1], hosp.geom.coordinates[0]],
+          coordinates,
           details: `Available beds: ${hosp.quantity}. Status: ${hosp.status}`,
           quantity: hosp.quantity,
           occupancy: hosp.occupancy,
@@ -102,7 +112,7 @@ export const LiveDisaster: React.FC = () => {
             id: `amb-hosp-${hosp.id}-${i}`,
             title: `${cleanTitle} Ambulance Unit #${i + 1}`,
             type: 'resource',
-            coordinates: [hosp.geom.coordinates[1] + offsetLat, hosp.geom.coordinates[0] + offsetLng],
+            coordinates: [coordinates[0] + offsetLat, coordinates[1] + offsetLng],
             details: `Affiliated with: ${cleanTitle}. Status: AVAILABLE. Emergency dispatch ready.`
           });
         }
@@ -110,6 +120,8 @@ export const LiveDisaster: React.FC = () => {
     });
 
     resShelt.data?.resources?.forEach((shelt: any) => {
+      const coordinates = toLeafletPoint(shelt.geom);
+      if (!coordinates) return;
       let cleanTitle = shelt.name || `Shelter ${shelt.id.slice(0, 5)}`;
       if (cleanTitle.startsWith('-')) {
         cleanTitle = cleanTitle.replace(/^-\s*/, '');
@@ -119,7 +131,7 @@ export const LiveDisaster: React.FC = () => {
         id: shelt.id,
         title: cleanTitle,
         type: 'shelter',
-        coordinates: [shelt.geom.coordinates[1], shelt.geom.coordinates[0]],
+        coordinates,
         details: `Occupancy: ${shelt.occupancy}/${shelt.quantity}. Power: ${shelt.electricityStatus}`,
         quantity: shelt.quantity,
         occupancy: shelt.occupancy
@@ -127,6 +139,8 @@ export const LiveDisaster: React.FC = () => {
     });
 
     resAmbs.data?.resources?.forEach((amb: any) => {
+      const coordinates = toLeafletPoint(amb.geom);
+      if (!coordinates) return;
       let cleanTitle = amb.name || `Ambulance Unit ${amb.id.slice(0, 5)}`;
       if (cleanTitle.startsWith('-')) {
         cleanTitle = cleanTitle.replace(/^-\s*/, '');
@@ -135,7 +149,7 @@ export const LiveDisaster: React.FC = () => {
         id: amb.id,
         title: cleanTitle,
         type: 'resource',
-        coordinates: [amb.geom.coordinates[1], amb.geom.coordinates[0]],
+        coordinates,
         details: `Status: ${amb.status}. Owner ID: ${amb.ownerId}`
       });
     });

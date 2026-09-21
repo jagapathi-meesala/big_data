@@ -37,6 +37,21 @@ const CITIES_COORDS = [
   { name: 'Bhadrachalam', lat: 17.6700, lon: 80.8900 }
 ];
 
+// Strict India-only geospatial & country filter (Lat 6.0 to 37.5 N, Lon 68.0 to 97.5 E)
+function isIndiaLocation(lat: number, lon: number, countryStr?: string): boolean {
+  if (countryStr) {
+    const c = countryStr.toLowerCase();
+    const nonIndia = ['mexico', 'japan', 'china', 'brazil', 'colombia', 'costa rica', 'guyana', 'panama', 'suriname', 'venezuela', 'russia', 'kazakhstan', 'kyrgyzstan', 'mongolia', 'chile', 'peru', 'ecuador', 'philippines', 'indonesia', 'turkey', 'greece', 'italy', 'usa', 'united states'];
+    if (nonIndia.some(nc => c.includes(nc))) {
+      return false;
+    }
+    if (c.includes('india') || c.includes('andhra') || c.includes('telangana') || c.includes('bay of bengal') || c.includes('indian ocean') || c.includes('arabian sea')) {
+      return true;
+    }
+  }
+  return lat >= 6.0 && lat <= 37.5 && lon >= 68.0 && lon <= 97.5;
+}
+
 export const syncUSGSQuakes = async (): Promise<number> => {
   try {
     logger.info('[USGS Sync] Querying live seismic earthquake feed...');
@@ -49,8 +64,12 @@ export const syncUSGSQuakes = async (): Promise<number> => {
       if (!coords || coords.length < 2) continue;
       const lon = coords[0];
       const lat = coords[1];
-      const mag = feat.properties?.mag || 3.0;
       const place = feat.properties?.place || 'Seismic Zone';
+
+      // Strict India-only filter check
+      if (!isIndiaLocation(lat, lon, place)) continue;
+
+      const mag = feat.properties?.mag || 3.0;
       const title = `Live Alert - Earthquake M${mag} (${place})`;
 
       const existing = await Incident.findOne({ where: { title } });
@@ -67,19 +86,20 @@ export const syncUSGSQuakes = async (): Promise<number> => {
           disasterType: DisasterType.EARTHQUAKE,
           geom: { type: 'Point', coordinates: [lon, lat] },
           district: place.split(',')[1]?.trim() || place,
-          state: place.split(',')[1]?.trim() || 'Global Alert Zone',
+          state: 'India',
           estimatedDamage: Math.round(mag * 100000)
         });
         count++;
       }
     }
-    logger.info(`[USGS Sync] Completed. Ingested ${count} new seismic incidents.`);
+    logger.info(`[USGS Sync] Completed. Ingested ${count} new seismic incidents in India.`);
     return count;
   } catch (err: any) {
     logger.warn(`[USGS Sync] Failed: ${err.message}`);
     return 0;
   }
 };
+
 
 export const syncEONETEvents = async (): Promise<number> => {
   try {
@@ -96,6 +116,9 @@ export const syncEONETEvents = async (): Promise<number> => {
       const lat = Array.isArray(coords[0]) ? coords[0][1] : coords[1];
       const eventName = evt.title || 'NASA Tracked Event';
       const categoryName = evt.categories?.[0]?.title || 'Natural Event';
+
+      // Strict India-only filter check
+      if (!isIndiaLocation(lat, lon, `${eventName} ${categoryName}`)) continue;
 
       let type = DisasterType.OTHER;
       if (categoryName.toLowerCase().includes('wildfire') || categoryName.toLowerCase().includes('fire')) type = DisasterType.FIRE;
@@ -114,13 +137,13 @@ export const syncEONETEvents = async (): Promise<number> => {
           disasterType: type,
           geom: { type: 'Point', coordinates: [lon, lat] },
           district: categoryName,
-          state: 'Global Satellite Watch',
+          state: 'India Satellite Watch',
           estimatedDamage: 250000
         });
         count++;
       }
     }
-    logger.info(`[NASA EONET Sync] Completed. Ingested ${count} new satellite event incidents.`);
+    logger.info(`[NASA EONET Sync] Completed. Ingested ${count} new satellite event incidents in India.`);
     return count;
   } catch (err: any) {
     logger.warn(`[NASA EONET Sync] Failed: ${err.message}`);
@@ -245,7 +268,12 @@ export const syncGDACSDisasters = async (): Promise<number> => {
         const lat = coords[1];
 
         const properties = feature.properties || {};
-        const eventName = properties.eventname || 'Unnamed Incident';
+        const eventName = properties.eventname || properties.name || 'Unnamed Incident';
+        const country = properties.country || '';
+
+        // Strict India-only filter check
+        if (!isIndiaLocation(lat, lon, `${country} ${eventName}`)) continue;
+
         const eventType = properties.eventtype || 'OTHER';
         const alertLevel = (properties.alertlevel || 'green').toLowerCase();
 
@@ -277,14 +305,14 @@ export const syncGDACSDisasters = async (): Promise<number> => {
               type: 'Point',
               coordinates: [lon, lat]
             },
-            district: properties.country || 'Disaster Control Zone',
-            state: properties.country || 'India',
+            district: country || 'Disaster Control Zone',
+            state: 'India',
             estimatedDamage: parseFloat(properties.severity || '0.0') || 0.0
           });
 
           await createSystemNotification(
             'Live Emergency Alert Ingested',
-            `GDACS Satellite feed detected active ${type.toLowerCase()} near ${properties.country || 'India'} (Alert level: ${properties.alertlevel || 'Green'}).`,
+            `GDACS Satellite feed detected active ${type.toLowerCase()} near ${country || 'India'} (Alert level: ${properties.alertlevel || 'Green'}).`,
             'WARNING'
           );
 

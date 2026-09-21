@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, Users, Home, Bell, Activity, ShieldAlert,
-  Truck, AlertOctagon, X,
+  Truck, AlertOctagon, X, Zap, RefreshCw,
   Navigation2, Navigation, MapPin, Clock, Gauge, ChevronRight, Compass, ArrowRight
 } from 'lucide-react';
 import { DisasterMap } from '../components/DisasterMap';
 import { SeverityDistributionChart } from '../components/DisasterCharts';
+import { FakeDisasterAlertModal } from '../components/FakeDisasterAlertModal';
+import useSocket from '../hooks/useSocket';
 import api from '../services/api';
 import { RootState } from '../store';
+
 
 // ─── Key rescue corridors (incident zone → nearest hospital/shelter) ──────────
 const RESCUE_CORRIDORS = [
@@ -20,6 +23,16 @@ const RESCUE_CORRIDORS = [
   { id: 'r4', label: 'Visakhapatnam → Kakinada', from: [17.6868, 83.2185] as [number,number], to: [16.9891, 82.2475] as [number,number], priority: 'MEDIUM', bdaBadge: 'Best Route', bdaColor: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
   { id: 'r5', label: 'Kurnool → Tirupati',   from: [15.8281, 78.0373] as [number,number], to: [13.6284, 79.4192] as [number,number], priority: 'HIGH', bdaBadge: 'Caution Route', bdaColor: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
 ];
+
+function toLeafletPoint(geom: any): [number, number] | null {
+  if (!geom) return null;
+  const coordinates = geom.coordinates || (typeof geom === 'string' ? JSON.parse(geom).coordinates : null);
+  if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
+  const [lon, lat] = coordinates;
+  return Number.isFinite(Number(lat)) && Number.isFinite(Number(lon))
+    ? [Number(lat), Number(lon)]
+    : null;
+}
 
 // fetch OSRM geometry for a route
 async function fetchOSRMRoute(from: [number,number], to: [number,number]): Promise<{ path: [number,number][]; distKm: number; durMins: number }> {
@@ -33,19 +46,45 @@ async function fetchOSRMRoute(from: [number,number], to: [number,number]): Promi
     const durMins = Math.round(data.routes[0].duration / 60);
     return { path: coords, distKm, durMins };
   } catch {
-    // Fallback straight line if OSRM is unavailable
-    return { path: [from, to], distKm: 0, durMins: 0 };
+    // Fallback calculation using distance formula
+    const R = 6371;
+    const dLat = (to[0] - from[0]) * (Math.PI / 180);
+    const dLon = (to[1] - from[1]) * (Math.PI / 180);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(from[0] * (Math.PI / 180)) * Math.cos(to[0] * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distKm = Math.round(R * c * 1.25);
+    const durMins = Math.round(distKm * 1.3);
+    return { path: [from, to], distKm, durMins };
   }
 }
 
+
 export const Dashboard: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const queryClient = useQueryClient();
   const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
+  const [isSimulationModalOpen, setIsSimulationModalOpen] = useState(false);
   const [selectedCorridor, setSelectedCorridor] = useState<string>('r1');
   const [routePaths, setRoutePaths]   = useState<[number,number][][]>([]);
   const [routeStats, setRouteStats]   = useState<Record<string, { distKm: number; durMins: number }>>({});
   const [loadingRoutes, setLoadingRoutes] = useState(true);
   const [status, setStatus] = useState<{ api?: boolean; db?: boolean; research?: boolean; streaming?: boolean } | undefined>(undefined);
+
+  // Auto refetch dashboard data on simulation socket events
+  useSocket('disaster_simulation_alert', () => {
+    queryClient.invalidateQueries(['dashboard-stats']);
+    queryClient.invalidateQueries(['recent-incidents-log']);
+    queryClient.invalidateQueries(['map-incidents-hospitals']);
+  });
+
+  useSocket('disaster_simulation_reset', () => {
+    queryClient.invalidateQueries(['dashboard-stats']);
+    queryClient.invalidateQueries(['recent-incidents-log']);
+    queryClient.invalidateQueries(['map-incidents-hospitals']);
+  });
+
 
   // Real system-status probe for the status modal (no hardcoded badges).
   const checkStatus = async () => {
@@ -112,17 +151,23 @@ export const Dashboard: React.FC = () => {
       const resShelt= await api.get('/resources',  { params: { type: 'SHELTER_CAPACITY', limit: 50 } });
       const items: any[] = [];
       resInc.data?.incidents?.forEach((inc: any) => {
+        const coordinates = toLeafletPoint(inc.geom);
+        if (!coordinates) return;
         items.push({ id: inc.id, title: inc.title, type: 'incident',
-          coordinates: [inc.geom.coordinates[1], inc.geom.coordinates[0]],
+          coordinates,
           details: `${inc.severity} severity - Status: ${inc.status}`, severity: inc.severity });
       });
       resHosp.data?.resources?.forEach((h: any) => {
+        const coordinates = toLeafletPoint(h.geom);
+        if (!coordinates) return;
         items.push({ id: h.id, title: h.name || `Hospital ${h.id.slice(0,5)}`, type: 'hospital',
-          coordinates: [h.geom.coordinates[1], h.geom.coordinates[0]], details: `Available beds: ${h.quantity}` });
+          coordinates, details: `Available beds: ${h.quantity}` });
       });
       resShelt.data?.resources?.forEach((s: any) => {
+        const coordinates = toLeafletPoint(s.geom);
+        if (!coordinates) return;
         items.push({ id: s.id, title: s.name || `Shelter ${s.id.slice(0,5)}`, type: 'shelter',
-          coordinates: [s.geom.coordinates[1], s.geom.coordinates[0]], details: `Open capacity: ${s.quantity}` });
+          coordinates, details: `Open capacity: ${s.quantity}` });
       });
       return items;
     },
@@ -142,25 +187,35 @@ export const Dashboard: React.FC = () => {
     p === 'CRITICAL' ? 'bg-rose-500/10 text-rose-500 border-rose-500/25'
     : p === 'HIGH'   ? 'bg-amber-500/10 text-amber-500 border-amber-500/25'
     :                  'bg-blue-500/10 text-blue-500 border-blue-500/25';
+  const activeCorridor = RESCUE_CORRIDORS.find((corridor) => corridor.id === selectedCorridor) || RESCUE_CORRIDORS[0];
+  const escapeEngineHref = `/escape-routes?originLat=${activeCorridor.from[0]}&originLon=${activeCorridor.from[1]}&destLat=${activeCorridor.to[0]}&destLon=${activeCorridor.to[1]}&targetName=${encodeURIComponent(activeCorridor.label.split(' → ')[1])}`;
 
   return (
     <div className="space-y-6">
       {/* Hero banner */}
-      <div className="p-6 bg-gradient-to-r from-brand-600 via-teal-600 to-cyan-700 border border-brand-700 rounded-3xl shadow-lg relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between">
+      <div className="p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between">
         <div className="space-y-1 relative z-10">
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">
-            Welcome, {user?.firstName || 'User'}
+          <h1 className="text-2xl font-bold tracking-tight text-white">
+            Welcome, {user?.firstName || 'User'} ({user?.role || 'ADMIN'})
           </h1>
-          <p className="text-sm text-slate-300">Emergency status monitoring room for Andhra Pradesh &amp; Telangana.</p>
+          <p className="text-xs text-slate-400">Emergency status monitoring room for Andhra Pradesh &amp; Telangana.</p>
         </div>
-        <button
-          onClick={() => setIsDiagnosticsOpen(true)}
-          className="mt-4 md:mt-0 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl flex items-center space-x-2 text-xs font-bold text-white relative z-10 cursor-pointer transition-all duration-200 active:scale-95"
-        >
-          <ShieldAlert size={16} className="text-red-400 animate-pulse" />
-          <span>Active Command System</span>
-        </button>
-        <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-white/10 blur-3xl rounded-full pointer-events-none" />
+        <div className="flex flex-wrap items-center gap-2.5 mt-4 md:mt-0 relative z-10">
+          <button
+            onClick={() => setIsSimulationModalOpen(true)}
+            className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl flex items-center space-x-2 text-xs font-bold transition-all duration-200 active:scale-95 cursor-pointer"
+          >
+            <Zap size={15} className="text-amber-400" />
+            <span>Trigger Fake Disaster Alert</span>
+          </button>
+          <button
+            onClick={() => setIsDiagnosticsOpen(true)}
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 rounded-xl flex items-center space-x-2 text-xs font-semibold text-slate-200 cursor-pointer transition-all duration-200 active:scale-95"
+          >
+            <ShieldAlert size={15} className="text-rose-400" />
+            <span>Active Command System</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI strip */}
@@ -245,7 +300,7 @@ export const Dashboard: React.FC = () => {
             )}
           </div>
           <Link
-            to="/escape-routes"
+            to={escapeEngineHref}
             className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-xl text-xs font-bold transition"
           >
             <Compass size={14} />
@@ -397,8 +452,20 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Fake Disaster Alert Modal */}
+      <FakeDisasterAlertModal
+        isOpen={isSimulationModalOpen}
+        onClose={() => setIsSimulationModalOpen(false)}
+        onSimulationTriggered={() => {
+          queryClient.invalidateQueries(['dashboard-stats']);
+          queryClient.invalidateQueries(['recent-incidents-log']);
+          queryClient.invalidateQueries(['map-incidents-hospitals']);
+        }}
+      />
     </div>
   );
 };
+
 
 export default Dashboard;

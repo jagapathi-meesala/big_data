@@ -265,3 +265,204 @@ export const updateIncidentStatus = async (
     res.status(500).json({ message: 'Internal server error updating incident status.' });
   }
 };
+
+export const simulateDisasterAlert = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const {
+      title,
+      disasterType,
+      district,
+      state,
+      severity,
+      latitude,
+      longitude,
+      description
+    } = req.body;
+
+    const simTitle = title && title.startsWith('[SIMULATION]') ? title : `[SIMULATION] ${title || 'Emergency Alert'}`;
+    const lat = parseFloat(latitude || '16.5062');
+    const lng = parseFloat(longitude || '80.6480');
+
+    let reporterId = req.user ? req.user.id : null;
+    const User = require('../models/User').default;
+    if (!reporterId) {
+      const admin = await User.findOne({ where: { role: 'ADMIN' } });
+      reporterId = admin ? admin.id : null;
+    }
+
+    // 1. Create Simulated Incident
+    const incident = await Incident.create({
+      reporterId,
+      title: simTitle,
+      description: description || 'Simulated Emergency Disaster Scenario for RADAR Pipeline Verification.',
+      severity: severity || SeverityLevel.CRITICAL,
+      status: IncidentStatus.REPORTED,
+      disasterType: disasterType || DisasterType.FLOOD,
+      district: district || 'Vijayawada',
+      state: state || 'Andhra Pradesh',
+      estimatedDamage: 500000.0,
+      geom: {
+        type: 'Point',
+        coordinates: [lng, lat],
+      },
+    });
+
+    // 2. Automate Resource Allocation (nearest hospital / ambulance)
+    const Resource = require('../models/Resource').default;
+    const Allocation = require('../models/Allocation').default;
+    
+    let allocatedResource = null;
+    let allocationRecord = null;
+
+    try {
+      const closestResource = await Resource.findOne({
+        where: {
+          status: 'AVAILABLE',
+          quantity: { [Op.gt]: 0 },
+        },
+        order: sequelize.literal(`geom <-> ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)`),
+      });
+
+      if (closestResource) {
+        closestResource.status = 'IN_TRANSIT';
+        await closestResource.save();
+
+        const resGeom = closestResource.geom;
+        const resCoords = resGeom && resGeom.coordinates ? resGeom.coordinates : [lng + 0.05, lat + 0.05];
+
+        allocationRecord = await Allocation.create({
+          incidentId: incident.id,
+          incident_id: incident.id,
+          resourceId: closestResource.id,
+          resource_id: closestResource.id,
+          quantityAllocated: 1,
+          optimizedRouteGeom: {
+            type: 'LineString',
+            coordinates: [resCoords, [lng, lat]],
+          },
+          status: 'ACTIVE',
+        });
+
+        allocatedResource = closestResource;
+      }
+    } catch (allocErr) {
+      console.warn('Simulated allocation creation warning:', allocErr);
+    }
+
+    // 3. Insert System Notification
+    await sequelize.query(`
+      INSERT INTO system_notifications (title, message, type, "createdAt", "updatedAt")
+      VALUES (:title, :message, 'WARNING', NOW(), NOW());
+    `, {
+      replacements: {
+        title: '[SIMULATION ALERT] Disaster Triggered',
+        message: `TEST ALERT: Simulated ${incident.severity} severity ${incident.disasterType} incident active in ${incident.district}, ${incident.state}.`
+      }
+    });
+
+    // 4. Redis Pub/Sub Broadcast for Socket.IO
+    try {
+      const { redisClient } = require('../config/redis');
+      const payload = {
+        event: 'disaster_simulation_alert',
+        incident: {
+          ...incident.toJSON(),
+          isSimulation: true,
+          coordinates: [lat, lng],
+        },
+        allocation: allocationRecord,
+        allocatedResource,
+        timestamp: new Date().toISOString(),
+      };
+      await redisClient.publish('incident:events', JSON.stringify(payload));
+    } catch (redisErr) {
+      console.error('Redis publish for simulation alert failed:', redisErr);
+    }
+
+    res.status(201).json({
+      message: 'Simulated disaster alert triggered successfully.',
+      incident: {
+        ...incident.toJSON(),
+        isSimulation: true,
+      },
+      allocation: allocationRecord,
+      allocatedResource,
+    });
+  } catch (error: any) {
+    console.error('Simulate disaster alert error:', error);
+    res.status(500).json({ message: 'Internal server error triggering simulated disaster alert.' });
+  }
+};
+
+export const resetSimulations = async (
+  _req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const Allocation = require('../models/Allocation').default;
+    const Resource = require('../models/Resource').default;
+
+    // Find all simulated incidents
+    const simIncidents = await Incident.findAll({
+      where: {
+        [Op.or]: [
+          { title: { [Op.iLike]: '%[SIMULATION]%' } },
+          { description: { [Op.iLike]: '%simulated%' } },
+        ]
+      }
+    });
+
+    const simIds = simIncidents.map(inc => inc.id);
+
+    if (simIds.length > 0) {
+      // Find allocations for simulated incidents
+      const simAllocations = await Allocation.findAll({
+        where: { incidentId: { [Op.in]: simIds } }
+      });
+
+      const resourceIds = simAllocations.map(a => a.resourceId).filter(Boolean);
+
+      // Delete allocations
+      await Allocation.destroy({ where: { incidentId: { [Op.in]: simIds } } });
+
+      // Reset resources back to AVAILABLE
+      if (resourceIds.length > 0) {
+        await Resource.update(
+          { status: 'AVAILABLE' },
+          { where: { id: { [Op.in]: resourceIds } } }
+        );
+      }
+
+      // Delete simulated incidents
+      await Incident.destroy({ where: { id: { [Op.in]: simIds } } });
+    }
+
+    // Clear simulation notifications
+    await sequelize.query(`
+      DELETE FROM system_notifications WHERE title LIKE '%[SIMULATION ALERT]%';
+    `);
+
+    // Redis Pub/Sub Broadcast for Reset
+    try {
+      const { redisClient } = require('../config/redis');
+      await redisClient.publish('incident:events', JSON.stringify({
+        event: 'disaster_simulation_reset',
+        timestamp: new Date().toISOString(),
+      }));
+    } catch (redisErr) {
+      console.error('Redis publish for simulation reset failed:', redisErr);
+    }
+
+    res.status(200).json({
+      message: 'Simulated disaster scenarios reset successfully.',
+      purgedCount: simIds.length,
+    });
+  } catch (error: any) {
+    console.error('Reset simulations error:', error);
+    res.status(500).json({ message: 'Internal server error resetting simulated disaster scenarios.' });
+  }
+};
+

@@ -43,10 +43,17 @@ def isotonic_fit(p_raw: np.ndarray, y: np.ndarray):
 
 def conformal_quantile(p: np.ndarray, y: np.ndarray, alpha: float) -> float:
     """Finite-sample conformal quantile of the nonconformity scores y - p."""
-    scores = y - p
+    scores = np.asarray(y, dtype=float) - np.asarray(p, dtype=float)
     n = len(scores)
     if n == 0:
         return 1.0
+    alpha = float(alpha)
+    if not np.isfinite(alpha):
+        raise ValueError("alpha must be finite")
+    if alpha <= 0:
+        return 0.0
+    if alpha >= 1:
+        return float(np.max(scores))
     q_level = min(1.0, np.ceil((n + 1) * (1 - alpha)) / n)
     return float(np.quantile(scores, q_level))
 

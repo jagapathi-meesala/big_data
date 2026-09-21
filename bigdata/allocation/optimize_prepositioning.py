@@ -90,7 +90,9 @@ def neighbour_matrix(ctx: pd.DataFrame) -> np.ndarray:
         (lat[:, None] - lat[None, :]) ** 2
         + ((lon[:, None] - lon[None, :]) * np.cos(np.radians(lat[:, None]))) ** 2
     )
-    return (d <= NEIGHBOUR_DEG).astype(float)
+    nb = (d <= NEIGHBOUR_DEG).astype(float)
+    np.fill_diagonal(nb, 0.0)
+    return nb
 
 
 # ------------------------------------------------------------- strategies ---
@@ -99,8 +101,18 @@ def stock_uniform(n_d: int, budget: int) -> np.ndarray:
 
 
 def stock_proportional(weights: np.ndarray, budget: int) -> np.ndarray:
-    w = np.clip(weights.astype(float), 1e-9, None)
-    return budget * w / w.sum()
+    w = np.asarray(weights, dtype=float)
+    if w.size == 0:
+        return np.array([], dtype=float)
+    if not np.isfinite(w).all():
+        raise ValueError("weights must be finite")
+    if np.allclose(w, 0.0):
+        return np.full(w.shape, budget / w.size)
+    w = np.clip(w, 0.0, None)
+    total = w.sum()
+    if total <= 0.0 or not np.isfinite(total):
+        return np.full(w.shape, budget / w.size)
+    return budget * w / total
 
 
 def scenario_matrix(events: pd.DataFrame, ctx: pd.DataFrame):

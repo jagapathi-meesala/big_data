@@ -12,6 +12,11 @@ interface MapItem {
   affectedPeople?: number;
   timeReported?: string;
   assignedResources?: string;
+  quantity?: number;
+  occupancy?: number;
+  icuBeds?: number;
+  doctorsCount?: number;
+  ambulancesCount?: number;
 }
 
 interface DisasterMapProps {
@@ -22,8 +27,20 @@ interface DisasterMapProps {
   routePaths?: [number, number][][];
 }
 
-const getMarkerIcon = (type: string, severity?: string) => {
+const getMarkerIcon = (type: string, severity?: string, title?: string) => {
   let color = '#3b82f6';
+
+  if (title?.includes('[SIMULATION]')) {
+    return L.divIcon({
+      html: `<div style="position: relative;">
+        <div style="background-color: #f59e0b; width: 1.5rem; height: 1.5rem; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 12px #f59e0b; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px;">S</div>
+      </div>`,
+      className: 'custom-leaflet-icon-sim',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+    });
+  }
+
   if (type === 'incident') {
     if (severity === 'CRITICAL') color = '#ef4444';
     else if (severity === 'HIGH') color = '#f97316';
@@ -47,17 +64,9 @@ const getMarkerIcon = (type: string, severity?: string) => {
   });
 };
 
-const getClusterIcon = (count: number) => {
-  return L.divIcon({
-    html: `<div style="background-color: #4f46e5; color: white; font-weight: bold; font-size: 11px; width: 1.75rem; height: 1.75rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.4);">${count}</div>`,
-    className: 'custom-cluster-icon',
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-  });
-};
-
 const renderPopupContent = (item: MapItem) => {
   const isInc = item.type === 'incident';
+  const isSim = item.title?.includes('[SIMULATION]');
   
   const totalBeds = item.quantity ?? 100;
   const occupancy = item.occupancy ?? 35;
@@ -68,11 +77,21 @@ const renderPopupContent = (item: MapItem) => {
   return (
     <div className="p-1 border-0 rounded-lg space-y-1.5 text-slate-800 dark:text-slate-100 font-sans">
       <div className="flex items-center justify-between border-b pb-1.5 mb-1.5 dark:border-slate-800">
-        <h4 className="font-bold text-xs">{item.title}</h4>
-        <span className="text-[8px] uppercase font-extrabold px-1.5 py-0.5 bg-slate-200 dark:bg-slate-800 rounded">
-          {item.type}
-        </span>
+        <h4 className="font-bold text-xs flex items-center gap-1">
+          {item.title}
+        </h4>
+        <div className="flex items-center gap-1">
+          {isSim && (
+            <span className="text-[8px] uppercase font-extrabold px-1.5 py-0.5 bg-amber-500/20 text-amber-500 border border-amber-500/30 rounded">
+              SIMULATION
+            </span>
+          )}
+          <span className="text-[8px] uppercase font-extrabold px-1.5 py-0.5 bg-slate-200 dark:bg-slate-800 rounded">
+            {item.type}
+          </span>
+        </div>
       </div>
+
 
       {isInc && (
         <div className="space-y-1 text-[11px]">
@@ -238,8 +257,6 @@ export const DisasterMap: React.FC<DisasterMapProps> = ({
   const [currentZoom, setCurrentZoom] = useState(zoom);
 
   const clusters = clusterMarkers(items, currentZoom);
-  const incidents = items.filter(item => item.type === 'incident');
-
   return (
     <div className="w-full h-full min-h-[400px] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-inner relative flex flex-col">
       <div className="flex-1 text-slate-800">
@@ -255,7 +272,7 @@ export const DisasterMap: React.FC<DisasterMapProps> = ({
             <Marker
               key={item.id}
               position={item.coordinates}
-              icon={getMarkerIcon(item.type, item.severity)}
+              icon={getMarkerIcon(item.type, item.severity, item.title)}
             >
               <Popup>
                 <div className="min-w-[260px] max-w-[320px]">

@@ -84,6 +84,7 @@ def main() -> int:
         + ((lon[:, None] - lon[None, :]) * np.cos(np.radians(lat[:, None]))) ** 2
     )
     neighbours = (d <= NEIGHBOUR_DEG).astype(float)
+    np.fill_diagonal(neighbours, 0.0)
 
     per_strategy = {c: 0.0 for c in strategy_cols}
     per_event_rows = []
