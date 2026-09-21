@@ -1,17 +1,19 @@
 import datetime
-from sqlalchemy import Column, String, Float, DateTime, Text, ForeignKey
+from sqlalchemy import Column, String, Float, DateTime, Text
 from db import Base
 
 class User(Base):
     __tablename__ = 'users'
 
     id = Column(String(50), primary_key=True, index=True)
-    name = Column(String(255), nullable=False)
+    first_name = Column(String(255), nullable=True)
+    last_name = Column(String(255), nullable=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
-    password = Column(String(255), nullable=False)
+    password_hash = Column(String(255), nullable=False)
     role = Column(String(50), default='VICTIM')
-    phone = Column(String(50), nullable=True)
+    phone_number = Column(String(50), nullable=True)
     district = Column(String(100), nullable=True)
+    state = Column(String(100), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
 
