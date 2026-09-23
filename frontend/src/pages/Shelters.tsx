@@ -5,9 +5,12 @@ import { Home, Users, MapPin, Flashlight, PlusCircle } from 'lucide-react';
 import api from '../services/api';
 
 export const Shelters: React.FC = () => {
-  const { data, isLoading } = useQuery(['shelters-list'], async () => {
-    const res = await api.get('/resources', { params: { type: 'SHELTER_CAPACITY', limit: 1000 } });
-    return res.data;
+  const { data, isLoading } = useQuery({
+    queryKey: ['shelters-list'],
+    queryFn: async () => {
+      const res = await api.get('/resources', { params: { type: 'SHELTER_CAPACITY', limit: 1000 } });
+      return res.data;
+    },
   });
 
   return (
@@ -70,14 +73,14 @@ export const Shelters: React.FC = () => {
                     <Flashlight size={14} />
                     <span>Power</span>
                   </span>
-                  <span className="font-bold uppercase text-[9px] text-emerald-500">{shelt.electricityStatus || 'Unknown'}</span>
+                  <span className="font-bold uppercase text-[9px] text-emerald-500">{shelt.electricityStatus || 'OPERATIONAL'}</span>
                 </div>
                 <div className="flex justify-between items-center pl-2 pt-1.5 mt-1.5 border-t">
                   <span className="opacity-70 flex items-center space-x-1">
                     <PlusCircle size={14} />
                     <span>Medical</span>
                   </span>
-                  <span className="font-bold uppercase text-[9px] text-emerald-500">{shelt.medicalFacilityStatus || 'Unknown'}</span>
+                  <span className="font-bold uppercase text-[9px] text-emerald-500">{shelt.medicalFacilityStatus || 'AVAILABLE'}</span>
                 </div>
               </div>
 

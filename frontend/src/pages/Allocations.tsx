@@ -9,28 +9,31 @@ export const Allocations: React.FC = () => {
   const [historyPage, setHistoryPage] = useState(1);
   const queryClient = useQueryClient();
 
-  const { data: activeAllocations, isLoading: loadingActive } = useQuery(
-    ['allocations', 'active'],
-    async () => {
+  const { data: activeAllocations, isLoading: loadingActive } = useQuery({
+    queryKey: ['allocations', 'active'],
+    queryFn: async () => {
       const res = await api.get('/allocations/active');
       return res.data;
-    }
-  );
+    },
+  });
 
-  const { data: historyData, isLoading: loadingHistory } = useQuery(
-    ['allocations', 'history', historyPage],
-    async () => {
+  const { data: historyData, isLoading: loadingHistory } = useQuery({
+    queryKey: ['allocations', 'history', historyPage],
+    queryFn: async () => {
       const res = await api.get('/allocations/history', {
         params: { page: historyPage, limit: 5 },
       });
       return res.data;
     },
-    { keepPreviousData: true }
-  );
+    keepPreviousData: true,
+  });
 
-  const { data: incidentsData } = useQuery(['incidents-list'], async () => {
-    const res = await api.get('/incidents', { params: { limit: 100 } });
-    return res.data;
+  const { data: incidentsData } = useQuery({
+    queryKey: ['incidents-list'],
+    queryFn: async () => {
+      const res = await api.get('/incidents', { params: { limit: 100 } });
+      return res.data;
+    },
   });
 
   const optimizeMutation = useMutation(
@@ -141,42 +144,47 @@ export const Allocations: React.FC = () => {
             <h2 className="text-lg font-bold mb-4">Active Dispatches</h2>
             {loadingActive ? (
               <div className="text-center py-10 opacity-55 text-sm">Loading active dispatches...</div>
-            ) : activeAllocations?.length === 0 ? (
-              <div className="text-center py-10 opacity-55 text-sm">No active dispatches. Select an incident to optimize resource mapping.</div>
-            ) : (
-              <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
-                {activeAllocations?.map((alloc: any) => (
-                  <div key={alloc.id} className="p-4 bg-slate-50 dark:bg-slate-955 dark:bg-slate-905 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-bold">{alloc.Incident?.title}</p>
-                      <p className="text-xs opacity-60">
-                        Allocated: <strong>{alloc.Resource?.type}</strong> (Qty: {alloc.quantityAllocated})
-                      </p>
-                      <span className="inline-block px-2 py-0.5 bg-blue-500/10 text-blue-500 rounded text-[9px] font-bold">
-                        {alloc.status}
-                      </span>
-                    </div>
+            ) : (() => {
+                const activeList = Array.isArray(activeAllocations)
+                  ? activeAllocations
+                  : (activeAllocations?.allocations || activeAllocations?.data || []);
+                return activeList.length === 0 ? (
+                  <div className="text-center py-10 opacity-55 text-sm">No active dispatches. Select an incident to optimize resource mapping.</div>
+                ) : (
+                  <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+                    {activeList.map((alloc: any) => (
+                      <div key={alloc.id || Math.random()} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl flex items-center justify-between">
+                        <div className="space-y-1">
+                          <p className="text-sm font-bold">{alloc.Incident?.title || alloc.incidentTitle || 'Disaster Incident'}</p>
+                          <p className="text-xs opacity-60">
+                            Allocated: <strong>{alloc.Resource?.type || alloc.resourceType || 'Emergency Unit'}</strong> (Qty: {alloc.quantityAllocated || alloc.quantity || 1})
+                          </p>
+                          <span className="inline-block px-2 py-0.5 bg-blue-500/10 text-blue-500 rounded text-[9px] font-bold">
+                            {alloc.status || 'ACTIVE'}
+                          </span>
+                        </div>
 
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => updateMutation.mutate({ id: alloc.id, status: 'COMPLETED' })}
-                        className="p-2 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-lg transition"
-                        title="Mark Complete"
-                      >
-                        <Check size={16} />
-                      </button>
-                      <button
-                        onClick={() => updateMutation.mutate({ id: alloc.id, status: 'CANCELLED' })}
-                        className="p-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition"
-                        title="Cancel Dispatch"
-                      >
-                        <XCircle size={16} />
-                      </button>
-                    </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => updateMutation.mutate({ id: alloc.id, status: 'COMPLETED' })}
+                            className="p-2 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white rounded-lg transition"
+                            title="Mark Complete"
+                          >
+                            <Check size={16} />
+                          </button>
+                          <button
+                            onClick={() => updateMutation.mutate({ id: alloc.id, status: 'CANCELLED' })}
+                            className="p-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition"
+                            title="Cancel Dispatch"
+                          >
+                            <XCircle size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                );
+              })()}
           </div>
         </div>
       </div>
@@ -203,23 +211,28 @@ export const Allocations: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {historyData?.allocations?.map((alloc: any) => (
-                    <tr key={alloc.id}>
-                      <td className="p-3 font-semibold">{alloc.Incident?.title || 'Unknown'}</td>
-                      <td className="p-3">{alloc.Resource?.type || 'Unknown'}</td>
-                      <td className="p-3 font-mono font-bold">{alloc.quantityAllocated}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-0.5 rounded-md font-bold uppercase text-[9px] ${
-                          alloc.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-500' :
-                          alloc.status === 'CANCELLED' ? 'bg-red-500/10 text-red-500' :
-                          'bg-blue-500/10 text-blue-500'
-                        }`}>
-                          {alloc.status}
-                        </span>
-                      </td>
-                      <td className="p-3 opacity-60">{new Date(alloc.createdAt).toLocaleString()}</td>
-                    </tr>
-                  ))}
+                  {(() => {
+                    const historyList = Array.isArray(historyData)
+                      ? historyData
+                      : (historyData?.allocations || historyData?.data || historyData?.history || []);
+                    return historyList.map((alloc: any) => (
+                      <tr key={alloc.id || Math.random()}>
+                        <td className="p-3 font-semibold">{alloc.Incident?.title || alloc.incidentTitle || 'Disaster Incident'}</td>
+                        <td className="p-3">{alloc.Resource?.type || alloc.resourceType || 'Emergency Unit'}</td>
+                        <td className="p-3 font-mono font-bold">{alloc.quantityAllocated || alloc.quantity || 1}</td>
+                        <td className="p-3">
+                          <span className={`px-2 py-0.5 rounded-md font-bold uppercase text-[9px] ${
+                            alloc.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-500' :
+                            alloc.status === 'CANCELLED' ? 'bg-red-500/10 text-red-500' :
+                            'bg-blue-500/10 text-blue-500'
+                          }`}>
+                            {alloc.status || 'ACTIVE'}
+                          </span>
+                        </td>
+                        <td className="p-3 opacity-60">{alloc.createdAt ? new Date(alloc.createdAt).toLocaleString() : 'Just now'}</td>
+                      </tr>
+                    ));
+                  })()}
                 </tbody>
               </table>
             </div>

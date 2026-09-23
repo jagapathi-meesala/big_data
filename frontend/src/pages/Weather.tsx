@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
   CloudRain, Wind, Droplets, Thermometer, AlertCircle, MapPin,
-  Eye, TrendingUp, TrendingDown, BarChart3, Calendar, Activity,
+  Eye, TrendingUp, BarChart3, Calendar, Activity,
   Zap, CloudLightning, CloudSnow, Sun, Waves
 } from 'lucide-react';
 import api from '../services/api';
@@ -157,24 +157,47 @@ const WeatherCard = ({ city }: { city: CityWeather }) => {
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Weather: React.FC = () => {
   const [tab, setTab] = useState<'weather' | 'rainfall' | 'extreme'>('weather');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const { data, isLoading } = useQuery(['live-weather-feed'], async () => {
-    const res = await api.get('/weather/live');
-    return res.data;
-  }, { refetchInterval: 5 * 60 * 1000 });
+  const { data, isLoading } = useQuery({
+    queryKey: ['live-weather-feed'],
+    queryFn: async () => {
+      const res = await api.get('/weather/live');
+      return res.data;
+    },
+    refetchInterval: 5 * 60 * 1000,
+  });
 
   const cities: CityWeather[] = data?.weather ?? [];
+  const filteredCities = cities.filter(c =>
+    c.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.alerts || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const maxTemp    = cities.length ? Math.max(...cities.map(c => c.temp)) : 0;
   const avgTemp    = cities.length ? cities.reduce((s,c)=>s+c.temp,0)/cities.length : 0;
   const alertCount = cities.filter(c => c.temp>=35||c.windSpeed>=20||c.rainfall>0).length;
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Weather Warning Terminal</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-          Live climatic indicators, historical rainfall data and extreme event reports for Andhra Pradesh &amp; Telangana.
-        </p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Weather Warning Terminal</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Live climatic indicators, historical rainfall data and extreme event reports for Andhra Pradesh &amp; Telangana.
+          </p>
+        </div>
+
+        {/* Live City Search Input */}
+        <div className="w-full md:w-80">
+          <input
+            type="text"
+            placeholder="Search city weather or alert (e.g. Hyderabad, Flood)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          />
+        </div>
       </div>
 
       {/* Tab nav */}
@@ -211,9 +234,13 @@ const Weather: React.FC = () => {
           </div>
           {isLoading ? (
             <div className="text-center py-20 text-sm text-slate-400 animate-pulse">Querying live weather feeds…</div>
+          ) : filteredCities.length === 0 ? (
+            <div className="text-center py-20 text-sm text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
+              No matching city weather alerts found for &quot;{searchQuery}&quot;.
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {cities.map(city => <WeatherCard key={city.city} city={city}/>)}
+              {filteredCities.map(city => <WeatherCard key={city.city} city={city}/>)}
             </div>
           )}
         </>

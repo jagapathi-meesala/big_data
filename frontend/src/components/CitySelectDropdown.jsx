@@ -40,6 +40,12 @@ export const CITIES_DATA = [
   { value: 'Jagtial', label: 'Jagtial (Telangana)', state: 'Telangana', lat: 18.7900, lon: 78.9100 }
 ];
 
+export const getCityCoords = (cityName) => {
+  const city = CITIES_DATA.find((c) => c.value.toLowerCase() === (cityName || '').toLowerCase());
+  if (city) return [city.lat, city.lon];
+  return [17.3850, 78.4867];
+};
+
 export const CitySelectDropdown = ({ value, onChange, placeholder = 'Search city...', isDisabled, excludeValue }) => {
   const filteredOptions = excludeValue
     ? CITIES_DATA.filter((c) => c.value !== excludeValue)

@@ -26,13 +26,30 @@ async function fetchOSRMRoute(from: [number,number], to: [number,number]): Promi
   }
 }
 
-function toLeafletPoint(geom: any): [number, number] | null {
-  const coordinates = geom?.coordinates;
-  if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
-  const [lon, lat] = coordinates;
-  return Number.isFinite(Number(lat)) && Number.isFinite(Number(lon))
-    ? [Number(lat), Number(lon)]
-    : null;
+import { getCityCoords } from '../components/CitySelectDropdown';
+
+function toLeafletPoint(obj: any): [number, number] | null {
+  if (!obj) return null;
+  const geom = obj.geom || obj;
+  let coordinates = geom?.coordinates;
+  if (typeof geom === 'string') {
+    try { coordinates = JSON.parse(geom).coordinates; } catch {}
+  }
+  if (Array.isArray(coordinates) && coordinates.length >= 2) {
+    const [lon, lat] = coordinates;
+    if (Number.isFinite(Number(lat)) && Number.isFinite(Number(lon)) && (Number(lat) !== 0 || Number(lon) !== 0)) {
+      return [Number(lat), Number(lon)];
+    }
+  }
+  const lat = obj?.lat ?? obj?.latitude;
+  const lon = obj?.lng ?? obj?.longitude ?? obj?.lon;
+  if (Number.isFinite(Number(lat)) && Number.isFinite(Number(lon)) && (Number(lat) !== 0 || Number(lon) !== 0)) {
+    return [Number(lat), Number(lon)];
+  }
+  if (obj?.district) {
+    return getCityCoords(obj.district);
+  }
+  return null;
 }
 
 export const LiveDisaster: React.FC = () => {
@@ -57,41 +74,58 @@ export const LiveDisaster: React.FC = () => {
     return () => { isMounted = false; };
   }, []);
 
-  const { data: mapItems, isLoading } = useQuery(['live-disaster-map-items'], async () => {
-    const resInc  = await api.get('/incidents', { params: { limit: 1000 } });
-    const resHosp = await api.get('/resources', { params: { type: 'HOSPITAL_BED', limit: 1000 } });
-    const resShelt= await api.get('/resources', { params: { type: 'SHELTER_CAPACITY', limit: 1000 } });
-    const resAmbs = await api.get('/resources', { params: { type: 'AMBULANCE', limit: 1000 } });
-    const resVols = await api.get('/users', { params: { role: 'VOLUNTEER', limit: 1000 } });
+  const { data: mapItems, isLoading } = useQuery({
+    queryKey: ['live-disaster-map-items'],
+    queryFn: async () => {
+      const resInc  = await api.get('/incidents', { params: { limit: 1000 } });
+      const resHosp = await api.get('/resources', { params: { type: 'HOSPITAL_BED', limit: 1000 } });
+      const resShelt= await api.get('/resources', { params: { type: 'SHELTER_CAPACITY', limit: 1000 } });
+      const resAmbs = await api.get('/resources', { params: { type: 'AMBULANCE', limit: 1000 } });
+      const resVols = await api.get('/users', { params: { role: 'VOLUNTEER', limit: 1000 } });
 
-    const items: any[] = [];
-    
-    resInc.data?.incidents?.forEach((inc: any) => {
-      const coordinates = toLeafletPoint(inc.geom);
-      if (!coordinates) return;
-      items.push({
-        id: inc.id,
-        title: inc.title,
-        type: 'incident',
-        coordinates,
-        severity: inc.severity,
-        affectedPeople: inc.estimatedDamage ? Math.ceil(inc.estimatedDamage / 5000) : 45,
-        timeReported: inc.createdAt,
-        assignedResources: inc.assignedHospital ? `${inc.assignedHospital}, ${inc.assignedVolunteer || 'Volunteer Assigned'}` : 'None'
-      });
-    });
+      const items: any[] = [];
 
-    resHosp.data?.resources?.forEach((hosp: any) => {
-      const coordinates = toLeafletPoint(hosp.geom);
-      if (coordinates) {
-        let cleanTitle = hosp.name || `Hospital ${hosp.id.slice(0, 5)}`;
-        if (cleanTitle.startsWith('-')) {
-          cleanTitle = cleanTitle.replace(/^-\s*/, '');
+      const coordCounts: Record<string, number> = {};
+
+      resInc.data?.incidents?.forEach((inc: any) => {
+        let coordinates = toLeafletPoint(inc);
+        if (!coordinates) return;
+
+        const key = `${coordinates[0].toFixed(2)},${coordinates[1].toFixed(2)}`;
+        const count = coordCounts[key] || 0;
+        coordCounts[key] = count + 1;
+
+        if (count > 0) {
+          const angle = count * 2.39996;
+          const radius = 0.025 * Math.sqrt(count);
+          coordinates = [
+            coordinates[0] + Math.sin(angle) * radius,
+            coordinates[1] + Math.cos(angle) * radius
+          ];
         }
 
         items.push({
-          id: hosp.id,
-          title: cleanTitle,
+          id: inc.id,
+          title: inc.title,
+          type: 'incident',
+          coordinates,
+          severity: inc.severity,
+          affectedPeople: inc.estimatedDamage ? Math.ceil(inc.estimatedDamage / 5000) : 45,
+          timeReported: inc.createdAt,
+          assignedResources: inc.assignedHospital ? `${inc.assignedHospital}, ${inc.assignedVolunteer || 'Volunteer Assigned'}` : 'None'
+        });
+      });
+
+      resHosp.data?.resources?.forEach((hosp: any) => {
+        const coordinates = toLeafletPoint(hosp);
+        if (coordinates) {
+          let cleanTitle = hosp.name || `Hospital ${hosp.id.slice(0, 5)}`;
+          if (cleanTitle.startsWith('-')) {
+            cleanTitle = cleanTitle.replace(/^-\s*/, '');
+          }
+          items.push({
+            id: hosp.id,
+            title: cleanTitle,
           type: 'hospital',
           coordinates,
           details: `Available beds: ${hosp.quantity}. Status: ${hosp.status}`,
@@ -120,7 +154,7 @@ export const LiveDisaster: React.FC = () => {
     });
 
     resShelt.data?.resources?.forEach((shelt: any) => {
-      const coordinates = toLeafletPoint(shelt.geom);
+      const coordinates = toLeafletPoint(shelt);
       if (!coordinates) return;
       let cleanTitle = shelt.name || `Shelter ${shelt.id.slice(0, 5)}`;
       if (cleanTitle.startsWith('-')) {
@@ -139,7 +173,7 @@ export const LiveDisaster: React.FC = () => {
     });
 
     resAmbs.data?.resources?.forEach((amb: any) => {
-      const coordinates = toLeafletPoint(amb.geom);
+      const coordinates = toLeafletPoint(amb);
       if (!coordinates) return;
       let cleanTitle = amb.name || `Ambulance Unit ${amb.id.slice(0, 5)}`;
       if (cleanTitle.startsWith('-')) {
@@ -155,27 +189,34 @@ export const LiveDisaster: React.FC = () => {
     });
 
     resVols.data?.users?.forEach((vol: any) => {
+      const coords = getCityCoords(vol.district);
       items.push({
         id: vol.id,
         title: `${vol.firstName} ${vol.lastName}`,
         type: 'volunteer',
-        coordinates: vol.district === 'Hyderabad' ? [17.3850, 78.4867] : [17.9689, 79.5941],
-        details: `Volunteer. Status: ${vol.status}. Contact: ${vol.phoneNumber}`
+        coordinates: coords,
+        details: `Volunteer. Status: ${vol.status || 'ON-DUTY'}. District: ${vol.district}. Contact: ${vol.phoneNumber}`
       });
     });
 
     return items;
-  });
+  },
+});
 
-  const { data: allocationsData } = useQuery(['active-allocations'], async () => {
-    const res = await api.get('/allocations/active');
-    return res.data;
+  const { data: allocationsData } = useQuery({
+    queryKey: ['active-allocations'],
+    queryFn: async () => {
+      const res = await api.get('/allocations/active');
+      return res.data;
+    },
   });
 
   const forceShowIds = new Set<string>();
   const activeRoutes: [number, number][][] = [];
 
-  allocationsData?.forEach((alloc: any) => {
+  const allocationsList = Array.isArray(allocationsData) ? allocationsData : (allocationsData?.allocations || []);
+
+  allocationsList.forEach((alloc: any) => {
     const incId = alloc.incidentId || alloc.incident_id;
     const resId = alloc.resourceId || alloc.resource_id;
 

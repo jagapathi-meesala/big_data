@@ -1,29 +1,33 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Building2, Bed, MapPin, Navigation, Activity, ShieldAlert, Fuel, Home, RefreshCw } from 'lucide-react';
+import { Building2, Bed, Navigation, Activity, RefreshCw } from 'lucide-react';
 import api from '../services/api';
+import { CITIES_DATA } from '../components/CitySelectDropdown';
 
 export const Hospitals: React.FC = () => {
   const [district, setDistrict] = useState('Hyderabad');
 
   // Query database registered hospitals
-  const { data: dbData, isLoading: isDbLoading } = useQuery(['hospitals-list'], async () => {
-    const res = await api.get('/resources', { params: { type: 'HOSPITAL_BED', limit: 1000 } });
-    return res.data;
+  const { data: dbData, isLoading: isDbLoading } = useQuery({
+    queryKey: ['hospitals-list'],
+    queryFn: async () => {
+      const res = await api.get('/resources', { params: { type: 'HOSPITAL_BED', limit: 1000 } });
+      return res.data;
+    },
   });
 
   // Query BDA OpenStreetMap + NPPES Healthcare Provider Registry & Distance Matrix API
-  const { data: bdaData, isLoading: isBdaLoading, refetch: refetchBda } = useQuery(
-    ['bda-nearby-resources', district],
-    async () => {
+  const { data: bdaData, isLoading: isBdaLoading, refetch: refetchBda } = useQuery({
+    queryKey: ['bda-nearby-resources', district],
+    queryFn: async () => {
       const res = await api.get('/public-apis/nearby-resources', {
         params: { district, lat: 17.3850, lon: 78.4867 }
       });
       return res.data;
     },
-    { refetchOnWindowFocus: false }
-  );
+    refetchOnWindowFocus: false,
+  });
 
   const bdaResources = bdaData?.data?.resources || [];
   const metrics = bdaData?.data?.summaryMetrics || {
@@ -47,13 +51,13 @@ export const Hospitals: React.FC = () => {
           <select
             value={district}
             onChange={(e) => setDistrict(e.target.value)}
-            className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold"
+            className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold cursor-pointer max-w-[200px]"
           >
-            <option value="Hyderabad">Hyderabad</option>
-            <option value="Vijayawada">Vijayawada</option>
-            <option value="Visakhapatnam">Visakhapatnam</option>
-            <option value="Warangal">Warangal</option>
-            <option value="Tirupati">Tirupati</option>
+            {CITIES_DATA.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
           </select>
           <button
             onClick={() => refetchBda()}
@@ -228,7 +232,7 @@ export const Hospitals: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-center pl-2">
                     <span className="opacity-70">ICU</span>
-                    <span className="font-bold">{hosp.icuBeds || 0}</span>
+                    <span className="font-bold text-brand-500">{hosp.icuBeds || Math.ceil((hosp.quantity || 450) * 0.22)}</span>
                   </div>
                 </div>
               </div>

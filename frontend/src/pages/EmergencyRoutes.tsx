@@ -1,10 +1,25 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { ShieldAlert, Compass, Navigation, RefreshCw, MapPin, ArrowRight, Clock, Gauge } from 'lucide-react';
+import { Compass, Navigation, RefreshCw, MapPin, ArrowLeftRight, Gauge } from 'lucide-react';
 import api from '../services/api';
+
+// Helper to fit map bounds dynamically on route change
+const MapController: React.FC<{ origin: [number, number]; dest: [number, number]; activePolyline?: [number, number][] }> = ({ origin, dest, activePolyline }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (activePolyline && activePolyline.length > 0) {
+      const bounds = L.latLngBounds(activePolyline);
+      map.fitBounds(bounds, { padding: [40, 40] });
+    } else if (origin && dest) {
+      const bounds = L.latLngBounds([origin, dest]);
+      map.fitBounds(bounds, { padding: [40, 40] });
+    }
+  }, [origin[0], origin[1], dest[0], dest[1], activePolyline, map]);
+  return null;
+};
 
 // Custom Leaflet Markers
 const originIcon = L.divIcon({
@@ -79,9 +94,9 @@ export const EmergencyRoutes: React.FC = () => {
   };
 
   // Query BDA Emergency Escape Route Engine API
-  const { data, isLoading, refetch, isError, error } = useQuery(
-    ['bda-escape-routes', originCity.lat, originCity.lon, destCity.lat, destCity.lon, originCity.name, destCity.name],
-    async () => {
+  const { data, isLoading, refetch, isError, error } = useQuery({
+    queryKey: ['bda-escape-routes', originCity.lat, originCity.lon, destCity.lat, destCity.lon, originCity.name, destCity.name],
+    queryFn: async () => {
       const res = await api.get('/public-apis/escape-routes', {
         params: {
           originLat: originCity.lat,
@@ -93,13 +108,11 @@ export const EmergencyRoutes: React.FC = () => {
       });
       return res.data;
     },
-    {
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000,
-    }
-  );
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const routes = data?.data?.routes || [];
+  const routes = data?.data?.routes || data?.routes || [];
   const activeRoute = routes.find((r: any) => r.id === activeRouteId) || routes[0];
 
   useEffect(() => {
@@ -168,15 +181,17 @@ export const EmergencyRoutes: React.FC = () => {
             />
           </div>
 
-          {/* Swap Button */}
-          <div className="md:col-span-2 flex justify-center">
+          {/* Swap Button with Parallel Opposing Arrows */}
+          <div className="md:col-span-2 flex flex-col items-center justify-center">
             <button
               onClick={handleSwapCities}
-              title="Swap Cities"
-              className="p-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-xl border border-slate-700 transition-transform active:scale-95 flex items-center justify-center mt-4 md:mt-0"
+              title="Reverse / Swap Origin & Destination Locations (⇄)"
+              className="group p-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-xl border border-emerald-500/30 transition-all duration-200 active:scale-95 flex items-center justify-center space-x-1.5 shadow-sm mt-4 md:mt-0"
             >
-              <ArrowRight className="w-4 h-4" />
+              <ArrowLeftRight className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-bold uppercase tracking-wider md:hidden text-emerald-300">Swap</span>
             </button>
+            <span className="hidden md:block text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">Reverse (⇄)</span>
           </div>
 
           {/* Destination Searchable Dropdown */}
@@ -294,6 +309,11 @@ export const EmergencyRoutes: React.FC = () => {
               scrollWheelZoom={true}
               style={{ height: '100%', width: '100%' }}
             >
+              <MapController
+                origin={[originCity.lat, originCity.lon]}
+                dest={[destCity.lat, destCity.lon]}
+                activePolyline={activeRoute?.polyline || activeRoute?.geometry}
+              />
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
