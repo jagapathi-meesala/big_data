@@ -152,7 +152,7 @@ export const DashboardLayout: React.FC = () => {
           
           <div className="hidden md:block">
             <span className="text-sm font-semibold opacity-75">
-              Welcome, {user?.firstName} ({user?.role})
+              Welcome, {user?.firstName || user?.name || 'User'}
             </span>
           </div>
 
@@ -263,8 +263,8 @@ export const DashboardLayout: React.FC = () => {
             </div>
 
             <Link to="/profile" className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold">
-                {user?.firstName ? user.firstName[0] : 'U'}
+              <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold uppercase shadow-sm">
+                {(user?.firstName || user?.name || 'U').charAt(0)}
               </div>
             </Link>
           </div>

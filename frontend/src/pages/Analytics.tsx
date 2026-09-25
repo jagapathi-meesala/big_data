@@ -43,7 +43,7 @@ export const Analytics: React.FC = () => {
   const generateInsights = () => {
     const insights = [];
     
-    // 1. Analyze forecast peaks
+    // 1. Forecast peaks advisory
     if (stats?.forecast && stats.forecast.length > 0) {
       let peakDay = stats.forecast[0];
       stats.forecast.forEach((d: any) => {
@@ -56,41 +56,38 @@ export const Analytics: React.FC = () => {
         const peakDateStr = new Date(peakDay.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
         insights.push({
           type: 'CRITICAL',
-          title: `Predictive Emergency Alert (Peak Expected: ${peakDateStr})`,
-          message: `AI projects a temporary surge of up to ${peakDay.count} active incidents around ${peakDateStr}. Recommend pre-positioning additional vehicle units and medical supplies in high-risk zones.`,
-          action: 'Pre-position Vehicles'
+          title: `Regional Operations Advisory (Expected Peak: ${peakDateStr})`,
+          message: `Forecasted weather and risk trends indicate a potential surge reaching around ${peakDay.count} incidents near ${peakDateStr}. Command officers recommend pre-deploying rescue vehicles and medical stockpiles in high-risk districts.`,
+          action: 'Deploy Fleet Assets'
         });
       }
     }
     
-    // 2. Analyze resource shortages
+    // 2. Resource capacity advisory
     const ambulances = stats?.resourceDistribution?.find((r: any) => r.type === 'AMBULANCE')?.total || 0;
-    const beds = stats?.resourceDistribution?.find((r: any) => r.type === 'HOSPITAL_BED')?.total || 0;
 
     if (ambulances < 50) {
       insights.push({
         type: 'WARNING',
-        title: 'Resource Deficiency: Ambulance Fleet Capacity',
-        message: `Current registered ambulance units (${ambulances}) are operating near threshold. Recommend coordinating with neighboring districts to request emergency mobile backup.`,
-        action: 'Request Mobile Backup'
+        title: 'Emergency Response Capacity Notice',
+        message: `Currently registered ambulance fleet count (${ambulances} units) is approaching operational capacity. Requesting assistance from neighboring district dispatch centers to stage standby support.`,
+        action: 'Request Standby Units'
       });
     }
 
-    if (beds < 8000) {
-      insights.push({
-        type: 'INFO',
-        title: 'Bed Allocation Optimization',
-        message: `Active ICU bed occupancy is projected to increase. Suggest optimizing distribution to match regional demands.`,
-        action: 'Review Bed Allocation'
-      });
-    }
+    insights.push({
+      type: 'INFO',
+      title: 'Hospital Capacity & Supply Allocation',
+      message: `District health officers are monitoring regional hospital bed availability and medical inventory to ensure rapid intake during emergency surges.`,
+      action: 'Check Hospital Stock'
+    });
 
-    // 3. Success / resolved state
+    // 3. Evacuation status
     insights.push({
       type: 'SUCCESS',
-      title: 'Disaster Mitigation Target Achieved',
-      message: `Automatic PostGIS solver successfully resolved travel routes for all active verified incidents. High-speed evacuation paths have been shared with local dispatch units.`,
-      action: 'View Transit Map'
+      title: 'Evacuation Corridors & Route Optimization',
+      message: `Spatial routing models have mapped verified primary and alternate evacuation paths across all active incident zones. Transit guidance is live for ground response teams.`,
+      action: 'View Rescue Routes'
     });
 
     return insights;

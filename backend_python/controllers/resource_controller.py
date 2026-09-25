@@ -6,37 +6,119 @@ from models import Resource
 
 resource_bp = Blueprint('resource', __name__)
 
+CITY_COORDS = {
+    "Hyderabad": (17.3850, 78.4867), "Vijayawada": (16.5062, 80.6480),
+    "Visakhapatnam": (17.6868, 83.2185), "Warangal": (17.9689, 79.5941),
+    "Guntur": (16.3067, 80.4365), "Karimnagar": (18.4386, 79.1288),
+    "Khammam": (17.2473, 80.1514), "Nalgonda": (17.0575, 79.2684),
+    "Nizamabad": (18.6725, 78.0941), "Kurnool": (15.8281, 78.0373),
+    "Anantapur": (14.6819, 77.6006), "Rajahmundry": (16.9891, 81.7810),
+    "Tirupati": (13.6284, 79.4192), "Nellore": (14.4426, 79.9865),
+    "Kakinada": (16.9891, 82.2475), "Kadapa": (14.4673, 78.8242),
+    "Eluru": (16.7107, 81.1035), "Srikakulam": (18.2941, 83.8963),
+    "Vizianagaram": (18.1124, 83.3956), "Mahbubnagar": (16.7488, 77.9856),
+    "Adilabad": (19.6641, 78.5320), "Suryapet": (17.1500, 79.6200),
+    "Siddipet": (18.1018, 78.8520), "Sangareddy": (17.6167, 78.0833),
+    "Bhadrachalam": (17.6700, 80.8900), "Ongole": (15.5057, 80.0499),
+    "Machilipatnam": (16.1812, 81.1363), "Tenali": (16.2430, 80.6400),
+    "Proddatur": (14.7500, 78.5500), "Hindupur": (13.8300, 77.4900),
+    "Nandyal": (15.4800, 78.4800), "Chittoor": (13.2172, 79.1003),
+    "Ramagundam": (18.8000, 79.4500), "Miryalaguda": (16.8700, 79.5600),
+    "Mancherial": (18.8700, 79.4600), "Jagtial": (18.7900, 78.9100),
+    "Rangareddy": (17.3500, 78.4300),
+}
+
+def _get_resource_coords(district):
+    if not district:
+        return (17.3850, 78.4867)
+    if district in CITY_COORDS:
+        return CITY_COORDS[district]
+    district_lower = district.lower()
+    for name, coords in CITY_COORDS.items():
+        if name.lower() in district_lower or district_lower in name.lower():
+            return coords
+    return (17.3850, 78.4867)
+
 @resource_bp.route('', methods=['GET'])
 def get_resources():
     db = get_db()
     res_type = request.args.get('type')
     district = request.args.get('district')
 
-    query = db.query(Resource)
+    query_str = """
+        SELECT id, name, type, quantity, occupancy, district, created_at,
+               CASE WHEN geom IS NOT NULL THEN ST_AsGeoJSON(geom) ELSE NULL END as geom_json
+        FROM resources WHERE 1=1
+    """
+    params = {}
     if res_type:
-        query = query.filter(Resource.type == res_type)
+        query_str += " AND type = :res_type"
+        params['res_type'] = res_type
     if district:
-        query = query.filter(Resource.district == district)
+        query_str += " AND district = :district"
+        params['district'] = district
 
-    resources = query.all()
-    out = []
-    for r in resources:
-        out.append({
-            'id': str(r.id),
-            'name': r.name or r.type,
-            'type': r.type,
-            'quantity': r.quantity,
-            'occupancy': r.occupancy,
-            'status': 'AVAILABLE' if r.quantity > 0 else 'DEPLETED',
-            'district': r.district or 'Hyderabad',
-            'latitude': 17.3850,
-            'longitude': 78.4867,
-            'geom': {
-                'coordinates': [78.4867, 17.3850]
-            },
-            'createdAt': r.created_at.isoformat() if r.created_at else None
-        })
-    return jsonify({'resources': out, 'total': len(out)})
+    query_str += " ORDER BY name ASC"
+
+    try:
+        rows = db.execute(text(query_str), params).fetchall()
+        out = []
+        import json
+        for row in rows:
+            dist_val = row.district or 'Hyderabad'
+            lat, lon = _get_resource_coords(dist_val)
+            if row.geom_json:
+                try:
+                    g = json.loads(row.geom_json)
+                    if g.get('coordinates'):
+                        lon, lat = g['coordinates'][0], g['coordinates'][1]
+                except Exception:
+                    pass
+
+            out.append({
+                'id': str(row.id),
+                'name': row.name or row.type,
+                'type': row.type,
+                'quantity': float(row.quantity or 0),
+                'occupancy': float(row.occupancy or 0),
+                'status': 'AVAILABLE' if (row.quantity or 0) > 0 else 'DEPLETED',
+                'district': dist_val,
+                'latitude': lat,
+                'longitude': lon,
+                'geom': {
+                    'coordinates': [lon, lat]
+                },
+                'createdAt': row.created_at.isoformat() if row.created_at else None
+            })
+        return jsonify({'resources': out, 'total': len(out)})
+    except Exception as e:
+        # Fallback to ORM query if SQL raw fails
+        query = db.query(Resource)
+        if res_type:
+            query = query.filter(Resource.type == res_type)
+        if district:
+            query = query.filter(Resource.district == district)
+        resources = query.all()
+        out = []
+        for r in resources:
+            dist_val = r.district or 'Hyderabad'
+            lat, lon = _get_resource_coords(dist_val)
+            out.append({
+                'id': str(r.id),
+                'name': r.name or r.type,
+                'type': r.type,
+                'quantity': float(r.quantity or 0),
+                'occupancy': float(r.occupancy or 0),
+                'status': 'AVAILABLE' if (r.quantity or 0) > 0 else 'DEPLETED',
+                'district': dist_val,
+                'latitude': lat,
+                'longitude': lon,
+                'geom': {
+                    'coordinates': [lon, lat]
+                },
+                'createdAt': r.created_at.isoformat() if r.created_at else None
+            })
+        return jsonify({'resources': out, 'total': len(out)})
 
 @resource_bp.route('', methods=['POST'])
 def create_resource():

@@ -208,14 +208,7 @@ export const FakeDisasterAlertModal: React.FC<FakeDisasterAlertModalProps> = ({
           </button>
         </div>
 
-        {/* Warning Banner */}
-        <div className="mx-6 mt-4 p-3.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl flex items-start gap-3 text-slate-700 dark:text-amber-200 text-xs leading-relaxed">
-          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-          <div>
-            <strong className="text-slate-900 dark:text-amber-100">SAFE SIMULATION: </strong>
-            Generates real database records, AI hazard scoring, resource routing &amp; map updates, but will <strong className="text-amber-700 dark:text-amber-100">NOT</strong> send real text messages or contact real emergency services. All records carry a <code className="bg-amber-100 dark:bg-amber-950 px-1 py-0.5 rounded text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">[SIMULATION]</code> tag and can be reset cleanly.
-          </div>
-        </div>
+
 
         {/* Tab Selection */}
         <div className="px-6 mt-4 flex border-b border-slate-200 dark:border-slate-800">

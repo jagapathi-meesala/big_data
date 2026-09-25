@@ -196,7 +196,7 @@ export const Dashboard: React.FC = () => {
       <div className="p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between">
         <div className="space-y-1 relative z-10">
           <h1 className="text-2xl font-bold tracking-tight text-white">
-            Welcome, {user?.firstName || 'User'} ({user?.role || 'ADMIN'})
+            Welcome, {user?.firstName || user?.name || 'User'}
           </h1>
           <p className="text-xs text-slate-400">Emergency status monitoring room for Andhra Pradesh &amp; Telangana.</p>
         </div>

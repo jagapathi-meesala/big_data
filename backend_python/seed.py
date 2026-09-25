@@ -139,7 +139,7 @@ def seed_database():
     if inc_count < 15:
         incidents_seed_data = [
             ("Flash Flood Emergency - Vijayawada", "Krishna River overflow near Prakasam Barrage inundating low-lying residential sectors. Emergency evacuation & boats required.", "FLOOD", "CRITICAL", "REPORTED", "Vijayawada", "Andhra Pradesh", 450000),
-            ("Severe Coastal Cyclone - Visakhapatnam", "Bay of Bengal landfall with gale speeds exceeding 95 km/h. Coastal shelters activated and emergency medical dispatch deployed.", "CYCLONE", "CRITICAL", "VERIFIED", "Visakhapatnam", "Andhra Pradesh", 1200000),
+            ("Severe Coastal Cyclone - Visakhapatnam", "Bay of Bengal landfall with gale speeds exceeding 95 km/h. Coastal shelters activated and emergency medical dispatch deployed.", "HURRICANE", "CRITICAL", "VERIFIED", "Visakhapatnam", "Andhra Pradesh", 1200000),
             ("Landslide & Mudslide Alert - Srikakulam", "Eastern Ghats mountain pass road blocked due to heavy monsoon downpour. National highway traffic diverted.", "LANDSLIDE", "HIGH", "REPORTED", "Srikakulam", "Andhra Pradesh", 180000),
             ("Hospital Oxygen Critical Alert - Tirupati", "Emergency ICU oxygen supply running low at district hospital hub. Priority mobile supply convoy requested.", "OTHER", "CRITICAL", "VERIFIED", "Tirupati", "Andhra Pradesh", 90000),
             ("Building Structural Collapse - Warangal", "Commercial building structure damaged due to foundation waterlogging. Urban search and rescue unit on standby.", "OTHER", "HIGH", "REPORTED", "Warangal", "Telangana", 350000),
@@ -147,7 +147,7 @@ def seed_database():
             ("Godavari River Inundation - Bhadrachalam", "River water level crossed 2nd danger signal (48 feet). Temple town evacuating low-lying habitations to relief centers.", "FLOOD", "CRITICAL", "VERIFIED", "Bhadrachalam", "Telangana", 850000),
             ("Urban Flooding & Musi Overflow - Hyderabad", "Heavy cloudburst causing flash urban flooding in Musi river catchment areas. Mobile de-watering pumps deployed.", "FLOOD", "HIGH", "REPORTED", "Hyderabad", "Telangana", 650000),
             ("Srisailam Dam Discharge Alert - Nalgonda", "Tailpond reservoir discharge gates opened. Downstream villages along Krishna river basin alerted.", "FLOOD", "HIGH", "VERIFIED", "Nalgonda", "Telangana", 300000),
-            ("Coastal High Storm Surge - Kakinada", "Deep sea storm surge flooding fishing hamlets along Kakinada port road. Relief boats and lifejackets mobilized.", "CYCLONE", "CRITICAL", "REPORTED", "Kakinada", "Andhra Pradesh", 420000),
+            ("Coastal High Storm Surge - Kakinada", "Deep sea storm surge flooding fishing hamlets along Kakinada port road. Relief boats and lifejackets mobilized.", "HURRICANE", "CRITICAL", "REPORTED", "Kakinada", "Andhra Pradesh", 420000),
             ("Sub-Station Transformer Fire - Ramagundam", "Thermal power grid sub-station transformer oil catch fire. Power backup switch gear initiated.", "FIRE", "CRITICAL", "VERIFIED", "Ramagundam", "Telangana", 780000),
             ("Severe Heatwave & Water Scarcity - Kurnool", "Rayalaseema extreme summer heatwave touching 44C. Emergency drinking water tankers dispatched to rural hamlets.", "OTHER", "HIGH", "REPORTED", "Kurnool", "Andhra Pradesh", 150000),
             ("Flash Downpour & Market Inundation - Guntur", "Agricultural produce market inundated under 3 feet of rainwater. Produce protection and drainage clearance active.", "FLOOD", "HIGH", "VERIFIED", "Guntur", "Andhra Pradesh", 280000),
@@ -155,25 +155,24 @@ def seed_database():
             ("Godavari River Ferry Evacuation - Rajahmundry", "Passenger ferry vessel engine failure amidst high river currents near Godavari bridge. Coast Guard boats dispatched.", "OTHER", "CRITICAL", "VERIFIED", "Rajahmundry", "Andhra Pradesh", 220000),
             ("Railway Track Washout - Khammam", "Heavy downpour causing ballast erosion along South Central Railway line. Express trains halted safely at station.", "FLOOD", "HIGH", "REPORTED", "Khammam", "Telangana", 310000),
             ("Drought & Crop Fire Alert - Anantapur", "Dry weather and strong winds triggering farm brush fire. Fire tenders pre-positioned across rural belt.", "FIRE", "MEDIUM", "REPORTED", "Anantapur", "Andhra Pradesh", 110000),
-            ("Coastal Barrier Erosion - Nellore", "High tidal waves damaging coastal protection seawall near Krishnapatnam port. Sandbag reinforcement active.", "CYCLONE", "HIGH", "VERIFIED", "Nellore", "Andhra Pradesh", 270000),
+            ("Coastal Barrier Erosion - Nellore", "High tidal waves damaging coastal protection seawall near Krishnapatnam port. Sandbag reinforcement active.", "HURRICANE", "HIGH", "VERIFIED", "Nellore", "Andhra Pradesh", 270000),
             ("Forest Ridge Wildfire - Chittoor", "Wildfire reported near Seshachalam forest hill ranges. Forest department and helicopters deployed for firefighting.", "FIRE", "HIGH", "REPORTED", "Chittoor", "Andhra Pradesh", 600000),
             ("Highway Bridge Structural Scour - Eluru", "National Highway NH-16 canal bridge pillar scouring detected after heavy runoff. Heavy vehicles rerouted safely.", "FLOOD", "MEDIUM", "VERIFIED", "Eluru", "Andhra Pradesh", 190000)
         ]
+        # Build city coordinate lookup
+        city_coords = {c['name']: (c['lat'], c['lon']) for c in CITIES_36}
 
         for title, desc, dtype, sev, st, dist, state_val, dmg in incidents_seed_data:
-            inc = Incident(
-                id=str(uuid.uuid4()),
-                title=title,
-                description=desc,
-                disaster_type=dtype,
-                severity=sev,
-                status=st,
-                district=dist,
-                state=state_val,
-                estimated_damage=dmg,
-                created_at=datetime.datetime.utcnow() - datetime.timedelta(hours=random.randint(1, 48))
-            )
-            db.add(inc)
+            lat, lon = city_coords.get(dist, (17.385, 78.4867))
+            hours_ago = random.randint(1, 48)
+            db.execute(text("""
+                INSERT INTO incidents (id, title, description, disaster_type, severity, status, district, state, estimated_damage, geom, created_at, updated_at)
+                VALUES (:id, :title, :desc, :dtype, :sev, :st, :dist, :state, :dmg, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326), NOW() - INTERVAL ':hours hours', NOW())
+            """.replace(':hours hours', f'{hours_ago} hours')), {
+                "id": str(uuid.uuid4()), "title": title, "desc": desc,
+                "dtype": dtype, "sev": sev, "st": st, "dist": dist,
+                "state": state_val, "dmg": dmg, "lon": lon, "lat": lat
+            })
         db.commit()
 
     # 4. Seed System Notifications

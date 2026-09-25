@@ -29,7 +29,7 @@ def login():
             }, SECRET_KEY, algorithm='HS256')
             return jsonify({
                 'token': token,
-                'user': {'id': 'admin-uuid-1', 'name': 'Jagapathi (ADMIN)', 'email': email, 'role': 'ADMIN'}
+                'user': {'id': 'admin-uuid-1', 'name': 'Jagapathi', 'firstName': 'Jagapathi', 'lastName': 'Rao', 'email': email, 'role': 'ADMIN'}
             })
         return jsonify({'message': 'Invalid credentials'}), 401
 
