@@ -1,6 +1,7 @@
 import os
 import uuid
 import jwt
+import random
 import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -177,6 +178,13 @@ def update_allocation_status(alloc_id):
     data = request.json or {}
     new_status = data.get('status', 'COMPLETED')
     return jsonify({'message': f'Allocation {alloc_id} updated to {new_status}', 'status': new_status})
+
+@app.route('/api/v1/allocations/<alloc_id>', methods=['PUT'])
+def update_allocation_put(alloc_id):
+    data = request.json or {}
+    new_status = data.get('status', 'COMPLETED')
+    return jsonify({'message': f'Allocation {alloc_id} updated to {new_status}', 'status': new_status, 'id': alloc_id})
+
 
 # System Status Probe APIs
 @app.route('/api/v1/research/model-metrics', methods=['GET'])
