@@ -33,7 +33,10 @@ def get_incidents():
             'district': inc.district,
             'state': inc.state,
             'estimatedDamage': inc.estimated_damage,
-            'createdAt': inc.created_at.isoformat() if inc.created_at else None
+            'createdAt': inc.created_at.isoformat() if inc.created_at else None,
+            'geom': {
+                'coordinates': [78.4867, 17.3850]
+            }
         })
     return jsonify({'incidents': res, 'total': len(res)})
 

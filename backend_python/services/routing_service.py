@@ -48,7 +48,7 @@ def haversine_km(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return R * c
 
-def generate_curved_geometry(p1, p2, curve_factor=0.06, num_points=25):
+def generate_curved_geometry(p1, p2, curve_factor=0.015, num_points=30):
     lat1, lon1 = p1[0], p1[1]
     lat2, lon2 = p2[0], p2[1]
     
@@ -68,7 +68,7 @@ def generate_curved_geometry(p1, p2, curve_factor=0.06, num_points=25):
     for i in range(num_points + 1):
         t = i / float(num_points)
         lat = (1 - t)**2 * lat1 + 2 * (1 - t) * t * control_lat + t**2 * lat2
-        lon = (1 - t)**2 * lon1 + 2 * (1 - t) * t * control_lon + t**2 * lat2
+        lon = (1 - t)**2 * lon1 + 2 * (1 - t) * t * control_lon + t**2 * lon2
         points.append([round(lat, 5), round(lon, 5)])
     return points
 
@@ -77,7 +77,7 @@ def compute_escape_routes(origin_lat, origin_lon, dest_lat, dest_lon, target_nam
     
     routes = []
     try:
-        resp = requests.get(osrm_url, timeout=5)
+        resp = requests.get(osrm_url, timeout=4)
         if resp.status_code == 200:
             data = resp.json()
             osrm_routes = data.get("routes", [])
@@ -117,15 +117,15 @@ def compute_escape_routes(origin_lat, origin_lon, dest_lat, dest_lon, target_nam
     if len(routes) < 3:
         configs = [
             {"badge": "Primary Low Risk", "color": "#10b981", "curve": 0.0, "risk": 18, "speed_mult": 1.0},
-            {"badge": "High-Speed Highway", "color": "#3b82f6", "curve": 0.07, "risk": 26, "speed_mult": 1.15},
-            {"badge": "Alternate Relief Corridor", "color": "#f59e0b", "curve": -0.07, "risk": 34, "speed_mult": 0.9}
+            {"badge": "High-Speed Highway", "color": "#3b82f6", "curve": 0.02, "risk": 26, "speed_mult": 1.15},
+            {"badge": "Alternate Relief Corridor", "color": "#f59e0b", "curve": -0.02, "risk": 34, "speed_mult": 0.9}
         ]
 
         existing_count = len(routes)
         for idx in range(existing_count, 3):
             cfg = configs[idx]
             geom = generate_curved_geometry(p1, p2, curve_factor=cfg["curve"])
-            c_dist = round(base_dist * (1.0 + abs(cfg["curve"]) * 0.8), 1)
+            c_dist = round(base_dist * (1.0 + abs(cfg["curve"]) * 0.5), 1)
             c_dur = round((c_dist / (60.0 * cfg["speed_mult"])) * 60)
 
             routes.append({

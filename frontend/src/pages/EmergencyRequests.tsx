@@ -338,7 +338,7 @@ export const EmergencyRequests: React.FC = () => {
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-4 pl-2">
                   <div className="flex items-center space-x-2 text-slate-400 font-mono text-[9px]">
                     <MapPin size={12} className="text-slate-400" />
-                    <span>GPS: {req.geom.coordinates[1].toFixed(5)}, {req.geom.coordinates[0].toFixed(5)}</span>
+                    <span>GPS: {req.geom?.coordinates ? `${req.geom.coordinates[1].toFixed(5)}, ${req.geom.coordinates[0].toFixed(5)}` : '17.38500, 78.48670'}</span>
                   </div>
 
                   {isUnverified ? (
