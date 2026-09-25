@@ -48,8 +48,31 @@ def haversine_km(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return R * c
 
+def generate_curved_geometry(p1, p2, curve_factor=0.06, num_points=25):
+    lat1, lon1 = p1[0], p1[1]
+    lat2, lon2 = p2[0], p2[1]
+    
+    mid_lat = (lat1 + lat2) / 2.0
+    mid_lon = (lon1 + lon2) / 2.0
+    
+    d_lat = lat2 - lat1
+    d_lon = lon2 - lon1
+    
+    norm_lat = -d_lon * curve_factor
+    norm_lon = d_lat * curve_factor
+    
+    control_lat = mid_lat + norm_lat
+    control_lon = mid_lon + norm_lon
+    
+    points = []
+    for i in range(num_points + 1):
+        t = i / float(num_points)
+        lat = (1 - t)**2 * lat1 + 2 * (1 - t) * t * control_lat + t**2 * lat2
+        lon = (1 - t)**2 * lon1 + 2 * (1 - t) * t * control_lon + t**2 * lat2
+        points.append([round(lat, 5), round(lon, 5)])
+    return points
+
 def compute_escape_routes(origin_lat, origin_lon, dest_lat, dest_lon, target_name="Target Hub"):
-    # Try querying live OSRM routing engine
     osrm_url = f"http://router.project-osrm.org/route/v1/driving/{origin_lon},{origin_lat};{dest_lon},{dest_lat}?overview=full&geometries=geojson&alternatives=true"
     
     routes = []
@@ -62,11 +85,9 @@ def compute_escape_routes(origin_lat, origin_lon, dest_lat, dest_lon, target_nam
                 dist_km = round(r.get("distance", 0) / 1000.0, 1)
                 dur_mins = round(r.get("duration", 0) / 60.0)
                 coords = r.get("geometry", {}).get("coordinates", [])
-                
-                # Flip coordinates to [lat, lon] for Leaflet
                 leaflet_coords = [[c[1], c[0]] for c in coords]
                 
-                badge = "Primary Low Risk" if idx == 0 else "High-Speed Highway" if idx == 1 else "Alternate Corridor"
+                badge = "Primary Low Risk" if idx == 0 else "High-Speed Highway" if idx == 1 else "Alternate Relief Corridor"
                 color = "#10b981" if idx == 0 else "#3b82f6" if idx == 1 else "#f59e0b"
                 
                 routes.append({
@@ -78,6 +99,7 @@ def compute_escape_routes(origin_lat, origin_lon, dest_lat, dest_lon, target_nam
                     "durationMins": dur_mins,
                     "roadRiskScore": max(12, min(45, 18 + idx * 8)),
                     "geometry": leaflet_coords,
+                    "polyline": leaflet_coords,
                     "steps": [
                         f"Depart origin towards {target_name}",
                         f"Proceed on Highway Corridor {idx+1}",
@@ -87,35 +109,41 @@ def compute_escape_routes(origin_lat, origin_lon, dest_lat, dest_lon, target_nam
     except Exception as e:
         print(f"OSRM query fallback triggered: {e}")
         
-    if not routes:
-        # Fallback straight-line corridor calculation
-        dist = round(haversine_km(origin_lat, origin_lon, dest_lat, dest_lon), 1)
-        dur = round((dist / 65.0) * 60)
-        
-        # Interpolate points
-        steps_n = 10
-        coords = []
-        for i in range(steps_n + 1):
-            t = i / steps_n
-            lat = origin_lat + t * (dest_lat - origin_lat)
-            lon = origin_lon + t * (dest_lon - origin_lon)
-            coords.append([lat, lon])
-            
-        routes.append({
-            "id": "route-1",
-            "name": f"Direct Escape Corridor to {target_name}",
-            "badge": "Primary Low Risk",
-            "color": "#10b981",
-            "distanceKm": dist,
-            "durationMins": dur,
-            "roadRiskScore": 18,
-            "geometry": coords,
-            "steps": [
-                f"Depart origin city towards {target_name}",
-                "Follow regional emergency escape highway",
-                f"Arrive at {target_name} Emergency Hub"
-            ]
-        })
+    p1 = [origin_lat, origin_lon]
+    p2 = [dest_lat, dest_lon]
+    base_dist = round(haversine_km(origin_lat, origin_lon, dest_lat, dest_lon), 1)
+
+    # Ensure ALWAYS 3 Corridors are returned
+    if len(routes) < 3:
+        configs = [
+            {"badge": "Primary Low Risk", "color": "#10b981", "curve": 0.0, "risk": 18, "speed_mult": 1.0},
+            {"badge": "High-Speed Highway", "color": "#3b82f6", "curve": 0.07, "risk": 26, "speed_mult": 1.15},
+            {"badge": "Alternate Relief Corridor", "color": "#f59e0b", "curve": -0.07, "risk": 34, "speed_mult": 0.9}
+        ]
+
+        existing_count = len(routes)
+        for idx in range(existing_count, 3):
+            cfg = configs[idx]
+            geom = generate_curved_geometry(p1, p2, curve_factor=cfg["curve"])
+            c_dist = round(base_dist * (1.0 + abs(cfg["curve"]) * 0.8), 1)
+            c_dur = round((c_dist / (60.0 * cfg["speed_mult"])) * 60)
+
+            routes.append({
+                "id": f"route-{idx+1}",
+                "name": f"Corridor {idx+1} ({cfg['badge']})",
+                "badge": cfg["badge"],
+                "color": cfg["color"],
+                "distanceKm": c_dist,
+                "durationMins": c_dur,
+                "roadRiskScore": cfg["risk"],
+                "geometry": geom,
+                "polyline": geom,
+                "steps": [
+                    f"Depart origin city towards {target_name}",
+                    f"Follow regional emergency escape highway (Corridor {idx+1})",
+                    f"Arrive at {target_name} Emergency Hub"
+                ]
+            })
 
     return {
         "origin": {"lat": origin_lat, "lon": origin_lon},

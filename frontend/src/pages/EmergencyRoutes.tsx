@@ -342,16 +342,17 @@ export const EmergencyRoutes: React.FC = () => {
               {/* Draw polylines for candidate routes */}
               {routes.map((r: any) => {
                 const isSelected = r.id === activeRouteId;
-                if (!r.polyline || r.polyline.length === 0) return null;
+                const polylineCoords = r.polyline || r.geometry;
+                if (!polylineCoords || polylineCoords.length === 0) return null;
                 return (
                   <Polyline
                     key={r.id}
-                    positions={r.polyline}
+                    positions={polylineCoords}
                     pathOptions={{
                       color: r.color || '#10b981',
-                      weight: isSelected ? 5 : 2.5,
-                      opacity: isSelected ? 0.9 : 0.4,
-                      dashArray: isSelected ? undefined : '5, 5'
+                      weight: isSelected ? 5 : 3,
+                      opacity: isSelected ? 0.95 : 0.45,
+                      dashArray: isSelected ? undefined : '6, 6'
                     }}
                   />
                 );

@@ -7,27 +7,40 @@ export const useSocket = (
   room?: string
 ) => {
   const socketRef = useRef<Socket | null>(null);
+  const callbackRef = useRef(callback);
 
   useEffect(() => {
-    const socket = io('/', {
-      transports: ['websocket'],
-    });
-    socketRef.current = socket;
+    callbackRef.current = callback;
+  }, [callback]);
 
-    socket.on('connect', () => {
-      console.log('Connected to WebSocket server:', socket.id);
-      if (room) {
-        socket.emit('join_incident_room', room);
-      }
-    });
+  useEffect(() => {
+    try {
+      const socket = io('/', {
+        transports: ['websocket', 'polling'],
+        autoConnect: true,
+      });
+      socketRef.current = socket;
 
-    socket.on(eventName, callback);
+      socket.on('connect', () => {
+        if (room) {
+          socket.emit('join_incident_room', room);
+        }
+      });
 
-    return () => {
-      socket.off(eventName, callback);
-      socket.disconnect();
-    };
-  }, [eventName, callback, room]);
+      socket.on(eventName, (data: any) => {
+        if (callbackRef.current) {
+          callbackRef.current(data);
+        }
+      });
+
+      return () => {
+        socket.off(eventName);
+        socket.disconnect();
+      };
+    } catch (e) {
+      console.warn('Socket connection warning:', e);
+    }
+  }, [eventName, room]);
 
   const emit = (name: string, data: any) => {
     if (socketRef.current) {
@@ -37,4 +50,5 @@ export const useSocket = (
 
   return { emit };
 };
+
 export default useSocket;
