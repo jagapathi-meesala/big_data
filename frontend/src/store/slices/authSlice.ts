@@ -9,6 +9,8 @@ export interface User {
   profilePicture?: string;
   district?: string;
   state?: string;
+  status?: string;
+  availability?: string;
   createdAt?: string;
 }
 interface AuthState {

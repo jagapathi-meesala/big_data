@@ -25,6 +25,10 @@ app.register_blueprint(incident_bp, url_prefix='/api/v1/incidents')
 app.register_blueprint(resource_bp, url_prefix='/api/v1/resources')
 app.register_blueprint(analytics_bp, url_prefix='/api/v1/analytics')
 
+@app.route('/api/v1/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'ok', 'message': 'AID-DRAS Python Backend Service operational'})
+
 # Dashboard Stats API
 # Dashboard Stats API
 @app.route('/api/v1/dashboard/stats', methods=['GET'])

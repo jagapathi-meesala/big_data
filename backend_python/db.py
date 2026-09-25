@@ -20,3 +20,7 @@ def get_db():
         return db
     finally:
         db.close()
+
+def close_db(e=None):
+    pass
+

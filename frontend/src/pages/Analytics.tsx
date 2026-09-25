@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { DisasterTrendsChart, ResourceAvailabilityChart, SeverityDistributionChart, VehicleAvailabilityChart } from '../components/DisasterCharts';
 import api from '../services/api';
-import { Cpu, Brain, Activity, TrendingUp, Layers, RefreshCw, Radio, ShieldCheck, Globe } from 'lucide-react';
+import { Cpu, Brain, Activity, TrendingUp, Layers, ShieldCheck, Globe } from 'lucide-react';
 
 export const Analytics: React.FC = () => {
   const queryClient = useQueryClient();
@@ -65,7 +65,6 @@ export const Analytics: React.FC = () => {
     
     // 2. Analyze resource shortages
     const ambulances = stats?.resourceDistribution?.find((r: any) => r.type === 'AMBULANCE')?.total || 0;
-    const fireTrucks = stats?.resourceDistribution?.find((r: any) => r.type === 'FIRE_TRUCK')?.total || 0;
     const beds = stats?.resourceDistribution?.find((r: any) => r.type === 'HOSPITAL_BED')?.total || 0;
 
     if (ambulances < 50) {
@@ -81,7 +80,7 @@ export const Analytics: React.FC = () => {
       insights.push({
         type: 'INFO',
         title: 'Bed Allocation Optimization',
-        message: `Active ICU bed occupancy is projected to increase. Suggest optimizing distribution to match the Guntur and Visakhapatnam regional demands.`,
+        message: `Active ICU bed occupancy is projected to increase. Suggest optimizing distribution to match regional demands.`,
         action: 'Review Bed Allocation'
       });
     }
@@ -98,8 +97,10 @@ export const Analytics: React.FC = () => {
   };
 
   const handleActionClick = (actionName: string) => {
-    alert(`AI Dispatch Command Action: "${actionName}" successfully transmitted to district centers.`);
+    alert(`AI Dispatch Command Action: "${actionName}" transmitted to district centers.`);
   };
+
+  const insightsList = generateInsights();
 
   // KPI Calculations
   const totalSupplies = stats?.resourceDistribution?.reduce((acc: number, item: any) => {
@@ -145,10 +146,19 @@ export const Analytics: React.FC = () => {
             <p className="text-xs text-slate-400 mt-0.5">
               Active Feeds: <strong>USGS Earthquakes</strong> • <strong>GDACS GeoJSON</strong> • <strong>NASA EONET Satellite</strong> • <strong>Open-Meteo Weather</strong>
             </p>
+            {syncStatus && <p className="text-xs text-emerald-400 mt-1 font-semibold">{syncStatus}</p>}
           </div>
         </div>
 
         <div className="flex items-center space-x-4 text-xs font-semibold shrink-0">
+          <button
+            onClick={handleSyncLiveAPIs}
+            disabled={isSyncing}
+            className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white rounded-lg font-bold transition text-xs flex items-center space-x-1.5"
+          >
+            <span>{isSyncing ? 'Syncing...' : 'Sync Live Feeds'}</span>
+          </button>
+          <div className="h-6 w-px bg-slate-800" />
           <div className="text-right">
             <span className="text-[10px] font-bold text-slate-400 block uppercase">Live Ingested Alerts</span>
             <span className="text-sm font-black text-emerald-400">{liveMeta?.liveApiIncidentsCount ?? 0} Events</span>
@@ -210,6 +220,31 @@ export const Analytics: React.FC = () => {
             </div>
           </div>
 
+          {/* AI Automated Insights */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {insightsList.map((item, idx) => (
+              <div
+                key={idx}
+                className={`p-4 rounded-2xl border transition-all ${
+                  item.type === 'CRITICAL'
+                    ? 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                    : item.type === 'WARNING'
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                }`}
+              >
+                <h4 className="text-xs font-bold uppercase mb-1">{item.title}</h4>
+                <p className="text-xs opacity-80 leading-relaxed mb-3">{item.message}</p>
+                <button
+                  onClick={() => handleActionClick(item.action)}
+                  className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-lg text-[10px] font-bold uppercase tracking-wider transition"
+                >
+                  {item.action}
+                </button>
+              </div>
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Incident Mitigation Trend line */}
             <div className="lg:col-span-2 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.005] hover:border-slate-350 dark:hover:border-slate-700">
@@ -220,25 +255,31 @@ export const Analytics: React.FC = () => {
                   <span>Real-Time API Sync Active</span>
                 </span>
               </div>
-              <DisasterTrendsChart trends={stats?.trends} forecast={stats?.forecast} />
+              <div className="relative w-full h-64">
+                <DisasterTrendsChart trends={stats?.trends} forecast={stats?.forecast} />
+              </div>
             </div>
 
             {/* Resources bar */}
             <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.005] hover:border-slate-350 dark:hover:border-slate-700">
               <h2 className="text-lg font-bold mb-4">Supply Stock Availability</h2>
-              <ResourceAvailabilityChart resourceDistribution={stats?.resourceDistribution} />
+              <div className="relative w-full h-64">
+                <ResourceAvailabilityChart resourceDistribution={stats?.resourceDistribution} />
+              </div>
             </div>
 
             {/* Vehicles bar */}
             <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.005] hover:border-slate-350 dark:hover:border-slate-700">
               <h2 className="text-lg font-bold mb-4">Rescue Vehicle Fleet</h2>
-              <VehicleAvailabilityChart resourceDistribution={stats?.resourceDistribution} />
+              <div className="relative w-full h-64">
+                <VehicleAvailabilityChart resourceDistribution={stats?.resourceDistribution} />
+              </div>
             </div>
 
             {/* Severity doughnut */}
             <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.005] hover:border-slate-350 dark:hover:border-slate-700">
               <h2 className="text-lg font-bold mb-4">Severity Ratios</h2>
-              <div className="h-[200px] flex items-center justify-center">
+              <div className="relative w-full h-64 flex items-center justify-center overflow-hidden">
                 <SeverityDistributionChart severityDistribution={stats?.severityDistribution} />
               </div>
             </div>

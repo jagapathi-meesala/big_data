@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../store/slices/authSlice';
 import api from '../services/api';
-import { ShieldCheck, UserPlus, AlertCircle, Loader2 } from 'lucide-react';
+import { UserPlus, AlertCircle, Loader2 } from 'lucide-react';
 
 export const Register: React.FC = () => {
   const [firstName, setFirstName] = useState('');

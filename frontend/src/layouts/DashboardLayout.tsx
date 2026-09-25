@@ -6,7 +6,7 @@ import { logout } from '../store/slices/authSlice';
 import { toggleTheme, initializeTheme } from '../store/slices/themeSlice';
 import {
   Menu, Sun, Moon, LogOut, LayoutDashboard, MapPin, Shield,
-  Activity, Bell, Compass, FlaskConical, AlertOctagon
+  Activity, Bell, Compass, AlertOctagon
 } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {

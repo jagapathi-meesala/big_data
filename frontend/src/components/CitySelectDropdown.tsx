@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import Select, { SingleValue } from 'react-select';
+import React from 'react';
+import Select from 'react-select';
 
 export interface CityOption {
   value: string;
@@ -48,15 +48,21 @@ export const CITIES_DATA: CityOption[] = [
   { value: 'Jagtial', label: 'Jagtial (Telangana)', state: 'Telangana', lat: 18.7900, lon: 78.9100 }
 ];
 
-interface Props {
-  value: CityOption | null;
-  onChange: (option: SingleValue<CityOption>) => void;
+export const getCityCoords = (cityName?: string): [number, number] => {
+  const city = CITIES_DATA.find((c) => c.value.toLowerCase() === (cityName || '').toLowerCase());
+  if (city) return [city.lat, city.lon];
+  return [17.3850, 78.4867];
+};
+
+interface CitySelectDropdownProps {
+  value?: CityOption | null;
+  onChange?: (selected: CityOption | null) => void;
   placeholder?: string;
   isDisabled?: boolean;
   excludeValue?: string;
 }
 
-export const CitySelectDropdown: React.FC<Props> = ({
+export const CitySelectDropdown: React.FC<CitySelectDropdownProps> = ({
   value,
   onChange,
   placeholder = 'Search city...',
@@ -72,7 +78,7 @@ export const CitySelectDropdown: React.FC<Props> = ({
       <Select<CityOption>
         options={filteredOptions}
         value={value}
-        onChange={onChange}
+        onChange={(val) => onChange?.(val)}
         placeholder={placeholder}
         isDisabled={isDisabled}
         isSearchable
@@ -129,32 +135,6 @@ export const CitySelectDropdown: React.FC<Props> = ({
           }),
         }}
       />
-    </div>
-  );
-};
-
-// Standalone Demo Component as requested by the user
-export const SearchableCitySelectDemo: React.FC = () => {
-  const [selectedCity, setSelectedCity] = useState<CityOption | null>(CITIES_DATA[0]);
-
-  return (
-    <div className="p-4 bg-slate-900 text-white rounded-xl shadow-md max-w-md mx-auto space-y-3">
-      <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-        Select City (Searchable Dropdown)
-      </label>
-      <CitySelectDropdown
-        value={selectedCity}
-        onChange={(option) => setSelectedCity(option)}
-        placeholder="Type city name to search..."
-      />
-      {selectedCity && (
-        <div className="p-3 bg-slate-800 rounded-lg text-xs space-y-1 border border-slate-700">
-          <p className="font-semibold text-emerald-400">Selected City Details:</p>
-          <p><strong>Name:</strong> {selectedCity.value}</p>
-          <p><strong>State:</strong> {selectedCity.state}</p>
-          <p><strong>Coordinates:</strong> {selectedCity.lat}° N, {selectedCity.lon}° E</p>
-        </div>
-      )}
     </div>
   );
 };

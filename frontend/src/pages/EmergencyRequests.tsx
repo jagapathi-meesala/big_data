@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  AlertOctagon, ShieldCheck, MapPin, Radio, Activity, Users,
-  Building2, Home, Clock, UserCheck, HeartPulse, AlertTriangle,
+  AlertOctagon, ShieldCheck, MapPin, Radio, Users,
+  Building2, Home, Clock, UserCheck, AlertTriangle,
   Flame, Waves, Wind, Mountain
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -124,7 +124,7 @@ export const EmergencyRequests: React.FC = () => {
     }
   );
 
-  const incidents = data?.incidents || [];
+  const incidents = Array.isArray(data) ? data : (data?.incidents || []);
   const totalAlerts = incidents.length;
   const unverifiedAlerts = incidents.filter((i: any) => i.status === 'REPORTED').length;
   const verifiedAlerts = totalAlerts - unverifiedAlerts;

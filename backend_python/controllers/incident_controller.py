@@ -35,7 +35,23 @@ def get_incidents():
             'estimatedDamage': inc.estimated_damage,
             'createdAt': inc.created_at.isoformat() if inc.created_at else None
         })
-    return jsonify(res)
+    return jsonify({'incidents': res, 'total': len(res)})
+
+@incident_bp.route('/<incident_id>/status', methods=['PATCH', 'PUT'])
+def update_incident_status(incident_id):
+    data = request.json or {}
+    new_status = data.get('status', 'VERIFIED')
+    db = get_db()
+    inc = db.query(Incident).filter(Incident.id == incident_id).first()
+    if not inc:
+        return jsonify({'message': 'Incident not found'}), 404
+    inc.status = new_status
+    db.commit()
+    return jsonify({
+        'id': str(inc.id),
+        'status': inc.status,
+        'message': f'Incident status updated to {new_status}'
+    })
 
 @incident_bp.route('', methods=['POST'])
 def create_incident():

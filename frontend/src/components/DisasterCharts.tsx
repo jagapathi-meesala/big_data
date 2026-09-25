@@ -81,8 +81,9 @@ export const DisasterTrendsChart: React.FC<{ trends?: any[]; forecast?: any[] }>
     ],
   };
 
-  const options = {
+  const options: any = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -166,8 +167,9 @@ export const ResourceAvailabilityChart: React.FC<{ resourceDistribution?: any[] 
     ],
   };
 
-  const options = {
+  const options: any = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -232,8 +234,9 @@ export const VehicleAvailabilityChart: React.FC<{ resourceDistribution?: any[] }
     ],
   };
 
-  const options = {
+  const options: any = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -286,9 +289,10 @@ export const SeverityDistributionChart: React.FC<{ severityDistribution?: any[] 
     ],
   };
 
-  const options = {
+  const options: any = {
     responsive: true,
-    cutout: '72%',
+    maintainAspectRatio: false,
+    cutout: '70%',
     plugins: {
       legend: {
         position: 'right' as const,
@@ -310,7 +314,11 @@ export const SeverityDistributionChart: React.FC<{ severityDistribution?: any[] 
     }
   };
 
-  return <Doughnut data={data} options={options} />;
+  return (
+    <div className="relative w-full h-48 flex items-center justify-center">
+      <Doughnut data={data} options={options} />
+    </div>
+  );
 };
 
 

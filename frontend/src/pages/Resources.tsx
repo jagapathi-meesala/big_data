@@ -81,8 +81,8 @@ export const Resources: React.FC = () => {
     setResourceType(resource.type);
     setQuantity(String(resource.quantity));
     setStatus(resource.status);
-    setLat(String(resource.geom.coordinates[1]));
-    setLng(String(resource.geom.coordinates[0]));
+    setLat(String(resource.geom?.coordinates?.[1] ?? 17.3850));
+    setLng(String(resource.geom?.coordinates?.[0] ?? 78.4867));
     setShowModal(true);
   };
 
@@ -186,7 +186,7 @@ export const Resources: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {data?.resources?.map((resource: any) => (
+                {(Array.isArray(data) ? data : (data?.resources || [])).map((resource: any) => (
                   <tr key={resource.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition">
                     <td className="p-4 font-semibold">{resource.type}</td>
                     <td className="p-4 font-mono font-bold">{resource.quantity}</td>
@@ -196,11 +196,11 @@ export const Resources: React.FC = () => {
                         resource.status === 'IN_TRANSIT' ? 'bg-blue-500/10 text-blue-500' :
                         'bg-slate-500/10 text-slate-500'
                       }`}>
-                        {resource.status}
+                        {resource.status || 'AVAILABLE'}
                       </span>
                     </td>
                     <td className="p-4 font-mono text-xs opacity-50">
-                      {resource.geom.coordinates[1].toFixed(4)}, {resource.geom.coordinates[0].toFixed(4)}
+                      {resource.geom?.coordinates ? `${resource.geom.coordinates[1].toFixed(4)}, ${resource.geom.coordinates[0].toFixed(4)}` : '17.3850, 78.4867'}
                     </td>
                     <td className="p-4 text-right space-x-2">
                       <button
