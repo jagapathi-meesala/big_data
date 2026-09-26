@@ -10,6 +10,7 @@ import {
 import { DisasterMap } from '../components/DisasterMap';
 import { SeverityDistributionChart } from '../components/DisasterCharts';
 import { FakeDisasterAlertModal } from '../components/FakeDisasterAlertModal';
+import { AgentDisasterPanel } from '../components/AgentDisasterPanel';
 import useSocket from '../hooks/useSocket';
 import api from '../services/api';
 import { RootState } from '../store';
@@ -284,6 +285,9 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* AI Disaster Response Agent Passport Orchestrator */}
+      <AgentDisasterPanel />
 
       {/* ── RESCUE ROUTES PANEL WITH BDA RISK ANALYSIS ENGINE ───────────────────────────────────── */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">

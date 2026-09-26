@@ -15,6 +15,7 @@ from controllers.auth_controller import auth_bp
 from controllers.incident_controller import incident_bp
 from controllers.resource_controller import resource_bp
 from controllers.analytics_controller import analytics_bp
+from controllers.agent_controller import agent_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -25,6 +26,7 @@ app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
 app.register_blueprint(incident_bp, url_prefix='/api/v1/incidents')
 app.register_blueprint(resource_bp, url_prefix='/api/v1/resources')
 app.register_blueprint(analytics_bp, url_prefix='/api/v1/analytics')
+app.register_blueprint(agent_bp, url_prefix='/api/v1/agent')
 
 @app.route('/api/v1/health', methods=['GET'])
 def health_check():

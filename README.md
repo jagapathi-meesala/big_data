@@ -57,3 +57,96 @@ GDACS ground truth.
   2018 are approximate.
 - The web dashboard's operational "AI" claims from the old build were
   removed; only pipeline-published numbers are shown.
+
+---
+
+## Disaster Response Agent Passport Integration
+
+The project integrates the **Disaster Response Agent** (`disaster-response-agent-01`, v1.0.0) from the Agent Passport framework as an **intelligent orchestration and decision-support layer**.
+
+### Architecture & Data Flow
+
+```
+User / Admin
+    ↓
+AID-DRAS Frontend (Dashboard / Agent Panel)
+    ↓
+Agent API Controller (POST /api/v1/agent/analyze)
+    ↓
+Disaster Response Agent Core Engine (Passport Verified)
+    ├── PostgreSQL / PostGIS (Incidents & Resource Capacity)
+    ├── Python Scikit-Learn ML Risk Predictor
+    ├── PostGIS Spatial Solver Allocation Engine
+    ├── OSRM Highway Rescue Routing Service
+    └── PySpark / Hadoop Big Data Pipeline
+    ↓
+Structured Agent Decision JSON Recommendation
+    ↓
+Dashboard / Disaster Map / Human Oversight Confirmation
+```
+
+### Agent API Endpoints
+
+- `GET /api/v1/agent/status` — Retrieves operational status, passport verification status, active capabilities (`situational_assessment`, `logistics_coordination`, `resource_allocation`, `weather_monitoring`, `resource_location`), and Checkpoint status (`Validate: PASSED`, `Explain: PASSED`, `Export: PASSED`).
+- `POST /api/v1/agent/analyze` — Accepts `{ "incidentId": "<UUID>", "query": "..." }`, queries PostgreSQL/PostGIS & ML risk models, executes Agent reasoning, logs notifications, and returns structured decision JSON.
+- `POST /api/v1/agent/execute-action` — Human Oversight Confirmation: Executes an authorized action recommended by the AI Agent.
+
+### Structured Response Schema Example
+
+```json
+{
+  "success": true,
+  "agent_id": "disaster-response-agent-01",
+  "data": {
+    "incident": {
+      "id": "789ce87c-43c5-4e47-8bbd-5cdcd8b82ed1",
+      "title": "Severe Coastal Cyclone - Visakhapatnam",
+      "disasterType": "CYCLONE",
+      "severity": "CRITICAL",
+      "district": "Visakhapatnam",
+      "coordinates": [83.2185, 17.6868]
+    },
+    "severity": {
+      "level": "CRITICAL",
+      "risk_score": 85.0
+    },
+    "situation_summary": "Agent Passport situational analysis for 'Severe Coastal Cyclone - Visakhapatnam'...",
+    "recommended_actions": [
+      {
+        "id": "act-1",
+        "action": "Pre-position 5 ambulance units along emergency corridor to Visakhapatnam.",
+        "priority": "CRITICAL",
+        "category": "AMBULANCE",
+        "status": "PROPOSED"
+      }
+    ],
+    "resource_priorities": [
+      {"resourceType": "AMBULANCE", "priorityLevel": "CRITICAL", "reason": "Rapid triage required..."}
+    ],
+    "hospital_recommendations": [...],
+    "ambulance_recommendations": [...],
+    "shelter_recommendations": [...],
+    "risk_factors": [...],
+    "reasoning_summary": "The Disaster Response Agent analyzed live operational metrics...",
+    "data_sources": [
+      "PostgreSQL / PostGIS Operational DB",
+      "Disaster Response Agent Passport Specification v1.0.0",
+      "Python Scikit-Learn ML Hazard Predictor",
+      "PostGIS Spatial Solver Allocation Engine",
+      "PySpark / Hadoop Big Data Analytics Pipeline"
+    ],
+    "timestamp": "2026-09-26T17:20:00Z"
+  }
+}
+```
+
+### Human Oversight Model
+
+The Agent acts purely as a decision-support system. All generated recommendations are flagged as `PROPOSED` until an authorized administrator clicks **Confirm & Execute Action**, which records an audited execution log in the database.
+
+### Running Agent Unit Tests
+
+```bash
+python3 -m unittest backend_python/tests/test_agent_integration.py
+```
+
