@@ -1,0 +1,39 @@
+%% AID-DRAS / RADAR System Architecture Diagram
+graph TD
+    subgraph Data Sources & Ingestion
+        IMD[IMD 0.25° Gridded Rainfall<br/>1901-2024]
+        Census[Census 2011<br/>Socio-Technical Deficits]
+        Feeds[Live API Feeds<br/>USGS / GDACS / NASA / Open-Meteo]
+    end
+
+    subgraph PySpark & HDFS Research Pipeline (RADAR)
+        ETL[PySpark ETL & Grid Mapping<br/>District-Day Panel Engine]
+        ML[Spark MLlib Classifiers<br/>RF / GBT / Logistic Regression]
+        Calib[Isotonic Calibration &<br/>Split-Conformal Risk Bounds (α=0.10)]
+        DDRPS[DDRPS 2.0 Priority Engine<br/>Weighted Composite Scoring]
+        LP[Pre-Positioning LP Solver<br/>Uncertainty-Aware Allocation]
+    end
+
+    subgraph Serving & Storage Layer
+        PostGIS[(PostgreSQL / PostGIS<br/>District Geometries & Incidents)]
+        Redis[(Redis Pub/Sub & Cache<br/>Real-Time Alert Dispatch)]
+    end
+
+    subgraph Full-Stack Web Platform (AID-DRAS)
+        NodeBackend[Node.js / Express API<br/>TypeScript Backend]
+        OSRM[OSRM Route Engine<br/>Multi-Risk Escape Polylines]
+        ReactUI[React + Vite Frontend<br/>Interactive GIS & AI Simulator]
+    end
+
+    IMD --> ETL
+    Census --> DDRPS
+    Feeds --> NodeBackend
+    ETL --> ML
+    ML --> Calib
+    Calib --> DDRPS
+    DDRPS --> LP
+    LP --> PostGIS
+    NodeBackend --> PostGIS
+    NodeBackend --> Redis
+    NodeBackend --> OSRM
+    ReactUI <--> NodeBackend

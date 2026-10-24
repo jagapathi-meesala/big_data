@@ -1,0 +1,20 @@
+% Pre-Positioning Strategy Evaluation Table Template
+\begin{table}[htbp]
+\caption{Pre-Positioning Strategy Evaluation on Held-Out Historical Flood Events ($B=200$ units, $T=0.5$ transfer efficiency)}
+\label{tab:strategy_comparison}
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Allocation Strategy} & \textbf{Mean Unmet Demand} & \textbf{\% Unmet Reduction vs Uniform} & \textbf{Top-5 Rank Overlap with Oracle} \\ \hline
+Uniform Allocation & \textit{[TODO: Pipeline Run]} & Baseline (0.0\%) & \textit{[TODO: Pipeline Run]} \\ \hline
+Hazard-Only ($x \propto \hat{p}$) & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} \\ \hline
+Risk-Neutral DDRPS ($x \propto \text{DDRPS}_d$) & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} \\ \hline
+Conformal DDRPS (Risk-Averse, $x \propto \tilde{p}$) & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} \\ \hline
+Oracle Pre-Positioning (Upper Bound) & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} & 100.0\% \\ \hline
+\end{tabular}
+\\[4pt]
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Note: Numerical results are generated dynamically upon pipeline execution via \texttt{./run\_pipeline.sh all} and \texttt{generate\_report.py}, producing exact metrics logged in \texttt{bigdata/research/results/allocation\_results.csv}.}
+\end{minipage}
+\end{table}

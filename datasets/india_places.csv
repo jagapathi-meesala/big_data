@@ -1,0 +1,116 @@
+State,District,City,Population,Area (in km^2),Latitude,Longitude
+Andhra Pradesh,-,-,49386799,160205,16.5,80.63
+Telangana,-,-,35193978,114840,17.35,78.47
+Andhra Pradesh,Anantapur,-,4083315,19130,14.7,77.6
+Andhra Pradesh,Chittoor,-,4170468,15152,14.47,78.82
+Andhra Pradesh,East Godavari,-,5151549,10807,16.95,82.25
+Andhra Pradesh,Guntur,-,4889230,11391,16.3,80.45
+Andhra Pradesh,Kadapa,-,2884524,15359,14.47,78.82
+Andhra Pradesh,Krishna,-,4529009,8727,16.28,81.22
+Andhra Pradesh,Kurnool,-,4046601,17658,15.8,77.97
+Andhra Pradesh,Prakasam,-,3392764,17626,15.33,79.55
+Andhra Pradesh,Sri Potti Sriramulu Nellore,-,2966082,13076,14.43,80
+Andhra Pradesh,Srikakulam,-,2699471,5837,18.42,84.02
+Andhra Pradesh,Visakhapatnam,-,4288113,11161,17.7,83.28
+Andhra Pradesh,Vizianagaram,-,2342868,6539,18.2,83.4
+Andhra Pradesh,West Godavari,-,3934782,7742,16.12,81.02
+Telangana,Adilabad,-,708952,4185.97,19.67,78.52
+Telangana,Komaram Bheem,-,515835,4300.16,0,0
+Telangana,Bhadradri Kothagudem,-,1304811,8951,0,0
+Telangana,Hyderabad,-,3441992,4325.29,17.37,78.48
+Telangana,Jagtial,-,983414,3043.23,18.8,78.93
+Telangana,Jangaon,-,582457,2187.5,17.72,79.18
+Telangana,Jayashankar Bhupalpally,-,712257,6361.7,0,0
+Telangana,Jogulamba Gadwal,-,664971,2928,0,0
+Telangana,Kamareddy,-,972625,3651,18.32,78.33
+Telangana,Karimnagar,-,1016063,2379.07,18.43,79.12
+Telangana,Khammam,-,1401639,4453,17.25,80.17
+Telangana,Mahabubabad,-,770170,2876.7,17.62,80.02
+Telangana,Mahbubnagar,-,1318110,4037,16.75,78
+Telangana,Mancherial,-,807037,4056.36,18.87,79.43
+Telangana,Medak,-,767428,2740.89,18.03,78.25
+Telangana,Medchal-Malkajgiri,-,2542203,5005.98,0,0
+Telangana,Mulugu,-,294671,3881,18.18,79.93
+Telangana,Nalgonda,-,1631399,2449.79,17.05,79.27
+Telangana,Narayanpet,-,566874,2336.44,16.73,77.5
+Telangana,Nagarkurnool,-,893308,6545,16.48,78.33
+Telangana,Nirmal,-,709415,3562.51,19.1,78.35
+Telangana,Nizamabad,-,1534428,4153,18.68,78.1
+Telangana,Peddapalli,-,795332,4614.74,18.6,79.38
+Telangana,Rajanna Sircilla,-,546121,2030.89,0,0
+Telangana,Ranga Reddy,-,2551731,1038,17.3,78.1
+Telangana,Sangareddy,-,1527628,4464.87,17.62,78.08
+Telangana,Siddipet,-,993376,3425.19,18.1,78.85
+Telangana,Suryapet,-,1099560,3374.47,17.13,79.62
+Telangana,Vikarabad,-,881250,3385,17.33,77.9
+Telangana,Wanaparthy,-,751553,2938,16.35,78.05
+Telangana,Warangal Urban,-,1135707,1304.5,17.95,79.5
+Telangana,Warangal Rural,-,716457,2175.5,0,0
+Telangana,Yadadri Bhuvanagiri,-,726465,3091.48,0,0
+Andhra Pradesh,Adilabad,Adilabad,117167,35.5,19.67,78.53
+Andhra Pradesh,Nizamabad,Nizamabad,311152,0,0,0
+Andhra Pradesh,Karimnagar,Ramagundam,237559,93.87,18.75,79.47
+Andhra Pradesh,Karimnagar,Jagtial,103930,45,18.8,78.93
+Andhra Pradesh,Karimnagar,Karimnagar,283657,40.5,18.43,79.12
+Andhra Pradesh,Hyderabad,GHMC,1730320,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,250932,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,135370,0,0,0
+Andhra Pradesh,Hyderabad,Secunderabad,217910,64.5,17.45,78.5
+Andhra Pradesh,Hyderabad,GHMC,172542,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,341099,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,153558,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,108062,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,189378,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,271385,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,442229,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,213359,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,468158,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,330193,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,237594,0,0,0
+Andhra Pradesh,Hyderabad,GHMC,345722,0,0,0
+Andhra Pradesh,Rangareddy,GHMC,309320,0,0,0
+Andhra Pradesh,Rangareddy,GHMC,567996,0,0,0
+Andhra Pradesh,Rangareddy,GHMC,383654,0,0,0
+Andhra Pradesh,Rangareddy,GHMC,413571,0,0,0
+Andhra Pradesh,Rangareddy,GHMC,105987,0,0,0
+Andhra Pradesh,Rangareddy,GHMC,384835,0,0,0
+Andhra Pradesh,Rangareddy,GHMC,118577,0,0,0
+Andhra Pradesh,Rangareddy,GHMC,369034,0,0,0
+Andhra Pradesh,Rangareddy,GHMC,229823,0,0,0
+Andhra Pradesh,Mahbubnagar,Mahbubnagar,190400,0,16.75,78
+Andhra Pradesh,Nalgonda,Suryapet,106805,35,17.13,79.62
+Andhra Pradesh,Nalgonda,Nalgonda,154326,105,17.05,79.27
+Andhra Pradesh,Nalgonda,Miryalaguda,104918,28.36,16.87,79.58
+Andhra Pradesh,Warangal,Warangal,620116,406.87,18,79.59
+Andhra Pradesh,Khammam,Khammam,184210,93.45,17.25,80.17
+Andhra Pradesh,Srikakulam,Srikakulam,135367,136,18.3,83.9
+Andhra Pradesh,Vizianagaram,Vizianagaram,228720,140,18.11,83.4
+Andhra Pradesh,Visakhapatnam,GVMC,1730320,0,0,0
+Andhra Pradesh,East Godavari,Rajahmundry,341831,45,17,81.78
+Andhra Pradesh,East Godavari,Kakinada,312538,192.3,16.99,82.25
+Andhra Pradesh,West Godavari,Tadepalligudem,104032,217,16.81,81.53
+Andhra Pradesh,West Godavari,Eluru,218020,235,16.7,81.1
+Andhra Pradesh,West Godavari,Bhimavaram,146961,194,16.54,81.52
+Andhra Pradesh,Krishna,Vijayawada,1021806,61.88,16.52,80.63
+Andhra Pradesh,Krishna,Gudivada,118167,117,16.44,80.99
+Andhra Pradesh,Krishna,Machilipatnam,169892,405,16.17,81.13
+Andhra Pradesh,Guntur,Mangalagiri,107197,141,16.43,80.55
+Andhra Pradesh,Guntur,Narasaraopet,117489,236,16.25,80.07
+Andhra Pradesh,Guntur,Chilakaluripet,101398,15,16.09,80.17
+Andhra Pradesh,Guntur,Guntur,670073,193,16.31,80.44
+Andhra Pradesh,Guntur,Tenali,164937,114,16.24,80.65
+Andhra Pradesh,Prakasam,Ongole,204746,204,15.51,80.05
+Andhra Pradesh,Sri Potti Sriramulu Nellore,Nellore,547621,343,14.44,79.99
+Andhra Pradesh,Y.S.R.,Proddatur,163970,21.06,14.75,78.55
+Andhra Pradesh,Y.S.R.,Kadapa,318916,164.08,14.48,78.8
+Andhra Pradesh,Kurnool,Kurnool,424920,341,15.83,78.03
+Andhra Pradesh,Kurnool,Adoni,184625,544,15.62,77.27
+Andhra Pradesh,Kurnool,Nandyal,211424,222,15.48,78.48
+Andhra Pradesh,Anantapur,Guntakal,126270,402,15.17,77.37
+Andhra Pradesh,Anantapur,Tadpatri,108171,361,14.92,78.02
+Andhra Pradesh,Anantapur,Anantapur,261004,278,14.69,77.6
+Andhra Pradesh,Anantapur,Dharmavaram,121874,375,14.41,77.71
+Andhra Pradesh,Anantapur,Hindupur,151677,200,13.82,77.48
+Andhra Pradesh,Chittoor,Tirupati,293421,27.44,13.63,79.42
+Andhra Pradesh,Chittoor,Madanapalle,180180,347,13.55,78.5
+Andhra Pradesh,Chittoor,Chittoor,160722,177,13.22,79.1

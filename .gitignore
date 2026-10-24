@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.env
+.env.*
+__pycache__/
+*.pyc
+.venv/
+venv/
+.git/
+bigdata/legacy/results/ddrps_historical_analytical.csv
+bigdata/legacy/results/district_time_master.csv
+bigdata/legacy/results/risk_predictions.csv
+*.parquet

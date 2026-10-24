@@ -1,0 +1,10 @@
+flask
+flask-cors
+sqlalchemy
+psycopg2-binary
+numpy
+scikit-learn
+requests
+pyjwt
+python-dotenv
+pydantic

@@ -1,0 +1,5 @@
+model_name,accuracy,macro_precision,macro_recall,macro_f1,positive_class_precision,positive_class_recall,positive_class_f1,roc_auc,pr_auc,confusion_matrix,class_support_neg_pos
+Persistence Baseline,0.7993,0.4953,0.4953,0.4953,0.1036,0.1036,0.1036,0.4953,0.1111,"[[2174, 277], [277, 32]]","[2451, 309]"
+Logistic Regression (balanced),0.4913,0.4843,0.4605,0.3961,0.0959,0.4207,0.1562,0.4687,0.104,"[[1226, 1225], [179, 130]]","[2451, 309]"
+Random Forest (balanced),0.8417,0.4413,0.4739,0.457,0.0,0.0,0.0,0.4219,0.0959,"[[2323, 128], [309, 0]]","[2451, 309]"
+XGBoost GBT,0.8699,0.443,0.4898,0.4652,0.0,0.0,0.0,0.4869,0.1287,"[[2401, 50], [309, 0]]","[2451, 309]"

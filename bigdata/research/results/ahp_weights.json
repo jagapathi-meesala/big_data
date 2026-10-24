@@ -1,0 +1,105 @@
+{
+  "ahp_pairwise_matrix": [
+    [
+      1.0,
+      2.0,
+      2.0,
+      3.0,
+      4.0
+    ],
+    [
+      0.5,
+      1.0,
+      1.0,
+      2.0,
+      3.0
+    ],
+    [
+      0.5,
+      1.0,
+      1.0,
+      1.0,
+      2.0
+    ],
+    [
+      0.3333333333333333,
+      0.5,
+      1.0,
+      1.0,
+      2.0
+    ],
+    [
+      0.25,
+      0.3333333333333333,
+      0.5,
+      0.5,
+      1.0
+    ]
+  ],
+  "criteria": [
+    "Qd",
+    "Dd",
+    "Hd",
+    "Md",
+    "Vd"
+  ],
+  "lambda_max": 5.052383,
+  "consistency_index_CI": 0.013096,
+  "random_index_RI": 1.12,
+  "consistency_ratio_CR": 0.011693,
+  "cr_acceptable": true,
+  "ahp_eigenvector_weights": {
+    "Qd": 0.380615,
+    "Dd": 0.220356,
+    "Hd": 0.176264,
+    "Md": 0.141902,
+    "Vd": 0.080863
+  },
+  "ahp_geometric_mean_weights": {
+    "Qd": 0.381959,
+    "Dd": 0.219378,
+    "Hd": 0.176104,
+    "Md": 0.141366,
+    "Vd": 0.081193
+  },
+  "baseline_weights": {
+    "Qd": 0.3,
+    "Dd": 0.25,
+    "Hd": 0.2,
+    "Md": 0.15,
+    "Vd": 0.1
+  },
+  "learned_weights": null,
+  "weight_comparison": {
+    "Qd": {
+      "baseline": 0.3,
+      "ahp_ev": 0.380615,
+      "ahp_gm": 0.381959,
+      "learned": null
+    },
+    "Dd": {
+      "baseline": 0.25,
+      "ahp_ev": 0.220356,
+      "ahp_gm": 0.219378,
+      "learned": null
+    },
+    "Hd": {
+      "baseline": 0.2,
+      "ahp_ev": 0.176264,
+      "ahp_gm": 0.176104,
+      "learned": null
+    },
+    "Md": {
+      "baseline": 0.15,
+      "ahp_ev": 0.141902,
+      "ahp_gm": 0.141366,
+      "learned": null
+    },
+    "Vd": {
+      "baseline": 0.1,
+      "ahp_ev": 0.080863,
+      "ahp_gm": 0.081193,
+      "learned": null
+    }
+  }
+}

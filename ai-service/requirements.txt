@@ -1,0 +1,15 @@
+fastapi==0.111.0
+uvicorn==0.30.1
+scikit-learn==1.5.0
+xgboost==2.0.3
+lightgbm==4.3.0
+tensorflow==2.16.1
+pandas==2.2.2
+numpy==1.26.4
+geopandas==0.14.4
+joblib==1.4.2
+pydantic==2.7.4
+psycopg2-binary==2.9.9
+redis==5.0.4
+shap==0.45.1
+requests==2.32.3

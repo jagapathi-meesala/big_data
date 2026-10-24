@@ -1,0 +1,26 @@
+{
+  "forecast_period": "2015-09",
+  "num_districts_evaluated": 23,
+  "spearman_correlation_rho": 0.6447,
+  "spearman_p_value": 0.0008981064410387322,
+  "mean_absolute_rank_change_MARC": 5.7,
+  "max_district_rank_change": 22,
+  "top_5_hazard_risk_districts": [
+    "Khammam",
+    "Warangal",
+    "Nizamabad",
+    "Hyderabad",
+    "Nalgonda"
+  ],
+  "top_5_response_priority_districts": [
+    "Mahbubnagar",
+    "Karimnagar",
+    "Adilabad",
+    "Medak",
+    "Nalgonda"
+  ],
+  "top_5_overlap_districts": [
+    "Nalgonda"
+  ],
+  "top_5_overlap_percentage": 20.0
+}

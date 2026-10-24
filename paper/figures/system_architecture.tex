@@ -1,0 +1,41 @@
+% AID-DRAS / RADAR System Architecture TeX Diagram
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm and 1.0cm,
+    box/.style={draw=black!70, fill=blue!5, thick, rectangle, rounded corners=3pt, align=center, font=\sffamily\footnotesize, inner sep=5pt},
+    data/.style={draw=green!60!black, fill=green!5, thick, rectangle, rounded corners=3pt, align=center, font=\sffamily\footnotesize, inner sep=5pt},
+    ml/.style={draw=orange!80!black, fill=orange!5, thick, rectangle, rounded corners=3pt, align=center, font=\sffamily\footnotesize, inner sep=5pt},
+    web/.style={draw=purple!70, fill=purple!5, thick, rectangle, rounded corners=3pt, align=center, font=\sffamily\footnotesize, inner sep=5pt},
+    arrow/.style={->, >=stealth, thick, color=black!80}
+]
+
+% Nodes
+\node (imd) [data] {IMD 0.25$^\circ$ Rainfall Grid\\(1901--2024)};
+\node (census) [data, right=0.8cm of imd] {Census 2011\\Deficit Data};
+\node (feeds) [data, right=0.8cm of census] {Live API Feeds\\(USGS/GDACS/NASA)};
+
+\node (panel) [ml, below=0.9cm of imd] {District-Day Panel ETL\\(PySpark / HDFS)};
+\node (mllib) [ml, below=0.8cm of panel] {Spark MLlib Models\\(RF / GBT / LogReg)};
+\node (conformal) [ml, below=0.8cm of mllib] {Isotonic Calibration \&\\Split-Conformal Bounds ($\alpha=0.10$)};
+\node (ddrps) [ml, right=0.8cm of conformal] {DDRPS 2.0 Engine\\$w_Q Q_d + w_D D_d + \dots$};
+
+\node (lp) [box, below=0.9cm of ddrps] {Pre-Positioning LP Solver\\$\min \sum \pi_s u_{s,d}$};
+\node (db) [box, right=1.0cm of lp] {PostgreSQL / PostGIS \&\\Redis Pub/Sub};
+\node (ui) [web, right=1.0cm of db] {AID-DRAS Platform\\Node.js + React GIS + OSRM};
+
+% Arrows
+\draw [arrow] (imd) -- (panel);
+\draw [arrow] (census) |- (ddrps);
+\draw [arrow] (feeds) |- (db);
+\draw [arrow] (panel) -- (mllib);
+\draw [arrow] (mllib) -- (conformal);
+\draw [arrow] (conformal) -- (ddrps);
+\draw [arrow] (ddrps) -- (lp);
+\draw [arrow] (lp) -- (db);
+\draw [arrow] (db) <-> (ui);
+
+\end{tikzpicture}
+\caption{AID-DRAS / RADAR End-to-End System Architecture: coupling PySpark/HDFS ML pipeline, split-conformal risk estimation, composite DDRPS priority scoring, LP pre-positioning optimization, and full-stack web GIS dispatch.}
+\label{fig:system_architecture}
+\end{figure}

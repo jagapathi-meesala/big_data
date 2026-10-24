@@ -1,0 +1,106 @@
+[
+  {
+    "model_name": "Persistence Baseline",
+    "accuracy": 0.7993,
+    "macro_precision": 0.4953,
+    "macro_recall": 0.4953,
+    "macro_f1": 0.4953,
+    "positive_class_precision": 0.1036,
+    "positive_class_recall": 0.1036,
+    "positive_class_f1": 0.1036,
+    "roc_auc": 0.4953,
+    "pr_auc": 0.1111,
+    "confusion_matrix": [
+      [
+        2174,
+        277
+      ],
+      [
+        277,
+        32
+      ]
+    ],
+    "class_support_neg_pos": [
+      2451,
+      309
+    ]
+  },
+  {
+    "model_name": "Logistic Regression (balanced)",
+    "accuracy": 0.4913,
+    "macro_precision": 0.4843,
+    "macro_recall": 0.4605,
+    "macro_f1": 0.3961,
+    "positive_class_precision": 0.0959,
+    "positive_class_recall": 0.4207,
+    "positive_class_f1": 0.1562,
+    "roc_auc": 0.4687,
+    "pr_auc": 0.104,
+    "confusion_matrix": [
+      [
+        1226,
+        1225
+      ],
+      [
+        179,
+        130
+      ]
+    ],
+    "class_support_neg_pos": [
+      2451,
+      309
+    ]
+  },
+  {
+    "model_name": "Random Forest (balanced)",
+    "accuracy": 0.8417,
+    "macro_precision": 0.4413,
+    "macro_recall": 0.4739,
+    "macro_f1": 0.457,
+    "positive_class_precision": 0.0,
+    "positive_class_recall": 0.0,
+    "positive_class_f1": 0.0,
+    "roc_auc": 0.4219,
+    "pr_auc": 0.0959,
+    "confusion_matrix": [
+      [
+        2323,
+        128
+      ],
+      [
+        309,
+        0
+      ]
+    ],
+    "class_support_neg_pos": [
+      2451,
+      309
+    ]
+  },
+  {
+    "model_name": "XGBoost GBT",
+    "accuracy": 0.8699,
+    "macro_precision": 0.443,
+    "macro_recall": 0.4898,
+    "macro_f1": 0.4652,
+    "positive_class_precision": 0.0,
+    "positive_class_recall": 0.0,
+    "positive_class_f1": 0.0,
+    "roc_auc": 0.4869,
+    "pr_auc": 0.1287,
+    "confusion_matrix": [
+      [
+        2401,
+        50
+      ],
+      [
+        309,
+        0
+      ]
+    ],
+    "class_support_neg_pos": [
+      2451,
+      309
+    ]
+  }
+]
