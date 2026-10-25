@@ -100,3 +100,10 @@ replay and outcome validation need at least one source.
 | hardcoded hospital beds / shelter constant | beds read from india_states.csv, deficits from Census-2011 |
 | "SHAP" weight tables, synthetic features | no synthetic data anywhere; calibration + conformal bounds |
 | PySpark only for a synthetic benchmark | Spark MLlib training + ETL + streaming + real scale benchmarks |
+
+
+## Implementation status (current repo state)
+
+- **Legacy pipeline (`bigdata/legacy/`)**: Artifact-backed and used by the papers. Results under `bigdata/legacy/results/` are verified (AUC/PR-AUC, rank stability, ablations, static deficits). ICDSG 2026 uses only these verified artifacts.
+- **RADAR modules**: All modules above are implemented in this repository (data acquisition, ETL, training, conformal calibration, DDRPS 2.0, allocation/LP, streaming scaffolding, serving, benchmarks). However, **no end-to-end RADAR run has been executed in this environment**; artifacts under `bigdata/research/results/` are limited to those produced by the legacy pipeline (e.g., `ablation_results.csv`, `ahp_weights.json`, `district_static_deficits.csv`). 
+- **Data requirements**: Full RADAR execution requires raw datasets (`datasets/raw/` with IMD gridded parquet, `flood_events.csv`, `oni_monthly.csv`, `district_grid_map.csv`), plus a working Spark/HDFS stack (or local Spark) as indicated by `run_pipeline.sh`. Claims of "validated on historical flood events" and large-scale benchmarks require those artifacts.
