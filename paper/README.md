@@ -10,7 +10,7 @@ This directory contains the IEEE research paper source for **RADAR (Risk-Aware D
 ```
 paper/
 ├── main.tex                       # Complete IEEEtran LaTeX paper (18 sections)
-├── references.bib                 # Verified IEEE BibTeX bibliography
+├── references.bib                 # Bibliography draft; entries need verification
 ├── figures/                       # Paper figures and diagrams
 │   ├── architecture_diagram.mmd   # Mermaid source diagram of system architecture
 │   └── system_architecture.tex   # LaTeX TikZ diagram source (included in main.tex)
@@ -25,31 +25,47 @@ paper/
 
 ---
 
-## Content & Verification Status
+## Evidence and Readiness
 
-### Verified Technical Implementation
-- **Architecture**: Complete full-stack integration (PySpark/HDFS ML pipeline + Node.js/PostGIS API + React/Leaflet Web GIS).
-- **Study Region**: 23 legacy Census-2011 districts of Andhra Pradesh & Telangana, India.
-- **Data Layers**: IMD $0.25^\circ$ daily gridded rainfall (1901--2024), Census-2011 deficits, NOAA ONI ENSO index, India Flood Inventory / EM-DAT ground truth events, live external feeds (USGS, GDACS, NASA EONET, Open-Meteo).
-- **AI/ML Methods**: Spark MLlib Random Forest, GBT, and Logistic Regression; leakage-free 1901--1990 climatological baseline; Isotonic Calibration; Split-Conformal Prediction bounds ($\alpha=0.10, 90\%$ coverage).
-- **Priority Scoring & LP Optimization**: DDRPS 2.0 weighted composite score ($w_Q Q_d + w_D D_d + w_H H_d + w_M M_d + w_V V_d$) and pre-positioning stock allocation Linear Program ($B=200$ units, $T=0.5$ inter-district transfer efficiency).
-- **Routing**: OSRM multi-risk emergency route candidate generation (Routes A, B, C) via offset waypoints and transit friction scoring.
+This is a **research draft, not a submission-ready paper**. The repository
+contains an exploratory legacy monthly pilot with saved classifier and ranking
+artifacts. That pilot repeats only two mapped subdivision rainfall series
+across districts and derives anomalies from the full 1901--2015 record,
+including the test period; it cannot substantiate leakage-free district-level
+flood prediction. The newer IMD-grid RADAR workflow (calibration, conformal
+bounds, event replay, pre-positioning and scale benchmarks) is a separate
+design and currently has no completed result bundle. See [PAPER_REVIEW.md](PAPER_REVIEW.md)
+for blockers and [main.tex](main.tex) for the carefully caveated legacy
+results.
 
-### Missing Data & Experimental TODOs
-> **Important Note:** In accordance with scientific integrity guidelines, no quantitative experiment numbers or accuracy metrics were fabricated.
+### Results currently present
 
-- **Pipeline Execution**: To populate the exact numerical values in Table II and the results section, run the PySpark pipeline scripts:
+- Legacy model metrics and ranking CSV/JSON artifacts under
+  `bigdata/legacy/results/`.
+- A constructed AHP comparison matrix under
+  `bigdata/research/results/ahp_weights.json`; its consistency ratio does not
+  constitute expert or outcome validation.
+- No verified output bundle for the newer RADAR result paths described in
+  `bigdata/research/README` and `bigdata/README_RADAR.md`.
+
+Do not treat listed inputs, model classes, or architecture components as
+validated methods merely because code or plans exist. No operational benefit,
+conformal coverage, or multi-node scalability claim should be made without the
+corresponding archived run, test protocol, and raw measurements.
+
+### Reproduction and compilation
+
+For the newer research pipeline, first verify source data, acquisition status,
+and environment, then run the documented stages:
   ```bash
   ./run_pipeline.sh download
   ./run_pipeline.sh all
   python bigdata/research/generate_report.py
   ```
-- **Generated Result Artifacts**: Running the pipeline populates:
-  - `bigdata/research/results/model_metrics.csv` (Exact ROC-AUC, PR-AUC, Brier scores across splits)
-  - `bigdata/research/results/conformal_settings.json` (Exact empirical coverage and quantile $\hat{q}$)
-  - `bigdata/research/results/ddrps_ranking.csv` & `ranking_metrics.json` (Spearman $\rho$, MARC, and Top-5 overlap stats)
-  - `bigdata/research/results/allocation_results.csv` & `validation_summary.json` (Unmet demand numbers across Uniform, Hazard-Only, DDRPS, Conformal, and Oracle policies)
-  - `bigdata/research/results/scalability_results.csv` (PySpark scale-up/scale-out throughput benchmarks)
+- **Expected artifacts** (not currently present): model metrics, calibration and
+  coverage diagnostics, rankings, event-replay allocations, scalability outputs,
+  and generated figures/reports. Running the runner does not by itself prove
+  that each stage succeeded; inspect logs and verify the files and provenance.
 
 ---
 
@@ -68,14 +84,17 @@ pdflatex main.tex
 ### Option 2: Using Overleaf or Online LaTeX Compilers
 1. Zip the `paper/` directory contents (`main.tex`, `references.bib`, `figures/`, `tables/`).
 2. Upload the zip archive to [Overleaf](https://www.overleaf.com/).
-3. Select `pdfLaTeX` as the compiler. `main.tex` is configured to compile cleanly with `IEEEtran.cls`.
+3. Select `pdfLaTeX` as the compiler and verify the output; local LaTeX/BibTeX
+  tools were unavailable during this review, so a clean compilation is not
+  yet established.
 
 ---
 
 ## Submission Checklist Before Journal / Conference Submission
 
-- [ ] Execute `./run_pipeline.sh all` on the full IMD $0.25^\circ$ dataset.
-- [ ] Run `python bigdata/research/generate_report.py` and `python bigdata/research/figures.py`.
-- [ ] Inject exact numbers from `bigdata/research/results/` into `tables/strategy_comparison.tex` and Section XIV of `main.tex`.
-- [ ] Include generated PNG figures from `bigdata/research/figures/` into the LaTeX `figures/` directory.
-- [ ] Verify clean PDF compilation with zero TeX warnings/errors.
+- [ ] Resolve P0 validity and code issues listed in [PAPER_REVIEW.md](PAPER_REVIEW.md).
+- [ ] Execute the newer pipeline from versioned raw inputs; retain checksums, configs, software versions, logs, and outputs.
+- [ ] Independently audit labels, splits, event geocoding, calibration, allocation policies, and all table-generation inputs.
+- [ ] Report complete baselines, uncertainty intervals, negative results, and sensitivity analyses; populate tables only from archived outputs.
+- [ ] Include only figures generated from those exact outputs and retain figure-generation source.
+- [ ] Verify citations and compile the final target-venue version after LaTeX/BibTeX tools are available.

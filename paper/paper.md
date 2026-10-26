@@ -1,39 +1,29 @@
-# From Meteorological Risk to Response Priority: Uncertainty-Aware District-Level Disaster Resource Pre-Positioning Validated on Historical Flood Events
+# RADAR Research Protocol: District-Level Disaster Prioritization and Pre-Positioning
 
 **Track:** Big Data Systems / Spatio-temporal Data Mining
 **System:** RADAR (Risk-Aware District Allocation & Response) on the AID-DRAS platform
 **Study region:** 23 legacy (Census-2011) districts of Andhra Pradesh & Telangana, India
-**Status:** draft — all `[RESULTS: …]` placeholders are injected from
-`bigdata/research/results/` by running the pipeline (`./run_pipeline.sh all`)
-and `bigdata/research/generate_report.py`.
+**Status:** research protocol, not a submission-ready manuscript. The newer
+IMD-grid / conformal / allocation pipeline has no completed result bundle in
+`bigdata/research/results/`. The checked-in legacy pilot is separate and has
+known target-climatology leakage and replicated subdivision rainfall; see
+`main.tex` and `PAPER_REVIEW.md` before citing any pilot metric.
 
 ---
 
 ## Abstract
 
-Disaster-resource pre-positioning is usually driven by meteorological hazard
-forecasts. Using 124 years of IMD 0.25° gridded daily rainfall (1901–2024) for
-23 districts of Andhra Pradesh and Telangana, we show that the districts with
-the highest *hazard* are not the districts where pre-positioned relief does
-the most good: hazard risk is spatially homogeneous relative to the
-socio-technical deficits that determine response outcomes. We build a
-leakage-free spatio-temporal hazard model (Spark MLlib Random Forest / GBT
-over district-day panels with a fixed 1901–1990 baseline climatology), convert
-its scores into decision-grade probabilities via isotonic calibration and
-split-conformal bounds with 90% coverage, and fuse them with Census-2011
-deficit indicators (exposure, healthcare capacity, mobility, housing) into a
-composite response-priority score (DDRPS 2.0). We then solve a
-budget-constrained pre-positioning LP that minimizes expected unmet demand,
-where the risk-averse variant hedges district-level model uncertainty using
-the conformal upper bounds. Replay against held-out historical flood events
-(India Flood Inventory / EM-DAT ground truth) shows [RESULTS: strategy
-comparison table] — in particular, the uncertainty-aware DDRPS strategy
-reduces unmet demand by [RESULTS: X]% relative to uniform allocation and by
-[RESULTS: Y]% relative to a hazard-only policy, while top-5 ranking overlap
-between hazard and response priority is only [RESULTS: Z]% (Spearman
-ρ = [RESULTS: ρ]). The full pipeline is implemented on HDFS/PySpark with
-scale-up throughput of [RESULTS: max rec/s] and scale-out behaviour across
-[RESULTS: worker counts] workers.
+This document specifies a proposed district-level disaster-risk and
+pre-positioning study for 23 legacy districts in Andhra Pradesh and Telangana.
+It describes candidate gridded-rainfall processing, temporal model evaluation,
+calibration, composite priority scoring, and event-based allocation replay.
+These steps are not, by themselves, evidence of calibrated flood prediction,
+90% empirical coverage, reduced unmet demand, or distributed scalability. No
+such results should be claimed until the relevant code has run on versioned
+inputs and the raw outputs, environment, and evaluation protocol have been
+archived and independently checked. This protocol must also distinguish the
+new district-grid pipeline from the legacy subdivision-level pilot described
+in the LaTeX draft.
 
 **Keywords:** disaster management, resource pre-positioning, conformal
 prediction, spatio-temporal modeling, Apache Spark, HDFS, district-level
@@ -57,20 +47,19 @@ meteorological (did we predict heavy rain?) rather than operational (did
 pre-positioning there reduce unmet demand when floods actually happened?).
 
 1.3 **Contributions.**
-- **C1 (Outcome validation):** first district-level, event-validated
-  comparison of hazard-only, deficit-only, composite (DDRPS), and
-  uncertainty-aware rankings for the AP/Telangana region, using historical
-  flood events as ground truth rather than rainfall as its own proxy.
-- **C2 (Uncertainty-aware allocation):** a split-conformal upper risk bound
-  feeding a pre-positioning LP; risk-averse allocation is compared against
-  risk-neutral and oracle allocations under an identical replay protocol.
-- **C3 (Leakage-free gridded modeling):** district-day panels from IMD 0.25°
-  daily grids with a fixed pre-test baseline climatology (±7-day day-of-year
-  window), eliminating the spatial smoothing and temporal leakage inherent in 
-  traditional coarse regional aggregations.
-- **C4 (Distributed implementation):** the entire ETL/model/benchmark stack
-  runs on HDFS + PySpark (MLlib + Structured Streaming) with reproducible
-  scale-up/scale-out benchmarks and a live alerting layer into PostGIS.
+- **Planned C1 (Outcome evaluation):** compare hazard-only, deficit-only,
+  composite (DDRPS), and uncertainty-aware strategies after a held-out-event
+  replay is complete.
+- **Planned C2 (Uncertainty-aware allocation):** evaluate a split-conformal
+  upper-risk input to the pre-positioning optimizer; empirical coverage and
+  operational utility remain unmeasured.
+- **Planned C3 (Gridded modeling):** construct district-day panels from IMD
+  0.25° rainfall with a fixed pre-test climatology; geographic mapping and
+  temporal leakage checks still require end-to-end verification.
+- **Planned C4 (Distributed implementation):** run ETL/model/benchmark stages
+  on a documented HDFS/PySpark cluster. Structured Streaming, scale-out, and
+  PostGIS alerting are separate engineering claims and require their own
+  reproducible tests.
 
 ## 2. Related Work
 
@@ -94,27 +83,29 @@ pre-positioning there reduce unmet demand when floods actually happened?).
 | Flood events (ground truth) | India Flood Inventory / EM-DAT / GDACS | 1978– | district / event |
 | ENSO covariate | NOAA ONI | 1950– | month |
 
-**District reconstruction.** Current (post-bifurcation) districts are mapped
-to the 23 legacy Census-2011 districts by an explicit alias/mapping table;
-legacy centroids are population-weighted means of member centroids; IMD cells
-within a 0.7° kernel of each centroid are aggregated with inverse-distance
-weights (polygon membership used when GADM is available), ensuring precise 
-district-level hazard signals rather than coarse regional smoothing.
+**District reconstruction (proposed).** Current district names are mapped to
+23 legacy Census-2011 units. The mapping, centroid construction, and
+grid-weight assignment require validation against authoritative boundaries
+and published coverage diagnostics. Centroid-kernel aggregation is a proxy
+and should be compared with polygon-based areal aggregation; it does not by
+itself establish precise district-level hazard measurements.
 
 ## 4. Methods
 
-### 4.1 District-day panel (PySpark)
+### 4.1 Proposed district-day panel (PySpark)
 
 For district *d* and day *t*: rainfall $r_{d,t}$ (area-weighted mean of
 cells), fixed-baseline climatology
 
 $$\mu_{d,\mathrm{doy}} = \mathbb{E}[r_{d,u} \mid \mathrm{doy}(u) \in \mathrm{doy}(t) \pm 7,\ u \in 1901..1990], \quad \sigma_{d,\mathrm{doy}} = \mathrm{sd}(\cdot)$$
 
-anomaly $z_{d,t} = (r_{d,t} - \mu)/\sigma$; features at forecast time *t*:
+anomaly $z_{d,t} = (r_{d,t} - \mu)/\sigma$; candidate features at forecast time *t*:
 lags (1, 7), rolling sums (7, 30), monsoon-cumulative rainfall (June reset),
 seasonal encodings (month/doy sin-cos), monsoon indicator, ONI. The
-climatology is computed **only from the fixed 1901–1990 baseline**, so no
-post-baseline observation enters feature or label construction.
+This is the intended design, not a verified result. Confirm the actual source
+coverage and ensure that climatology, imputation, normalization, and label
+thresholds are fitted without test-period observations. Missing rainfall must
+not silently become a negative event label.
 
 ### 4.2 Targets and models
 
@@ -123,21 +114,26 @@ post-baseline observation enters feature or label construction.
 - **Flood incidence:** $y^{F,K}_{d,t} = \mathbf{1}[\exists$ flood event at
   $d$ starting in $(t, t+K]]$, $K = 14$ days (ground truth).
 
-Models (Spark MLlib, class-weighted): Logistic Regression, Random Forest
-(100×10), GBT (100×5). Temporal split train ≤ 2005, val 2006–2010, test >
-2010 (flood target: rows ≥ 1978). Metrics: ROC-AUC, PR-AUC, Brier, reliability.
+Proposed models (Spark MLlib, class-weighted): Logistic Regression, Random
+Forest (100 trees, depth 10), and GBT (100 iterations, depth 5). Proposed
+temporal split: train ≤ 2005, validation 2006–2010, test > 2010 (flood-target
+rows begin no earlier than the event-source coverage). These settings have not
+been validated by an end-to-end run. Report ROC-AUC, average precision, Brier
+score, reliability plots, prevalence, and thresholded confusion metrics.
 
 ### 4.3 Calibration and conformal bounds
 
-Isotonic regression on the validation split maps raw scores to calibrated
-probabilities $\hat{p}$. Split conformal on the same split: nonconformity
-$s_i = y_i - \hat{p}_i$; finite-sample quantile
-
-$$\hat{q} = \mathrm{Quantile}\left(\{s_i\},\ \lceil (n+1)(1-\alpha)\rceil / n\right), \quad \alpha = 0.10,$$
-
-upper bound $\tilde{p} = \min(1, \hat{p} + \hat{q})$, guaranteeing marginal
-coverage $\Pr(y \le \tilde{p}) \ge 0.90$, verified empirically on the test
-split.
+Isotonic regression would map raw scores to calibrated probabilities
+$\hat{p}$. Calibration and conformal-quantile fitting should use disjoint
+chronological calibration sets (or a justified cross-fitting procedure).
+For $n$ conformal observations, use the conservative order statistic
+$k=\lceil(n+1)(1-\alpha)\rceil$ of scores $s_i=y_i-\hat{p}_i$, with explicit
+handling if $k>n$, rather than an interpolated sample quantile. The candidate
+upper bound is $\tilde{p}=\min(1,\hat{p}+\hat{q})$. Nominal coverage depends on
+exchangeability assumptions; temporal dependence and distribution shift mean
+that 90% coverage must not be claimed without a justified time-series method
+and held-out coverage and sharpness results. No such result is currently
+available.
 
 ### 4.4 DDRPS 2.0 (response priority)
 
@@ -149,9 +145,10 @@ $D_d = \mathrm{mm}(\rho_d \ln(1+\mathrm{pop}_d))$; healthcare
 $H_d = 1 - \mathrm{mm}(\text{beds}/10\text{k})$; mobility
 $M_d = 1 - \mathrm{mm}(\text{vehicles/household})$; housing
 $V_d = \mathrm{mm}(\text{dilapidated share})$; $\mathrm{mm}$ = min-max.
-Weight schemes: fixed baseline (0.30/0.25/0.20/0.15/0.10), an AHP-expert
-variant, and a data-driven elastic-net learned baseline (which naive weight 
-learning tends to over-index on statics, nearly silencing hazard).
+Weight schemes under consideration: fixed baseline
+(0.30/0.25/0.20/0.15/0.10) and a documented AHP sensitivity variant. No
+independently elicited experts or valid learned-weight experiment is currently
+documented; claims about ElasticNet failure are unsupported.
 
 ### 4.5 Uncertainty-aware pre-positioning (core experiment)
 
@@ -164,20 +161,27 @@ $$\min_{x} \ \sum_{s \in \mathcal{S}} \pi_s \sum_d u_{s,d} \quad
 
 Scenarios $\mathcal{S}$ = historical events with demand
 $n_{s,d} = \text{affected}_{s,d}/5000$ (fallback: 2% of population).
-Strategies: **uniform**, **risk-only** ($x \propto \hat{p}$), **DDRPS**
-($x \propto$ composite), **conformal** ($x \propto \tilde{p}$ — risk-averse),
-**oracle** (LP on the true event distribution — upper bound). Evaluation
-replays held-out events (> 2010) under the identical demand model.
+Candidate policies: **uniform**, **hazard-only**, **deficit-only**, **DDRPS**,
+and an uncertainty-aware policy whose objective explicitly combines hazard
+uncertainty with exposure/need. The current script's conformal policy is
+proportional to upper hazard alone; it is not a conformal DDRPS policy. Fit
+policy stocks using training events only, then replay untouched held-out
+events. An oracle fitted to event outcomes is a hindsight benchmark, not a
+deployable policy. Demand units, fallback affected-population rates, neighbor
+definition, and transfer efficiency require sourced justification and
+sensitivity tests.
 
 ## 5. Results
 
-`[RESULTS: auto-injected from bigdata/research/results/REPORT.md — model
-metrics, conformal coverage, ranking metrics per weight scheme, allocation
-replay, scalability curves.]`
+No completed results are available for the proposed gridded/conformal/event-
+replay workflow. Populate this section only after a versioned end-to-end run;
+include sample sizes, event provenance, uncertainty intervals, all baselines,
+and negative or inconclusive findings. Legacy pilot results are reported
+separately and caveated in `main.tex`.
 
-Figures: `fig1_study_region`, `fig2_model_metrics`,
-`fig3_ranking_scatter`, `fig4_allocation`, `fig5_scalability`,
-`fig6_events_timeline` (auto-generated by `bigdata/research/figures.py`).
+Figures are planned. Include only generated files that exist, retain their
+source data and scripts, and verify that each plot corresponds to the final
+evaluation split.
 
 ## 6. Discussion
 
@@ -192,26 +196,28 @@ Figures: `fig1_study_region`, `fig2_model_metrics`,
 
 ## 7. Threats to Validity
 
-- Ground-truth events are sparse/one-sided (IFI starts 1978; EM-DAT free-text
-  locations mapped by name matching); results are reported per source.
+- Ground-truth events may be sparse and geocoding may be uncertain; source
+  coverage, location matching, duplicate handling, and negative-label
+  assumptions need an explicit audit before event-based claims.
 - Centroid-kernel aggregation vs exact polygon weighting (ablation when GADM
   is available).
 - District-boundary vintage mismatch (2018+ Telangana reorganisation) handled
   by a fixed mapping table; intra-district heterogeneity is smoothed.
-- **Data Staleness**: Reliance on 2011 Census deficits ignores recent rapid 
-  urbanization and dynamic population shifts (especially in Hyderabad); however, 
-  relative district-level vulnerability ranks evolve slower than absolute populations. 
-  Future work must fuse recent satellite nightlights or WorldPop projections.
+- **Data staleness**: Census-2011 is old for current response planning. Do not
+  assume relative vulnerability ranks remain stable without validation; seek
+  current population and facility data.
 
 ## 8. Conclusion & Future Work
 
-Contributions C1–C4 deliver an outcome-validated, uncertainty-aware,
-end-to-end distributed decision pipeline. Future: LSTM/temporal transformers
-on the gridded panel; Bayesian deep ensembles replacing conformal bounds;
-multi-resource LP; human-in-the-loop weight elicitation at scale.
+This document is a proposed protocol, not evidence that the planned
+contributions have been achieved. The immediate work is to verify inputs and
+labels, correct temporal leakage, run held-out experiments, and report
+limitations before considering architectural extensions.
 
 ## Reproducibility
 
-All artifacts regenerate from `./run_pipeline.sh download && ./run_pipeline.sh all`
-on the repo's docker-compose stack; unit tests pin the leakage, coverage, and
-allocation invariants (`bigdata/tests/test_units.py`).
+The checked-in unit tests exercise selected helper invariants, but do not
+establish end-to-end data validity, conformal coverage under temporal
+dependence, or allocation-policy correctness. Pin environment and input
+checksums, record commands/configuration, archive outputs, and rerun the
+complete pipeline from a clean state before claiming reproducibility.

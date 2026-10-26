@@ -1,20 +1,20 @@
-% Pre-Positioning Strategy Evaluation Table Template
+% Planned evaluation table; no held-out allocation results are currently available.
 \begin{table}[htbp]
-\caption{Pre-Positioning Strategy Evaluation on Held-Out Historical Flood Events ($B=200$ units, $T=0.5$ transfer efficiency)}
+\caption{Planned Held-Out Event Allocation Evaluation (Not Yet Measured)}
 \label{tab:strategy_comparison}
 \centering
-\begin{tabular}{|l|c|c|c|}
+\begin{tabular}{|l|c|c|}
 \hline
-\textbf{Allocation Strategy} & \textbf{Mean Unmet Demand} & \textbf{\% Unmet Reduction vs Uniform} & \textbf{Top-5 Rank Overlap with Oracle} \\ \hline
-Uniform Allocation & \textit{[TODO: Pipeline Run]} & Baseline (0.0\%) & \textit{[TODO: Pipeline Run]} \\ \hline
-Hazard-Only ($x \propto \hat{p}$) & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} \\ \hline
-Risk-Neutral DDRPS ($x \propto \text{DDRPS}_d$) & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} \\ \hline
-Conformal DDRPS (Risk-Averse, $x \propto \tilde{p}$) & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} \\ \hline
-Oracle Pre-Positioning (Upper Bound) & \textit{[TODO: Pipeline Run]} & \textit{[TODO: Pipeline Run]} & 100.0\% \\ \hline
+\textbf{Allocation policy} & \textbf{Held-out unmet demand} & \textbf{Reduction vs uniform} \\ \hline
+Uniform & Not measured & Reference \\ \hline
+Hazard-only & Not measured & Not measured \\ \hline
+DDRPS & Not measured & Not measured \\ \hline
+Conformal DDRPS & Not measured & Not measured \\ \hline
+Training-scenario LP reference (not an oracle) & Not measured & Not measured \\ \hline
 \end{tabular}
 \\[4pt]
 \begin{minipage}{\linewidth}
 \footnotesize
-\textit{Note: Numerical results are generated dynamically upon pipeline execution via \texttt{./run\_pipeline.sh all} and \texttt{generate\_report.py}, producing exact metrics logged in \texttt{bigdata/research/results/allocation\_results.csv}.}
+\textit{Note: This is a protocol template, not an empirical result. Populate only from an archived held-out replay; identify the demand unit, event count, and uncertainty interval.}
 \end{minipage}
 \end{table}

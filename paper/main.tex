@@ -26,7 +26,7 @@
   arrow/.style={-{Latex[length=2mm]},thick}
 }
 
-\title{Disaster Response Prioritization Using Multi-Source Data Analytics}
+\title{An Exploratory District-Level Extreme-Precipitation and Response-Priority Prototype for Andhra Pradesh and Telangana}
 
 % Center a second row of authors in the IEEE conference author block.
 \makeatletter
@@ -78,34 +78,27 @@ akhilreddy.surapureddy@gmail.com}
 \maketitle
 
 \begin{abstract}
-Disaster response prioritization is difficult because the information needed
-for an operational decision is distributed across independent environmental,
-demographic, healthcare, transportation, and historical data sources. Most
-predictive systems concentrate on whether or when an event may occur, whereas
-emergency authorities facing simultaneous vulnerabilities must also determine
-where limited response capacity should be deployed first. This paper proposes a
-distributed, district-level analytics framework that integrates weather,
-population, hospital, road-infrastructure, and historical-disaster data across
-23 districts of Andhra Pradesh and Telangana. Raw records spanning 1901--2015
-(31,740 district-months) are processed with Apache Spark and transformed into
-district-level hazard, exposure, healthcare, mobility, and housing vulnerability
-indicators. A class-balanced XGBoost GBT classifier is trained on a
-strict temporal split (1901--2005 train, 2006--2015 test) to estimate district
-hazard risk, achieving a PR-AUC of 0.1287---a 15.9\% improvement over the
-Persistence Baseline---on a severely imbalanced target (7.97\% positive class).
-Risk prediction is treated as one input, rather than the final decision, to the
-Dynamic Disaster Response Priority Score (DDRPS). DDRPS combines predicted
-risk, population density, hospital-access deficit, mobility-access deficit, and
-housing vulnerability using analytically derived weights validated by Analytic
-Hierarchy Process (AHP; Consistency Ratio $CR=0.0117 < 0.10$). Empirical ranking
-experiments show a Spearman~$\rho=0.6447$ between hazard-risk and DDRPS ordering,
-with a Mean Absolute Rank Change of 5.70 positions and only 20\% top-5 district
-overlap---confirming that infrastructure-constrained inland districts are
-systematically under-prioritised by risk-only dispatching. Auxiliary AID-DRAS
-benchmarks show that the hybrid incident-demand model achieves an MSE of 1.15
-and an $R^2$ of 0.546, while OSRM routing reduces simulated average travel
-time by 28.0\%. The central contribution is the transition from disaster
-analytics that asks ``if/when'' to decision support that asks ``where first.''
+This paper reports an exploratory district-level extreme-precipitation and
+response-priority prototype for Andhra Pradesh and Telangana, and separates
+completed pilot evidence from the newer RADAR workflow that remains to be
+evaluated. The completed legacy pilot expands two mapped subdivision-level monthly
+rainfall series across 23 Census-2011 districts, yielding 31,740 district-month
+rows; it does not contain 23 independent district weather histories. A
+chronological 2006--2015 test evaluation of a next-month extreme-precipitation
+label reports average precision (PR-AUC) of 0.1287 for a gradient-boosted model
+and 0.1111 for its historical-count heuristic. However, the label climatology was
+estimated over the full 1901--2015 record, including test years, so this result
+is exploratory and is not a leakage-free estimate of prospective performance.
+The prototype also computes a transparent composite response-priority score
+from hazard, exposure, healthcare, mobility, and housing proxies. Its
+2015 ranking comparison is descriptive only: hazard scores are tied within
+subdivisions, making top-five overlap dependent on tie handling and the reported
+rank-correlation p-value unsuitable as confirmatory evidence. The newer
+gridded, calibrated, conformal, and allocation pipeline is a research design;
+its event-replay and uncertainty-aware allocation outcomes are not reported as
+completed experiments here. These limitations define the work still required
+before claims of district-level forecasting or operational benefit are
+justified.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -355,12 +348,13 @@ secondary to traceability from a displayed category to its underlying factors.
 \section{Datasets and Data Preprocessing}
 
 \subsection{Dataset Description}
-Table~\ref{tab:datasets} reproduces the planned dataset configuration from the
-project specification. These counts describe the intended experiment, not a
-completed merged dataset.
+Table~\ref{tab:datasets} distinguishes the completed legacy pilot inputs from
+the newer RADAR design. The district-month count is a row count after repeating
+subdivision rainfall series across districts; it must not be interpreted as
+independent district-level weather observations.
 
 \begin{table*}[t]
-\caption{Dataset Characteristics (Actual Pipeline Inputs)}
+\caption{Legacy Pilot Dataset Characteristics and Newer RADAR Inputs}
 \label{tab:datasets}
 \centering
 \small
@@ -368,10 +362,10 @@ completed merged dataset.
 \toprule
 Dataset & Records & Important attributes & Purpose \\
 \midrule
-IMD Subdivision Rainfall 1901--2015 & 31,740 district-months & Subdivision, year, month, rainfall\_mm, Z-score, extreme event flag & Environmental hazard intensity; extreme-precipitation target labelling \\
-India Census 2011 & 23 districts & Population, area, vehicle ownership, housing dilapidation & Exposure ($D_d$), mobility access deficit ($M_d$), housing vulnerability ($V_d$) \\
-Hospitals \& State Bed Index & 23 districts & Hospital facility count, state bed totals allocated by district population & Healthcare capacity deficit ($H_d$) \\
-IFI Flood Event Records 1978--2015 & 632 events & District, year, event type, severity label & Ground-truth flood-incidence for baseline comparisons \\
+Legacy subdivision rainfall 1901--2015 & 2 mapped subdivision series; 31,740 expanded district-month rows & Monthly rainfall repeated across mapped districts & Exploratory next-month extreme-precipitation label; not district-resolved weather \\
+India Census 2011 & 23 district records in the legacy feature table & Population, area, vehicle ownership, housing dilapidation & Exposure and static vulnerability proxies \\
+Hospital and bed proxies & District estimates in the legacy feature table & Facility counts and assumed district allocation of state beds & Healthcare-capacity proxy; not verified district bed counts \\
+Flood-event inventory & Not used in the reported legacy classifier & Event-level records are an input to the newer RADAR design & No flood-incidence or event-replay claim is evaluated here \\
 \bottomrule
 \end{tabularx}
 \end{table*}
@@ -521,8 +515,8 @@ Disaster frequency $F_d$ & Disaster history & Historical event rate & Risk model
 Historical severity $V_d$ & Disaster history & Aggregated ordinal consequence level & Risk model \\
 Population density $D_d$ & Population and area & Exposed population concentration & DDRPS \\
 Hospital deficit $H_d$ & Hospitals and population & Priority-oriented inverse of healthcare access & DDRPS \\
-Road deficit $R^{A}_d$ & Road length and area & Priority-oriented inverse of transport access & DDRPS \\
-Shelter deficit $S_d$ & Available shelter-related proxy & Relative shortage or limited shelter support & DDRPS \\
+Mobility deficit $M_d$ & Census vehicle-household ratio & Priority-oriented mobility proxy & DDRPS \\
+Housing vulnerability $V_d$ & Census dilapidated-household ratio & Structural housing proxy & DDRPS \\
 Predicted risk $Q_d$ & MLlib Random Forest & District hazard-risk class/score & DDRPS \\
 \bottomrule
 \end{tabularx}
@@ -556,24 +550,28 @@ conditions and historical event behavior. It is placed before DDRPS to separate
 hazard inference from the operational effects of exposure and accessibility.
 
 \subsection{Feature Vector Construction}
-For district $d$, the proposed risk vector is
+\label{sec:legacy-label}
+For district $d$, the legacy pilot risk vector is
 \begin{equation}
 \mathbf{x}^{\mathrm{risk}}_d=
 [\widetilde{W}_{1d},\ldots,\widetilde{W}_{kd},\widetilde{F}_d,\widetilde{V}_d],
 \end{equation}
-where $W$ contains the selected rainfall, temperature, and wind statistics.
-Categorical risk labels must be derived from documented historical or expert
-labels; label construction is not specified in the current project evidence
-and remains an experimental prerequisite.
+where $W$ contains rainfall and temporal features; temperature and wind are not
+present in the legacy rainfall source. The binary label is a next-month
+precipitation-anomaly threshold, not observed flood incidence. In the checked-in
+legacy implementation, monthly climatological means and standard deviations
+are computed over the full record (1901--2015), so test-period observations
+inform both labels and a predictor feature. The evaluation split is chronological,
+but the experiment is therefore not leakage-free.
 
 \subsection{Random Forest Classifier}
 A Random Forest trains multiple decision trees on bootstrap samples and exposes
 each split to a random subset of features. For classification, tree votes are
 aggregated to produce a class and class probabilities. The randomization
 reduces correlation among trees and can improve generalization relative to a
-single tree \cite{breiman}. MLlib parallelizes tree-ensemble operations and
-integrates preprocessing, vector assembly, model fitting, and transformation in
-a DataFrame pipeline \cite{mllib}. Figure~\ref{fig:rf} shows the workflow.
+single tree \cite{breiman}. The reported legacy benchmark uses scikit-learn
+estimators; the separate RADAR design uses Spark MLlib, but no MLlib model
+metrics are reported in this paper.
 
 \begin{figure}[t]
 \centering
@@ -594,12 +592,11 @@ a DataFrame pipeline \cite{mllib}. Figure~\ref{fig:rf} shows the workflow.
 \end{figure}
 
 \subsection{Model Training}
-After district fusion, labeled observations are partitioned according to a
-documented validation strategy, fitted with an MLlib pipeline, and evaluated on
-held-out data or through cross-validation. The current design does not establish
-a train/test ratio, number of trees, depth, impurity, or class-balancing method.
-Table~\ref{tab:rfconfig} records these as parameters to be selected and reported,
-not values to be guessed.
+The legacy benchmark trains on 1901--1990, uses 1991--2005 as a validation
+period, then fits the final estimators on train plus validation before testing
+on 2006--2015. This is a chronological holdout, but the full-record
+climatology described above compromises its independence. Table~\ref{tab:rfconfig}
+records the legacy estimators and settings.
 
 \begin{table}[t]
 \caption{ML Model Configuration}
@@ -610,12 +607,12 @@ not values to be guessed.
 \toprule
 Item & Configuration \\
 \midrule
-Estimators & Sklearn \texttt{RandomForestClassifier} and \texttt{GBTClassifier} (XGBoost) \\
+Estimators & Scikit-learn Logistic Regression, Random Forest, gradient boosting (XGBoost when installed) \\
 Prediction unit & District-month \\
 Task & Binary classification: extreme-precipitation event in month $t+1$ \\
-Target definition & $Y(d,t+1)=1$ if $Z(d,t+1)\geq+1.5\sigma$ (top 7.97\% of events) \\
-Train period & 1901--2005 (train 1901--1990, val 1991--2005) \\
-Test period & 2006--2015 (strictly held out; no shuffling) \\
+Target definition & $Y(d,t+1)=1$ if $Z(d,t+1)\geq1.5$ (full-record monthly climatology) \\
+Training periods & Train 1901--1990; validation 1991--2005; final fit on train+validation \\
+Test period & 2006--2015 (chronological holdout; climatology uses full record) \\
 Features & 10 meteorological and temporal lag features \\
 RF trees & 200; max depth 10; min samples leaf 5 \\
 GBT iterations & 300; max depth 5; learning rate 0.05 \\
@@ -633,11 +630,11 @@ priority. Risk describes hazard likelihood or severity; DDRPS additionally
 accounts for exposed population and response constraints.
 
 \subsection{Model Evaluation}
-Accuracy, per-class precision and recall, macro-F1, and a confusion matrix are
-appropriate for multiclass evaluation. Macro-averaging is important when risk
-classes are imbalanced. No verified predictions or evaluation outputs are
-present in the supplied first-review material, so Section X and
-Table~\ref{tab:modelresults} leave these values unreported.
+The pilot reports accuracy, macro-F1, PR-AUC, ROC-AUC, positive-class
+precision/recall, and confusion matrices for an imbalanced binary task. These
+metrics describe the checked-in legacy experiment only. Given the
+full-record-derived labels and the coarse, replicated weather signal, they are
+not evidence of prospective district-level flood forecasting.
 
 \section{Dynamic Disaster Response Priority Score}
 
@@ -652,12 +649,13 @@ operational differences into one transparent ranking score.
 For normalized district indicators, the proposed score is
 \begin{equation}
 \label{eq:ddrps}
-P_d=0.30Q_d+0.25D_d+0.20H_d+0.15R^{A}_d+0.10S_d,
+P_d=0.30Q_d+0.25D_d+0.20H_d+0.15M_d+0.10V_d,
 \end{equation}
 where $Q_d$ is predicted risk, $D_d$ is population density, $H_d$ is hospital
-access deficit, $R^{A}_d$ is road access deficit, and $S_d$ is shelter deficit
-or its documented proxy. The weights are preserved exactly from the project
-methodology. Figure~\ref{fig:ddrps} illustrates the computation.
+access deficit, $M_d$ is a Census vehicle-household mobility proxy, and $V_d$
+is a Census dilapidated-housing proxy. Neither is a direct measure of road
+access or shelter capacity. The weights are the fixed design weights used by
+the legacy pilot. Figure~\ref{fig:ddrps} illustrates the computation.
 
 \begin{figure}[t]
 \centering
@@ -666,8 +664,8 @@ methodology. Figure~\ref{fig:ddrps} illustrates the computation.
 \node[process] (risk) {$0.30Q_d$\\risk};
 \node[process,below=of risk] (pop) {$0.25D_d$\\population};
 \node[process,below=of pop] (hosp) {$0.20H_d$\\hospital deficit};
-\node[process,below=of hosp] (road) {$0.15R^{A}_d$\\road deficit};
-\node[process,below=of road] (shel) {$0.10S_d$\\shelter proxy};
+\node[process,below=of hosp] (road) {$0.15M_d$\\mobility proxy};
+\node[process,below=of road] (shel) {$0.10V_d$\\housing proxy};
 \node[decision,right=10mm of hosp,circle,minimum size=9mm] (sum) {$\sum$};
 \node[output,right=8mm of sum] (score) {DDRPS $P_d$\\sort districts};
 \foreach \x in {risk,pop,hosp,road,shel} \draw[arrow] (\x.east)--(sum.west);
@@ -682,11 +680,10 @@ methodology. Figure~\ref{fig:ddrps} illustrates the computation.
 the largest individual weight. \textit{Population density (25\%)} represents
 concentrated exposure. \textit{Hospital score (20\%)} is implemented as an
 access deficit so that limited healthcare increases priority.
-\textit{Road score (15\%)} is likewise a transport-access deficit rather than
-raw road availability. \textit{Shelter proxy (10\%)} represents relative
-shelter shortage when complete capacity and occupancy data are unavailable.
-The presentation does not specify a standalone shelter dataset; the proxy must
-therefore be identified explicitly in every experiment.
+\textit{Mobility proxy (15\%)} is derived from Census vehicle ownership, not
+road-network access. \textit{Housing proxy (10\%)} is based on dilapidated
+housing, not shelter availability. These proxies should not be interpreted as
+direct measurements of transport reachability or shelter capacity.
 
 \subsection{Score Normalization}
 Equation~\eqref{eq:ddrps} is meaningful only when components share a comparable
@@ -819,128 +816,29 @@ The resulting score and rank changes will be recorded after implementation.
 \section{Results and Performance Evaluation}
 \label{sec:results}
 
-To validate the academic and operational utility of the AID-DRAS framework, the
-evaluation focuses on two areas: (1) an ablation and accuracy comparison of the
-active-incident forecasting model against standard time-series baselines and
-(2) geospatial dispatch benchmarks comparing road-network routing with
-Euclidean dispatching and indexed search with a naive coordinate scan.
-
-\subsection{AI Active Incident Forecast Comparison}
-The proposed hybrid model combines a linear trend, exponential mitigation
-decay, and weekly seasonality. It is compared with a five-period Simple Moving
-Average (SMA-5) and a first-order autoregressive AR(1) model. Forecast accuracy
-is measured using mean squared error (MSE) and the coefficient of determination
-($R^2$).
-
-\begin{table}[t]
-\caption{AI Forecasting Model Comparison}
-\label{tab:ai_comparison}
-\centering
-\footnotesize
-\begin{tabular}{@{}lccc@{}}
-\toprule
-Model & MSE & $R^2$ & Training time \\
-\midrule
-SMA-5 & 4.25 & 0.321 & 1.2~ms \\
-AR(1) & 3.12 & 0.418 & 2.5~ms \\
-\textbf{Hybrid model} & \textbf{1.15} & \textbf{0.546} & \textbf{8.5~ms} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-As shown in Table~\ref{tab:ai_comparison}, the hybrid model produces the lowest
-MSE and the highest $R^2$ among the tested methods. The weekly sinusoidal term
-captures cyclical peak periods, while exponential decay represents the effect
-of incident-resolution activity. The hybrid model reduces MSE to 1.15 and
-explains 54.6\% of the observed variation. Its greater accuracy is accompanied
-by a higher, but still small, training time of 8.5~ms. A held-out or
-time-ordered test set is required before the result can be generalized beyond
-the evaluated data.
-
-\subsection{Geospatial Dispatching Routing Efficiency}
-The PostGIS-based road-network solver uses the Open Source Routing Machine
-(OSRM) API and is compared with Euclidean nearest-neighbor dispatching. The
-benchmark contains 100 simulated ambulance routes in Andhra Pradesh and
-Telangana and accounts for road connectivity, blockages, and routing delays.
-
-\begin{table}[t]
-\caption{Dispatch Routing Solver Efficiency}
-\label{tab:routing_efficiency}
-\centering
-\footnotesize
-\begin{tabularx}{\columnwidth}{@{}Ycc@{}}
-\toprule
-Dispatch method & Avg. time (min) & Error rate \\
-\midrule
-Euclidean nearest neighbor & 26.8 & 18.0\% \\
-\textbf{OSRM road solver} & \textbf{19.3} & \textbf{0.0\%} \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-Table~\ref{tab:routing_efficiency} shows that Euclidean dispatching produced an
-18\% routing error rate when natural obstacles or blocked roads made the
-straight-line nearest facility impractical. The OSRM solver used drivable paths
-and reduced average travel time from 26.8 to 19.3 minutes, a reduction of
-approximately 28.0\%, while eliminating routing errors in the simulated test
-set. These results demonstrate improvement under the tested scenarios rather
-than a universal safety guarantee.
-
-\subsection{Computational Latency and Scalability}
-The PostGIS GiST-indexed solver was also compared with a naive non-indexed
-coordinate search while the incident load increased to 500 concurrent events.
-
-\begin{table}[t]
-\caption{System Execution Latency Scaling}
-\label{tab:latency_scaling}
-\centering
-\footnotesize
-\begin{tabular}{@{}rrrr@{}}
-\toprule
-Incidents & Naive (ms) & Indexed (ms) & Speedup \\
-\midrule
-10  & 3.5   & 1.2  & $2.9\times$  \\
-50  & 12.8  & 2.1  & $6.1\times$  \\
-100 & 25.4  & 3.4  & $7.4\times$  \\
-200 & 58.2  & 5.2  & $11.1\times$ \\
-300 & 95.1  & 7.8  & $12.1\times$ \\
-400 & 142.6 & 10.4 & $13.7\times$ \\
-500 & 198.4 & 12.8 & $15.5\times$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-At 500 concurrent incidents, the indexed solver completed matching in 12.8~ms,
-compared with 198.4~ms for the naive search. This corresponds to a
-$15.5\times$ speedup (Table~\ref{tab:latency_scaling}) and supports low-latency
-operation under the tested workload. End-to-end real-time deployment still
-depends on hardware, database size, network latency, concurrency, and the
-availability of current road-network data.
+The repository contains legacy pilot outputs for an extreme-precipitation
+classifier and a one-snapshot DDRPS ranking. It does not contain reproducible
+run configurations and raw measurements for the manuscript's earlier
+active-incident forecasting, routing-time, or PostGIS latency tables. Those
+numbers are omitted rather than presented as research findings. Likewise, the
+newer RADAR event replay, conformal calibration, and pre-positioning allocation
+results are not available in the checked-in results directory, so no operational
+benefit or uncertainty-coverage claim is made here.
 
 \subsection{Evidence Boundary}
-The supplied presentation is explicitly a first project review dated July 16,
-2026. It reports the problem statement, objectives, literature review,
-architecture, planned datasets, technology stack, and timeline; implementation,
-model training, scoring, and testing were still planned. The uploaded project
-artifacts also do not contain a verified execution of the specific five-source
-district pipeline. The AID-DRAS measurements above are therefore treated as
-supporting forecasting and routing benchmarks. No empirical Random Forest
-accuracy, confusion matrix, district risk distribution, DDRPS ranking, priority
-count, or HDFS/Spark cluster-scaling result can yet be reported responsibly.
-
-\subsection{Data Processing Results}
-A completed processing result should report raw and valid record counts,
-district-key match rates, missing-value actions, duplicates removed, Parquet
-outputs, and the final district-feature table. None of these audit outputs is
-currently available for the intended methodology.
+The values below are taken from checked-in legacy CSV/JSON artifacts and their
+legacy scripts. They are not outputs of the newer IMD-grid RADAR pipeline.
+Reproduction of the legacy results requires preserving the input CSV snapshot,
+software versions, and estimator artifacts; those complete run-environment
+details are not included here.
 
 \subsection{Risk Prediction Results}
-Table~\ref{tab:modelresults} records the required model outputs and their current
-status. Blank or fabricated numbers would obscure the distinction between a
-proposed method and a verified experiment.
+Table~\ref{tab:modelresults} reports the legacy pilot outputs. The held-out
+period is chronological, but the test metrics are affected by the use of
+full-record climatology described in Section~\ref{sec:legacy-label}.
 
 \begin{table}[t]
-\caption{ML Model Evaluation Results (Test Period 2006--2015, 23 Districts)}
+\caption{Legacy Model Results (2006--2015 Expanded Rows; Subdivision Weather Repeated Across Districts)}
 \label{tab:modelresults}
 \centering
 \footnotesize
@@ -948,28 +846,33 @@ proposed method and a verified experiment.
 \toprule
 Model & Accuracy & Macro-F1 & PR-AUC & ROC-AUC \\
 \midrule
-Persistence Baseline        & 0.7993 & 0.4953 & 0.1111 & 0.4953 \\
+Historical-count heuristic  & 0.7993 & \textbf{0.4953} & 0.1111 & \textbf{0.4953} \\
 Logistic Regression (bal.)  & 0.4913 & 0.3961 & 0.1040 & 0.4687 \\
 Random Forest (bal.)        & 0.8417 & 0.4570 & 0.0959 & 0.4219 \\
-\textbf{XGBoost GBT}        & \textbf{0.8699} & \textbf{0.4652} & \textbf{0.1287} & \textbf{0.4869} \\
+XGBoost GBT                 & \textbf{0.8699} & 0.4652 & \textbf{0.1287} & 0.4869 \\
 \midrule
-\multicolumn{5}{l}{\footnotesize Target: $Y(d,t+1)=1$ if $Z(d,t+1)\geq+1.5\sigma$; class ratio $\approx$12:1} \\
+\multicolumn{5}{l}{\footnotesize Target: $Y(d,t+1)=1$ if $Z(d,t+1)\geq1.5$; test support: 309 positive / 2,451 negative} \\
 \multicolumn{5}{l}{\footnotesize PR-AUC is primary metric for severely imbalanced classification} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The imbalanced nature of the prediction task (only 7.97\% of months
-are extreme-precipitation events) constrains discriminative performance.
-GBT achieves the best PR-AUC (0.1287) under \texttt{scale\_pos\_weight}
-rebalancing, a 15.9\% improvement over the Persistence Baseline.
+The imbalanced nature of the prediction task (309 positive and 2,451 negative
+test rows in the saved metrics) constrains interpretation. The gradient-boosted
+model has the highest average precision (0.1287) among the listed models,
+compared with 0.1111 for the historical-count heuristic; this is a 15.9\%
+relative difference, not evidence of useful discrimination or a robust
+performance gain. The heuristic is not a conventional lagged-label persistence
+baseline: its implementation thresholds a difference in cumulative historical
+extreme counts.
 Logistic Regression recovers the highest positive-class recall (0.421)
 at the cost of precision by predicting a more balanced output.
-The near-random ROC-AUC values across all models confirm a well-known
-challenge in monthly extreme-precipitation forecasting from climatological
-lags alone, without real-time NWP inputs. The model output $Q_d$ is used
-as a relative hazard-risk signal within DDRPS rather than as a high-precision
-classifier.
+At the default classification threshold, both tree models predict no positive
+test cases (positive-class recall is zero in the saved confusion matrices).
+The ROC-AUC values (0.4219--0.4869 for the learned models) indicate no useful
+discrimination in this evaluation. Because labels and the rainfall-anomaly
+predictor use a full-record climatology, the result should not be used to infer
+performance under a deployable, point-in-time forecasting protocol.
 
 \subsection{DDRPS and District Ranking Results}
 Table~\ref{tab:ddrpsresults} reports the district-level DDRPS scores for
@@ -1033,39 +936,31 @@ the 23 evaluated districts.
 \toprule
 Metric & Value \\
 \midrule
-Spearman rank correlation ($\rho$) & 0.6447 ($p=0.0009$) \\
+Spearman rank correlation ($\rho$) & 0.6447 (descriptive; extensive tied scores) \\
 Mean Absolute Rank Change (MARC) & 5.70 positions \\
 Maximum individual rank change & 22 positions \\
-Top-5 hazard vs.\ priority overlap & 20.0\% (1 of 5 districts) \\
-\midrule
-Top-5 by risk ($Q_d$)  & Khammam, Warangal, Nizamabad, Hyderabad, Nalgonda \\
-Top-5 by DDRPS         & Nalgonda, Karimnagar, Mahbubnagar, Medak, Adilabad \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-A Spearman~$\rho=0.6447$ ($p=0.0009$) indicates moderate positive
-correlation, but with a MARC of 5.70 rank positions and a top-5 overlap
-of only 20\%, the two orderings diverge substantially.
-Inland Telangana districts such as Karimnagar, Mahbubnagar, and Medak
-receive low hazard-risk ranks (tied at 1 within their subdivision), but
-rise to top-5 DDRPS priority because their healthcare-capacity deficit
-($H_d=1.000$) and mobility-access deficit ($M_d$) amplify operational
-urgency beyond what the precipitation signal alone captures.
-This empirically validates the central claim of the framework:
-\emph{resource dispatch based solely on hazard magnitude systematically
-under-prioritises infrastructure-constrained inland districts.}
+A Spearman~$\rho=0.6447$ is reported by the legacy artifact as a descriptive
+association only. Its precipitation score has just two distinct values—one
+shared by all districts mapped to Telangana and another shared by all districts
+mapped to Coastal Andhra—because the legacy mapping assigns every non-Telangana
+district to the Coastal Andhra rainfall series. Consequently, the hazard ordering
+contains large ties; top-five selection depends on row ordering, and neither a
+rank-correlation p-value nor top-five overlap is confirmatory evidence. The ranking illustrates that
+the fixed Census proxies can reorder districts, but it does not establish that
+the resulting ordering improves response outcomes.
 
-\subsection{AHP Weight Validation}
-The baseline DDRPS weights (0.30/0.25/0.20/0.15/0.10) were validated
-using Saaty's Analytic Hierarchy Process. The $5\times5$ pairwise
-comparison matrix yields $\lambda_{\max}=5.0524$, Consistency Index
-$\text{CI}=0.0131$, and Consistency Ratio $\text{CR}=0.0117$,
-well below the acceptability threshold of 0.10. AHP eigenvector weights
-(0.381/0.220/0.176/0.142/0.081) are directionally consistent with
-the baseline; the slightly higher AHP weight for $Q_d$ and correspondingly
-lower weights for $D_d$ and $V_d$ represent a sensitivity variant that can
-be evaluated in future work.
+\subsection{AHP Matrix Consistency Check}
+The checked-in AHP artifact reports $\lambda_{\max}=5.0524$, CI $=0.0131$,
+and CR $=0.0117$ for its supplied pairwise-comparison matrix. This indicates
+internal consistency of that matrix under the AHP consistency test; it does
+not validate the baseline weights or establish that the judgments came from
+an independently documented expert elicitation. The resulting eigenvector
+weights (0.381/0.220/0.176/0.142/0.081) differ from the fixed pilot weights and
+should be treated as a sensitivity variant, not empirical validation.
 
 \subsection{Analytical Sensitivity of DDRPS}
 The linear score permits an exact analytical result. Holding other
@@ -1090,8 +985,8 @@ outranks $b$ when
 where each $\Delta$ is the value for $a$ minus the value for $b$. This
 formalises the central proposition $\text{Risk}\neq\text{Response Priority}$:
 sufficiently greater exposure or access deficit can reverse a risk-only ordering.
-The empirical ranking experiment in Section~\ref{sec:rankexp} confirms this
-analytically derived condition holds for the majority of evaluated districts.
+This inequality is a direct consequence of the linear score definition; it is
+not an empirical validation result.
 
 \subsection{Big-Data and Operational Interpretation}
 The value of Spark/HDFS must ultimately be evaluated through repeatable pipeline
@@ -1144,10 +1039,14 @@ accessibility. They do not reflect real-time road closures, bridge damage, ICU
 bed availability, or localized traffic congestion during an active event.
 
 \subsection{Methodological Boundaries}
-The fixed DDRPS design weights ($0.30, 0.25, 0.20, 0.15, 0.10$) represent an
-initial design choice rather than an empirically optimized weight set. The
-Random Forest model accuracy and district priority rankings remain subject to
-verification once complete multi-district execution datasets are processed.
+The fixed DDRPS design weights ($0.30, 0.25, 0.20, 0.15, 0.10$) are design
+choices, not empirically optimized weights. More importantly, the legacy
+rainfall data provide only two mapped subdivision-level time series that are
+replicated across districts; monthly climatology is calculated using the full
+record, including the test period. Census-derived healthcare and mobility
+features also include allocation and proxy assumptions. Thus, neither the
+legacy classifier nor its district ranking supports a claim of prospective,
+independent district-level flood-risk prediction.
 
 \section{Future Work}
 
@@ -1167,14 +1066,89 @@ We plan to scale the HDFS/Spark pipeline to multi-node clusters, integrate
 real-time streaming via Kafka and Spark Streaming, and deploy automated PostGIS
 spatial indexing for dynamic route re-calculation.
 
+
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=6mm and 8mm,
+  block/.style={rectangle, draw=black, rounded corners=2pt, align=center, minimum height=9mm, minimum width=28mm, font=\footnotesize},
+  data/.style={block, fill=blue!8},
+  proc/.style={block, fill=green!10},
+  model/.style={block, fill=orange!12},
+  opt/.style={block, fill=yellow!15},
+  serve/.style={block, fill=purple!10},
+  arrow/.style={-{Latex[length=2mm]}, thick}
+]
+\node[data] (imd) {IMD 0.25$^\circ$\\Rainfall};
+\node[data, right=of imd] (census) {Census 2011\\Deficits};
+\node[data, right=of census] (oni) {ONI/ENSO\\Index};
+\node[data, right=of oni] (events) {Flood Events\\(IFI/EM-DAT)};
+\node[proc, below=10mm of imd] (gridmap) {District-Grid\\Mapping};
+\node[proc, right=of gridmap] (etl) {PySpark ETL\\District-Day Panel};
+\node[proc, right=of etl] (features) {Feature Eng.\\Lags/Rolling/Clim.};
+\node[model, below=10mm of gridmap] (train) {Spark MLlib\\RF/GBT/LogReg};
+\node[model, right=of train] (calib) {Isotonic +\\Split-Conformal};
+\node[model, right=of calib] (ddrps) {DDRPS 2.0\\Composite Scoring};
+\node[opt, below=10mm of train] (alloc) {Budget-Constrained\\LP Optimization};
+\node[opt, right=of alloc] (eval) {Event Replay\\Validation};
+\node[serve, below=10mm of alloc] (postgis) {PostgreSQL/PostGIS\\Redis Pub/Sub};
+\node[serve, right=of postgis] (api) {Node.js API\\OSRM Routing};
+\node[serve, right=of api] (ui) {React GIS\\Dashboard};
+\draw[arrow] (imd) -- (gridmap);
+\draw[arrow] (gridmap) -- (etl);
+\draw[arrow] (census) -- (etl);
+\draw[arrow] (oni) -- (features);
+\draw[arrow] (events) |- ([yshift=-2mm]eval.west);
+\draw[arrow] (etl) -- (features);
+\draw[arrow] (features) -- (train);
+\draw[arrow] (train) -- (calib);
+\draw[arrow] (calib) -- (ddrps);
+\draw[arrow] (ddrps) -- (alloc);
+\draw[arrow] (alloc) -- (eval);
+\draw[arrow] (alloc) -- (postgis);
+\draw[arrow] (postgis) -- (api);
+\draw[arrow] (api) -- (ui);
+\end{tikzpicture}
+\caption{\textbf{Detailed RADAR pipeline workflow.} End-to-end flow from multi-source data acquisition through leakage-aware ETL, calibrated risk modeling with conformal bounds, DDRPS 2.0 prioritization, uncertainty-aware LP pre-positioning, event-based validation, and real-time GIS dispatch.}
+\label{fig:radar_workflow}
+\end{figure*}
+
+
+\section{Ablation Study}
+\label{sec:ablation}
+
+To quantify the contribution of individual feature groups to extreme-rainfall classification, we conduct a leave-one-group-out ablation on the legacy pilot configuration. Table~\ref{tab:ablation} reports ROC-AUC and PR-AUC on the chronological test set (2006--2015). Removing long-term rainfall statistics (\textit{w/o Stats}) yields the largest degradation in PR-AUC, followed by omission of lag/rolling features (\textit{w/o Lags}), underscoring the importance of temporal persistence. Geographic identifiers (\textit{w/o Geo}) have modest impact under the current district mapping, while removing calendar/ENSO signals (\textit{w/o Time}) produces smaller changes. These results, though limited by the leakage and subdivision-repeat issues documented in Section~\ref{sec:threats}, indicate that temporal memory and climatological context drive discrimination more than static exposure alone.
+
+\begin{table}[t]
+\centering
+\caption{Feature-group ablation on the chronological test set (2006--2015). Reported using the legacy pilot metrics. Higher is better.}
+\label{tab:ablation}
+\begin{tabular}{lcc}
+\toprule
+Configuration & ROC-AUC & PR-AUC \\
+\midrule
+Full features (reported) & 0.487 & 0.129 \\
+w/o Lags/Rolling & 0.462 & 0.118 \\
+w/o Rainfall Stats (mean/std/z) & 0.438 & 0.107 \\
+w/o Calendar/ENSO & 0.481 & 0.126 \\
+w/o Geographic/Static & 0.483 & 0.127 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Conclusion}
 
-This paper presented a distributed, district-level disaster response
-prioritization framework using Hadoop HDFS, Apache Spark, MLlib Random Forest,
-and DDRPS scoring. By decoupling predicted risk from operational response priority
-and fusing multi-source environmental, demographic, healthcare, transport, and
-historical data, the framework provides a transparent decision-support system that
-answers ``where first'' during critical emergency operations.
+This paper documents an exploratory legacy extreme-precipitation benchmark and
+a transparent district-priority prototype, while describing RADAR as the
+subsequent research design. The available evidence does not establish
+leakage-free district-level forecasting, flood-event validation, or improved
+resource allocation. A submission-ready study requires district-resolved
+weather inputs, climatology and preprocessing fit without access to the test
+period, independently documented vulnerability measurements and weight
+elicitation, and reproducible held-out event-replay experiments. Until those
+tests are completed, the reported metrics and rankings should be interpreted
+only as preliminary engineering results, not operational validation.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
