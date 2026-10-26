@@ -136,14 +136,21 @@ def attach_flood_labels(panel: pd.DataFrame) -> pd.DataFrame:
     marks = []
     for _, r in ev.iterrows():
         end = r["date_end"] if pd.notna(r["date_end"]) else r["date_start"]
-        start_mark = r["date_start"] - pd.Timedelta(days=FLOOD_LEAD_DAYS - 1)
+        # Positive label window is the K days immediately preceding the event,
+        # i.e. (t, t+K] for a decision made at day t.
+        start_mark = r["date_start"] - pd.Timedelta(days=FLOOD_LEAD_DAYS)
         idx = pd.date_range(start_mark, end, freq="D")
         marks.append(pd.DataFrame({"district": r["district"], "date": idx}))
     marks = pd.concat(marks, ignore_index=True).drop_duplicates()
     marks["flood_flag"] = 1
 
     panel = panel.merge(marks, on=["district", "date"], how="left")
-    panel[f"flood_event_next{FLOOD_LEAD_DAYS}"] = panel["flood_flag"].fillna(0)
+    # The available event inventory does not establish complete absence of
+    # floods on unmarked dates. Keep these labels unknown rather than asserting
+    # negative outcomes from a sparse positive-only inventory.
+    panel[f"flood_event_next{FLOOD_LEAD_DAYS}"] = panel["flood_flag"].where(
+        panel["flood_flag"].notna(), np.nan
+    )
     return panel.drop(columns="flood_flag")
 
 
@@ -314,7 +321,7 @@ def run_spark():
         ev["date_end"] = ev["date_end"].fillna(ev["date_start"])
         marks = []
         for _, r in ev.iterrows():
-            start_mark = r["date_start"] - pd.Timedelta(days=FLOOD_LEAD_DAYS - 1)
+            start_mark = r["date_start"] - pd.Timedelta(days=FLOOD_LEAD_DAYS)
             for d in pd.date_range(start_mark, r["date_end"], freq="D"):
                 marks.append((r["district"], d.to_pydatetime().date()))
         marks_df = spark.createDataFrame(
@@ -322,7 +329,7 @@ def run_spark():
         ).withColumn("flood_flag", F.lit(1))
         panel = panel.join(F.broadcast(marks_df), on=["district", "date"], how="left")
         panel = panel.withColumn(
-            f"flood_event_next{FLOOD_LEAD_DAYS}", F.coalesce("flood_flag", F.lit(0))
+            f"flood_event_next{FLOOD_LEAD_DAYS}", F.col("flood_flag").cast("int")
         ).drop("flood_flag")
     else:
         panel = panel.withColumn(f"flood_event_next{FLOOD_LEAD_DAYS}", F.lit(None).cast("int"))

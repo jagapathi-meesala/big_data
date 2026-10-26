@@ -63,22 +63,30 @@ def train_target(spark, target: str) -> pd.DataFrame:
     from pyspark.ml.evaluation import BinaryClassificationEvaluator
     from pyspark.ml.feature import Imputer, VectorAssembler
     from pyspark.sql import functions as F
+    from pyspark.ml.functions import vector_to_array
+    from pyspark.sql.types import DoubleType
 
     df = spark.read.parquet(panel_uri())
     df = split_col(df)
 
     label = "extreme_rain_day" if target == "extreme" else f"flood_event_next{FLOOD_LEAD_DAYS}"
     if target == "flood":
-        df = df.filter(F.year("date") >= 1978).filter(F.col(label).isNotNull())
-    else:
-        df = df.filter(F.col(label).isNotNull())
-    df = df.fillna(0.0, subset=FEATURES)
+        df = df.filter(F.year("date") >= 1978)
+    # Event-inventory labels may be unknown; only explicit 0/1 labels can be
+    # used for fitting or supervised evaluation.
+    df = df.filter(F.col(label).isin(0, 1))
+    train = df.filter(F.col("split") == "train")
 
-    # positive-class weight to counter imbalance
-    n_pos = df.filter(F.col(label) == 1).count()
-    n_neg = df.filter(F.col(label) == 0).count()
-    if n_pos == 0:
-        raise ValueError(f"target {target} has no positive rows — is ground truth present?")
+    # Compute imbalance weights from training data only; validation/test labels
+    # must not influence the fitted model configuration.
+    n_pos = train.filter(F.col(label) == 1).count()
+    n_neg = train.filter(F.col(label) == 0).count()
+    if n_pos == 0 or n_neg == 0:
+        raise ValueError(
+            f"target {target} requires explicit positive and negative training labels; "
+            f"found positives={n_pos}, negatives={n_neg}. Sparse event inventories "
+            "cannot be treated as complete negative labels."
+        )
     pos_weight = float(n_neg) / float(n_pos)
     df = df.withColumn(
         "cls_weight", F.when(F.col(label) == 1, F.lit(pos_weight)).otherwise(F.lit(1.0))
@@ -106,21 +114,23 @@ def train_target(spark, target: str) -> pd.DataFrame:
     for name, model in models.items():
         imputer = Imputer(inputCols=FEATURES, outputCols=FEATURES).setStrategy("median")
         pipeline = Pipeline(stages=[imputer, assembler, model])
-        train = df.filter(F.col("split") == "train")
         fitted = pipeline.fit(train)
-        pred = fitted.transform(df).select(
+        transformed = fitted.transform(df)
+        pred = transformed.withColumn(
+            "p_raw", vector_to_array("p_raw")[1].cast(DoubleType())
+        ).select(
             "district", "date", label, "p_raw", "split"
         ).withColumn("model", F.lit(name)).withColumn("target", F.lit(target))
         all_predictions.append(pred)
 
         evaluator_auc = BinaryClassificationEvaluator(
-            labelCol=label, rawPredictionCol="p_raw", metricName="areaUnderROC"
+            labelCol=label, rawPredictionCol="rawPrediction", metricName="areaUnderROC"
         )
         evaluator_pr = BinaryClassificationEvaluator(
-            labelCol=label, rawPredictionCol="p_raw", metricName="areaUnderPR"
+            labelCol=label, rawPredictionCol="rawPrediction", metricName="areaUnderPR"
         )
         for split in ("val", "test"):
-            sub = pred.filter(F.col("split") == split)
+            sub = transformed.filter(F.col("split") == split)
             if sub.rdd.isEmpty():
                 continue
             auc = evaluator_auc.evaluate(sub)

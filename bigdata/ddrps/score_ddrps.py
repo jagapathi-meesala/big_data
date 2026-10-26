@@ -44,8 +44,11 @@ LEARNED_WEIGHTS_CANDIDATES = [
 
 
 def latest_risk(calibrated_dir: Path, model: str = "rf") -> pd.DataFrame:
-    """Per-district mean calibrated risk over the test period (the decision
-    horizon). Uses the chosen model's flood target if present, else extreme."""
+    """Per-district mean calibrated risk over the pre-test validation period.
+
+    Using test-period predictions to set a fixed allocation policy would leak
+    future covariates into the held-out event replay.
+    """
     preferred = calibrated_dir / f"flood_{model}.parquet"
     fallback = calibrated_dir / f"extreme_{model}.parquet"
     src = preferred if preferred.exists() else fallback
@@ -58,7 +61,7 @@ def latest_risk(calibrated_dir: Path, model: str = "rf") -> pd.DataFrame:
     df = df[df["model"] == ("flood_rf" if "flood" in src.name else "extreme_rf")]
     if df.empty:
         df = pd.read_parquet(src)
-    df = df[df["split"] == "test"]
+    df = df[df["split"] == "val"]
     snap = (
         df.groupby("district", as_index=False)
         .agg(Qd=("p_cal", "mean"), Qd_upper=("p_upper", "mean"),
@@ -172,7 +175,7 @@ def main() -> int:
     cols = ["district", "scheme", "Qd", "Qd_upper", "Dd", "Hd", "Md", "Vd",
             "ddrps", "risk_rank", "priority_rank", "category", "population"]
     save_csv(out[cols].sort_values(["scheme", "priority_rank"]), DDRPS_RANKING_CSV)
-    metrics["decision_window"] = f"test period (years > {SPLIT_VAL_END})"
+    metrics["decision_window"] = f"validation period ending {SPLIT_VAL_END} (pre-test)"
     save_json(metrics, RANKING_METRICS_JSON)
     print(f"[ddrps] saved {DDRPS_RANKING_CSV.name} + {RANKING_METRICS_JSON.name}")
     return 0

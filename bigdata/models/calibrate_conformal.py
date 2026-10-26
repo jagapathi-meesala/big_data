@@ -42,20 +42,25 @@ def isotonic_fit(p_raw: np.ndarray, y: np.ndarray):
 
 
 def conformal_quantile(p: np.ndarray, y: np.ndarray, alpha: float) -> float:
-    """Finite-sample conformal quantile of the nonconformity scores y - p."""
+    """Conservative finite-sample quantile of one-sided scores ``y - p``."""
     scores = np.asarray(y, dtype=float) - np.asarray(p, dtype=float)
     n = len(scores)
     if n == 0:
-        return 1.0
+        raise ValueError("at least one conformal calibration example is required")
     alpha = float(alpha)
     if not np.isfinite(alpha):
         raise ValueError("alpha must be finite")
-    if alpha <= 0:
-        return 0.0
-    if alpha >= 1:
-        return float(np.max(scores))
-    q_level = min(1.0, np.ceil((n + 1) * (1 - alpha)) / n)
-    return float(np.quantile(scores, q_level))
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must be strictly between 0 and 1")
+    if not np.isfinite(scores).all():
+        raise ValueError("conformal scores must be finite")
+
+    # The split-conformal rank is ceil((n + 1) * (1 - alpha)); using a
+    # discrete order statistic avoids interpolation that can be anti-conservative.
+    rank = int(np.ceil((n + 1) * (1.0 - alpha)))
+    if rank > n:
+        return 1.0  # y,p in [0,1], so this yields a valid clipped upper bound.
+    return float(np.partition(scores, rank - 1)[rank - 1])
 
 
 def empirical_coverage(p_upper: np.ndarray, y: np.ndarray) -> float:
@@ -64,30 +69,51 @@ def empirical_coverage(p_upper: np.ndarray, y: np.ndarray) -> float:
 
 def calibrate_one(df: pd.DataFrame, model: str, alpha: float) -> pd.DataFrame:
     sub = df[df["model"] == model].copy()
-    val = sub[sub["split"] == "val"]
+    val = sub[sub["split"] == "val"].copy()
     if val.empty:
         raise ValueError(f"no validation rows for model {model}")
-    ir = isotonic_fit(val["p_raw"].to_numpy(), val["label"].to_numpy())
+    if "date" not in val:
+        raise ValueError("validation rows require a date for chronological separation")
+
+    val["date"] = pd.to_datetime(val["date"], errors="coerce")
+    val = val.dropna(subset=["date"]).sort_values("date")
+    unique_dates = val["date"].drop_duplicates().to_numpy()
+    if len(unique_dates) < 2:
+        raise ValueError("validation data need at least two distinct dates")
+
+    # Fit the calibration map on the earlier validation block and estimate the
+    # conformal quantile on a later, disjoint block to avoid reusing fitted rows.
+    split_at = max(1, int(np.floor(2 * len(unique_dates) / 3)))
+    split_at = min(split_at, len(unique_dates) - 1)
+    conformal_start = pd.Timestamp(unique_dates[split_at])
+    cal_fit = val[val["date"] < conformal_start]
+    conf = val[val["date"] >= conformal_start]
+    if cal_fit.empty or conf.empty:
+        raise ValueError("could not form non-empty calibration and conformal blocks")
+
+    ir = isotonic_fit(cal_fit["p_raw"].to_numpy(), cal_fit["label"].to_numpy())
 
     sub["p_cal"] = ir.predict(sub["p_raw"].to_numpy())
-    q_raw = conformal_quantile(val["p_raw"].to_numpy(), val["label"].to_numpy(), alpha)
-    q_cal = conformal_quantile(val["p_cal"].to_numpy(), val["label"].to_numpy(), alpha)
+    conf_indices = conf.index
+    conf = sub.loc[conf_indices]
+    q_cal = conformal_quantile(conf["p_cal"].to_numpy(), conf["label"].to_numpy(), alpha)
     sub["p_upper"] = np.clip(sub["p_cal"] + q_cal, 0.0, 1.0)
 
     test = sub[sub["split"] == "test"]
-    cov_val = empirical_coverage(
-        np.clip(val["p_raw"].to_numpy() + q_raw, 0, 1), val["label"].to_numpy()
-    )
+    cov_conf = empirical_coverage(conf["p_upper"].to_numpy(), conf["label"].to_numpy())
     cov_test = (
         empirical_coverage(test["p_upper"].to_numpy(), test["label"].to_numpy())
         if not test.empty
         else float("nan")
     )
     print(
-        f"[calib] {model}: q_cal={q_cal:.4f} val-coverage={cov_val:.3f} "
+        f"[calib] {model}: q_cal={q_cal:.4f} conformal-coverage={cov_conf:.3f} "
         f"test-coverage={cov_test:.3f} (target >= {1 - alpha})"
     )
     sub.attrs["q_cal"] = q_cal
+    sub.attrs["n_isotonic_fit"] = int(len(cal_fit))
+    sub.attrs["n_conformal"] = int(len(conf))
+    sub.attrs["conformal_coverage"] = cov_conf
     sub.attrs["coverage_test"] = cov_test
     return sub
 
@@ -120,6 +146,9 @@ def main() -> int:
             out.to_parquet(out_path, index=False)
             settings["models"][f"{target}_{model}"] = {
                 "q_cal": float(out.attrs.get("q_cal", float("nan"))),
+                "n_isotonic_fit": int(out.attrs.get("n_isotonic_fit", 0)),
+                "n_conformal": int(out.attrs.get("n_conformal", 0)),
+                "conformal_coverage": float(out.attrs.get("conformal_coverage", float("nan"))),
                 "coverage_test": float(out.attrs.get("coverage_test", float("nan"))),
                 "rows": int(len(out)),
                 "parquet": out_path.name,

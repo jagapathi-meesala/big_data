@@ -69,12 +69,45 @@ class TestClimatologyLeakage(unittest.TestCase):
         self.assertTrue(np.isfinite(panel["rain_anom"]).all())
         self.assertTrue(set(panel["extreme_rain_day"].unique()) <= {0, 1})
 
+    def test_sparse_event_inventory_does_not_create_false_negatives(self):
+        import build_district_day_panel as etl
+
+        panel = pd.DataFrame(
+            {
+                "district": ["Krishna", "Krishna", "Krishna"],
+                "date": pd.to_datetime(["2000-01-01", "2000-01-02", "2000-01-03"]),
+            }
+        )
+        old_path = etl.FLOOD_EVENTS_CSV
+        try:
+            etl.FLOOD_EVENTS_CSV = Path("/nonexistent/flood_events.csv")
+            labeled = etl.attach_flood_labels(panel)
+            self.assertTrue(labeled["flood_event_next14"].isna().all())
+        finally:
+            etl.FLOOD_EVENTS_CSV = old_path
+
 
 def doy_magic(dates):
     return dates.dayofyear / 12.0
 
 
 class TestConformal(unittest.TestCase):
+    def test_quantile_uses_conservative_discrete_order_statistic(self):
+        from calibrate_conformal import conformal_quantile
+
+        scores = np.arange(1, 11, dtype=float) / 10
+        q = conformal_quantile(np.zeros(10), scores, alpha=0.15)
+        # ceil((10 + 1) * 0.85) = 10, so the maximum score is required.
+        self.assertAlmostEqual(q, 1.0)
+
+    def test_quantile_rejects_empty_or_invalid_calibration(self):
+        from calibrate_conformal import conformal_quantile
+
+        with self.assertRaises(ValueError):
+            conformal_quantile(np.array([]), np.array([]), alpha=0.1)
+        with self.assertRaises(ValueError):
+            conformal_quantile(np.array([0.2]), np.array([0]), alpha=1.0)
+
     def test_coverage_guarantee_holds(self):
         from calibrate_conformal import conformal_quantile, empirical_coverage
 
@@ -90,6 +123,30 @@ class TestConformal(unittest.TestCase):
 
         q = conformal_quantile(np.zeros(10), np.zeros(10), alpha=0.1)
         self.assertLessEqual(q, 0.0)
+
+
+class TestFloodLabelValidity(unittest.TestCase):
+    def test_positive_only_event_inventory_is_not_binary_training_data(self):
+        from train_risk_model import train_target
+
+        class FakeFrame:
+            def filter(self, *_args, **_kwargs):
+                return self
+
+            def count(self):
+                return 4
+
+        class FakeSpark:
+            class Reader:
+                @staticmethod
+                def parquet(_path):
+                    return FakeFrame()
+
+            read = Reader()
+
+        with unittest.mock.patch("pyspark.sql.functions.year", return_value="date"):
+            with self.assertRaisesRegex(ValueError, "explicit positive and negative"):
+                train_target(FakeSpark(), "flood")
 
 
 class TestAllocation(unittest.TestCase):

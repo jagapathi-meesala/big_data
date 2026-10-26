@@ -8,8 +8,8 @@ flood season. Each strategy is a district->units stock vector:
   ddrps      proportional to the DDRPS composite score
   conformal  proportional to the conformal UPPER bound Qd_upper
              (risk-averse: hedges district-level model uncertainty)
-  oracle     LP-optimal with the TRUE historical event distribution
-             (upper bound on achievable performance)
+    training_scenario_lp  LP optimum fitted only on pre-test scenarios; not an
+                                                oracle or an upper bound on held-out performance
 
 Demand model: units needed = affected population / UNITS_PER_POP_COVERED;
 events without an affected count fall back to 2% of district population
@@ -37,6 +37,7 @@ from config import (
     ALLOCATION_STRATEGIES_JSON,
     ALLOCATION_UNIT_POP_COVERED,
     CALIBRATED_PANEL_DIR,
+    DDRPS_BASELINE_WEIGHTS,
     DDRPS_RANKING_CSV,
     DISTRICT_CENTROIDS_CSV,
     FLOOD_EVENTS_CSV,
@@ -51,7 +52,9 @@ NEIGHBOUR_DEG = 1.2   # centroid distance treated as "adjacent"
 
 
 def load_context() -> pd.DataFrame:
-    static = read_csv(STATIC_DEFS_CSV)[["district", "population"]]
+    static = read_csv(STATIC_DEFS_CSV)[
+        ["district", "population", "Dd", "Hd", "Md", "Vd"]
+    ]
     centroids = read_csv(DISTRICT_CENTROIDS_CSV)[["district", "lat", "lon"]]
     ddrps = read_csv(DDRPS_RANKING_CSV)
     ddrps = ddrps[ddrps["scheme"] == "baseline"]
@@ -59,7 +62,9 @@ def load_context() -> pd.DataFrame:
     risk_src = CALIBRATED_PANEL_DIR / "flood_rf.parquet"
     src = risk_src if risk_src.exists() else CALIBRATED_PANEL_DIR / "extreme_rf.parquet"
     risk = pd.read_parquet(src)
-    risk = risk[risk["split"] == "test"]
+    # A fixed policy evaluated on held-out events must not depend on test-period
+    # rainfall predictions. Use the pre-test validation horizon instead.
+    risk = risk[risk["split"] == "val"]
     r = risk.groupby("district", as_index=False).agg(
         Qd=("p_cal", "mean"), Qd_upper=("p_upper", "mean")
     )
@@ -217,24 +222,34 @@ def main() -> int:
     events = events.dropna(subset=["district", "date_start"])
     events = events[events["date_start"].dt.year > 1977]
 
+    # Policies, including the scenario-LP reference, are constructed only from
+    # the pre-test period. Held-out events are reserved for evaluate_on_events.py.
     fit_events = events[events["date_start"].dt.year <= SPLIT_VAL_END]
     needs_fit, freq_fit, _ = scenario_matrix(fit_events, ctx)
     print(f"[alloc] fitting scenarios: {needs_fit.shape[0]} events, "
           f"budget={args.budget}")
 
+    w = DDRPS_BASELINE_WEIGHTS
+    conformal_ddrps = (
+        w["Qd"] * ctx["Qd_upper"]
+        + w["Dd"] * ctx["Dd"]
+        + w["Hd"] * ctx["Hd"]
+        + w["Md"] * ctx["Md"]
+        + w["Vd"] * ctx["Vd"]
+    )
     strategies = {
         "uniform": stock_uniform(len(ctx), args.budget),
         "risk_only": stock_proportional(ctx["Qd"].to_numpy(), args.budget),
-        "safety_stock": stock_proportional(ctx["Qd"].to_numpy() + 0.1, args.budget),
+        "conformal_hazard_only": stock_proportional(ctx["Qd_upper"].to_numpy(), args.budget),
         "ddrps": stock_proportional(ctx["ddrps"].to_numpy(), args.budget),
-        "conformal": stock_proportional(ctx["Qd_upper"].to_numpy(), args.budget),
+        "conformal_ddrps": stock_proportional(conformal_ddrps.to_numpy(), args.budget),
     }
     lp = lp_optimal_stock(needs_fit, freq_fit, neighbours, args.budget)
     if lp is not None:
-        strategies["oracle_lp"] = lp
+        strategies["training_scenario_lp"] = lp
     else:
-        print("[alloc] PuLP not installed — using greedy for the oracle column")
-        strategies["oracle_greedy"] = greedy_stock(
+        print("[alloc] PuLP not installed — using greedy training-scenario reference")
+        strategies["training_scenario_greedy"] = greedy_stock(
             needs_fit, freq_fit, neighbours, args.budget
         )
 

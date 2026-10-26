@@ -27,8 +27,9 @@ etl/                         PySpark (or pandas reference) ETL
 models/
   train_risk_model.py        Spark MLlib LogReg / RF / GBT, temporal splits,
                              dual targets: extreme-rain-day & flood-next-14d
-  calibrate_conformal.py     isotonic calibration + split-conformal upper
-                             bounds (90% coverage) -> decision-grade risk
+  calibrate_conformal.py     isotonic calibration + one-sided conformal upper
+                             bounds; temporal coverage assumptions remain
+                             unverified
 
 ddrps/
   score_ddrps.py             DDRPS 2.0 = w·(Qd, Dd, Hd, Md, Vd) under three
@@ -36,7 +37,8 @@ ddrps/
 
 allocation/
   optimize_prepositioning.py budget-constrained stock allocation strategies
-                             (uniform / risk / DDRPS / conformal / LP oracle)
+                             (uniform / risk / DDRPS / conformal DDRPS /
+                             training-scenario LP reference, not an oracle)
   evaluate_on_events.py      replay held-out historical events: unmet demand,
                              precision@5, recall@5
 
@@ -89,7 +91,22 @@ The outcome-validation experiment needs district-level flood events:
 Without events, the extreme-rain model + DDRPS still run; the allocation
 replay and outcome validation need at least one source.
 
-## What was fixed relative to the old pipeline
+## Evidence status and limitations
+
+The newer IMD-grid workflow requires a complete data-backed run and audit
+before paper claims are made. The legacy monthly workflow is not district-
+resolved: it repeats two mapped subdivision rainfall series across districts,
+and its full-period climatology uses future test years. The saved legacy scores
+are exploratory only. See `paper/PAPER_REVIEW.md` for the validity issues and
+submission blockers.
+
+Allocation policies must be derived from pre-test inputs; the LP output is a
+training-scenario reference, not a true oracle. Conformal coverage assumes
+exchangeability, which is not established for dependent daily time series. Do
+not describe nominal coverage as a guaranteed operational result without a
+suitable temporal method and held-out evaluation.
+
+## Design changes relative to the old pipeline
 
 | Old (legacy/)                              | RADAR |
 |--------------------------------------------|-------|
@@ -98,6 +115,7 @@ replay and outcome validation need at least one source.
 | Z-scores over the FULL 1901-2015 record (test leakage) | fixed 1901-1990 baseline climatology, ±7-day DOY window |
 | monthly target, `fillna(0)` target bug | district-day labels; flood events from ground truth |
 | hardcoded hospital beds / shelter constant | beds read from india_states.csv, deficits from Census-2011 |
+<<<<<<< Updated upstream
 | "SHAP" weight tables, synthetic features | no synthetic data anywhere; calibration + conformal bounds |
 | PySpark only for a synthetic benchmark | Spark MLlib training + ETL + streaming + real scale benchmarks |
 
@@ -107,3 +125,7 @@ replay and outcome validation need at least one source.
 - **Legacy pipeline (`bigdata/legacy/`)**: Artifact-backed and used by the papers. Results under `bigdata/legacy/results/` are verified (AUC/PR-AUC, rank stability, ablations, static deficits). ICDSG 2026 uses only these verified artifacts.
 - **RADAR modules**: All modules above are implemented in this repository (data acquisition, ETL, training, conformal calibration, DDRPS 2.0, allocation/LP, streaming scaffolding, serving, benchmarks). However, **no end-to-end RADAR run has been executed in this environment**; artifacts under `bigdata/research/results/` are limited to those produced by the legacy pipeline (e.g., `ablation_results.csv`, `ahp_weights.json`, `district_static_deficits.csv`). 
 - **Data requirements**: Full RADAR execution requires raw datasets (`datasets/raw/` with IMD gridded parquet, `flood_events.csv`, `oni_monthly.csv`, `district_grid_map.csv`), plus a working Spark/HDFS stack (or local Spark) as indicated by `run_pipeline.sh`. Claims of "validated on historical flood events" and large-scale benchmarks require those artifacts.
+=======
+| "SHAP" weight tables, synthetic features | intended data-backed ETL and calibration; results remain to be verified |
+| PySpark only for a synthetic benchmark | Spark MLlib training + ETL + streaming design; no multi-node scale claim without measured cluster runs |
+>>>>>>> Stashed changes
