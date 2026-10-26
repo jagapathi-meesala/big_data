@@ -1,0 +1,16 @@
+% Proposed RADAR inputs; do not treat as verified experimental coverage.
+\begin{table}[htbp]
+\caption{Proposed Study Inputs and Verification Status}
+\label{tab:datasets}
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Layer / Source} & \textbf{Provider / Origin} & \textbf{Period} & \textbf{Status / Unit} \\ \hline
+Daily rainfall & IMD 0.25$^\circ$ gridded product & Intended 1901--2024 & Download and spatial mapping not verified \\ \hline
+Census vulnerability & Census of India & 2011 & Repository CSV; legacy districts require audited mapping \\ \hline
+Hospital capacity & Facilities CSV and state bed totals & Static & Proxy estimates; district bed counts are not observed \\ \hline
+District boundaries & Repository district registry / optional GADM & Vintage-dependent & Mapping and areal-weight validation required \\ \hline
+Flood events & India Flood Inventory / EM-DAT & Source-dependent & Required for event labels/replay; no result bundle checked in \\ \hline
+ENSO covariate & NOAA ONI & Intended monthly series & Acquisition and join coverage must be verified \\ \hline
+\end{tabular}
+\end{table}
